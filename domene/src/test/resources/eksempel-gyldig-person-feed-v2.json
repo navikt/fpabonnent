@@ -1,0 +1,193 @@
+{
+  "title": "PersonFeed_v2",
+  "items": [
+    {
+      "type": "DOEDSMELDINGANNULLERT",
+      "sequence": 10,
+      "content": {
+        "identer": [
+          {
+            "ident": "1234565432123",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "12345567889",
+            "type": "NorskIdent"
+          }
+        ]
+      },
+      "metadata": {
+        "guid": "baf1818c-7afd-455f-8770-7e083272ee81",
+        "createdDate": "2018-09-14T14:41:37.936"
+      }
+    },
+    {
+      "type": "DOEDSMELDINGOPPRETTET",
+      "sequence": 12,
+      "content": {
+        "identer": [
+          {
+            "ident": "1357911131723",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "11235813211",
+            "type": "NorskIdent"
+          }
+        ],
+        "doedsdato": "2018-09-13"
+      },
+      "metadata": {
+        "guid": "f68c0e11-a460-4903-81f4-2fd59ae8870e",
+        "createdDate": "2018-09-14T15:15:36.481"
+      }
+    },
+    {
+      "type": "DOEDSMELDINGOPPRETTET",
+      "sequence": 13,
+      "content": {
+        "identer": [
+          {
+            "ident": "1234565432123",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "12345567889",
+            "type": "NorskIdent"
+          }
+        ],
+        "doedsdato": "2018-09-14"
+      },
+      "metadata": {
+        "guid": "4437c18a-2cef-496e-a2f4-a0385efa82f0",
+        "createdDate": "2018-09-14T15:15:36.981"
+      }
+    },
+    {
+      "type": "DOEDFOEDSELOPPRETTET",
+      "sequence": 14,
+      "content": {
+        "identer": [
+          {
+            "ident": "1235813213455",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "32113853211",
+            "type": "NorskIdent"
+          }
+        ],
+        "doedfoedselsdato": "2018-09-13"
+      },
+      "metadata": {
+        "guid": "c131160b-18f5-4dd8-9c1f-212d36d1c035",
+        "createdDate": "2018-09-14T22:20:02.934"
+      }
+    },
+    {
+      "type": "DOEDSMELDINGOPPRETTET",
+      "sequence": 15,
+      "content": {
+        "identer": [
+          {
+            "ident": "1155334466777",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "43210123456",
+            "type": "NorskIdent"
+          }
+        ],
+        "doedsdato": "2018-09-14"
+      },
+      "metadata": {
+        "guid": "9959b856-bbc5-452d-87d1-88845c601be0",
+        "createdDate": "2018-09-14T22:20:03.56"
+      }
+    },
+    {
+      "type": "STATSBORGERSKAPENDRET",
+      "sequence": 16,
+      "content": {
+        "identer": [
+          {
+            "ident": "10065842233",
+            "type": "NorskIdent"
+          },
+          {
+            "ident": "1112223332223",
+            "type": "AktoerId"
+          }
+        ],
+        "land": "BRA",
+        "dato": "2015-04-04"
+      },
+      "metadata": {
+        "guid": "6fd2e6d0-ae9f-46f0-bdd9-a863d829b482",
+        "createdDate": "2018-10-12T12:35:45.685"
+      }
+    },
+    {
+      "type": "DOEDSMELDINGOPPRETTET",
+      "sequence": 23,
+      "content": {
+        "identer": [
+          {
+            "ident": "7890123456789",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "17161514131",
+            "type": "NorskIdent"
+          }
+        ],
+        "doedsdato": "2018-10-01"
+      },
+      "metadata": {
+        "guid": "b465ccf1-4b89-4d54-8fd2-1cb5e4cf30b4",
+        "createdDate": "2018-10-12T12:51:11.404"
+      }
+    },
+    {
+      "type": "FOEDSELSMELDINGOPPRETTET",
+      "sequence": 41,
+      "content": {
+        "personIdenterBarn": [
+          {
+            "ident": "1678902101234",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "27282921222",
+            "type": "NorskIdent"
+          }
+        ],
+        "personIdenterMor": [
+          {
+            "ident": "1572671828321",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "24023022021",
+            "type": "NorskIdent"
+          }
+        ],
+        "personIdenterFar": [
+          {
+            "ident": "1929394959697",
+            "type": "AktoerId"
+          },
+          {
+            "ident": "16128906979",
+            "type": "NorskIdent"
+          }
+        ],
+        "foedselsdato": "2018-08-27"
+      },
+      "metadata": {
+        "guid": "a8a4db7e-aed9-43f3-80c6-f683d775ecf0",
+        "createdDate": "2018-10-15T12:43:55.345"
+      }
+    }
+  ]
+}

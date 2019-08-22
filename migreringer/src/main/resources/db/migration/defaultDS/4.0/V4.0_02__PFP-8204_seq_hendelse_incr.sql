@@ -1,0 +1,1 @@
+alter sequence SEQ_INNGAAENDE_HENDELSE increment by 50;

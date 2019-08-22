@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+      http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+                 version="2.1">
+
+    <sequence-generator name="SEQ_INNGAAENDE_HENDELSE" allocation-size="50" sequence-name="SEQ_INNGAAENDE_HENDELSE"/>
+    <sequence-generator name="SEQ_KODELISTE_NAVN_I18N" allocation-size="50" sequence-name="SEQ_KODELISTE_NAVN_I18N"/>
+
+    <entity class="no.nav.foreldrepenger.abonnent.kodeverk.Kodeverk"/>
+    <entity class="no.nav.foreldrepenger.abonnent.kodeverk.Kodeliste"/>
+    <entity class="no.nav.foreldrepenger.abonnent.kodeverk.KodelisteNavnI18N"/>
+    <entity class="no.nav.foreldrepenger.abonnent.feed.domain.InputFeed"/>
+    <entity class="no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse"/>
+    <entity class="no.nav.foreldrepenger.abonnent.feed.domain.HendelseLock"/>
+    <entity class="no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType"/>
+    <entity class="no.nav.foreldrepenger.abonnent.felles.HendelseType"/>
+    <entity class="no.nav.foreldrepenger.abonnent.felles.FeedKode"/>
+
+</entity-mappings>

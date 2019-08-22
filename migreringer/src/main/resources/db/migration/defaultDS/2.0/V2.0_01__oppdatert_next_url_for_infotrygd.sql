@@ -1,0 +1,1 @@
+UPDATE INPUT_FEED SET NEXT_URL = REPLACE(next_url,'fra', 'sistLesteSekvensId') WHERE KODE = 'JF_INFOTRYGD';

@@ -1,0 +1,79 @@
+
+== abonnent.feed.domain.HendelseRepositoryFeil
+
+[options="header", cols="5h,5,5,20,15,15,20,15"]
+|===
+|Feilkode|Level|Type|Feilmelding|Løsningsforslag|Parametre|Cause|Java-metode
+|FP-164339|WARN|TekniskFeil|Fant mer enn en InngåendeHendelse med feedKode=%s, sekvensnummer=%s og håndtertStatus=%s.||arg0: String, arg1: Long, arg2: HåndtertStatusType||fantMerEnnEnHendelse
+|FP-264339|WARN|TekniskFeil|Fant ikke InngåendeHendelse med feedKode=%s, sekvensnummer=%s og håndtertStatus=%s.||arg0: String, arg1: Long, arg2: HåndtertStatusType||fantIkkeHendelse
+|===
+
+
+== abonnent.feed.grovsortering.GrovsorteringFeil
+
+[options="header", cols="5h,5,5,20,15,15,20,15"]
+|===
+|Feilkode|Level|Type|Feilmelding|Løsningsforslag|Parametre|Cause|Java-metode
+|FP-462049|ERROR|TekniskFeil|Noe gikk galt når hendelser skulle sendes til grovsortering|||Exception|kanIkkeSjekkeEtterHendelserTilGrovsortering
+|FP-962343|ERROR|TekniskFeil|Noe gikk galt ved utføring av grovsortering i transaksjon|||Exception|kanIkkeUtføreGrovsorteringITransaksjon
+|FP-137303|ERROR|TekniskFeil|Uventet feil ved grovsortering|||Exception|uventetFeilVedGrovsortering
+|===
+
+
+== abonnent.feed.poller.FeedPollerFeil
+
+[options="header", cols="5h,5,5,20,15,15,20,15"]
+|===
+|Feilkode|Level|Type|Feilmelding|Løsningsforslag|Parametre|Cause|Java-metode
+|FP-602051|ERROR|TekniskFeil|Kan ikke utlede nextUrl|||Exception|kanIkkeUtledeNextUrl
+|===
+
+
+== abonnent.felles.AbonnentHendelserFeil
+
+[options="header", cols="5h,5,5,20,15,15,20,15"]
+|===
+|Feilkode|Level|Type|Feilmelding|Løsningsforslag|Parametre|Cause|Java-metode
+|FP-309345|ERROR|TekniskFeil|Ukjent meldingstype - kan ikke finne hendelsestjeneste. type=%s, sekvensnummer=%s||arg0: String, arg1: long||ukjentMeldingtypeKanIkkeFinneHendelseTjeneste
+|FP-690327|WARN|TekniskFeil|Prosessering av preconditions for %s mangler %s. TaskId: %s||arg0: String, arg1: String, arg2: Long||prosesstaskPreconditionManglerProperty
+|FP-125639|ERROR|TekniskFeil|Mer enn en hendelsestjeneste funnet. type=%s, sekvensnummer=%s||arg0: String, arg1: long||merEnnEnHendelseTjenesteFunnet
+|FP-730005|ERROR|TekniskFeil|Kan ikke konvertere feed-content. type=%s, sekvensnummer=%s||arg0: String, arg1: long||kanIkkeKonvertereFeedContent
+|FP-195374|WARN|TekniskFeil|Finner ingen aktørId på sekvensnummer=%s||arg0: long||finnerIngenAktørId
+|FP-846675|WARN|TekniskFeil|Ukjent Hendelse Type <%s>||arg0: String||ukjentHendelseType
+|FP-295374|INFO|TekniskFeil|Finner ikke unik aktørId. Fant %s aktørId på sekvensnummer=%s||arg0: int, arg1: long||merEnnEnAktørId
+|===
+
+
+== abonnent.web.app.exceptions.FeltValideringFeil
+
+[options="header", cols="5h,5,5,20,15,15,20,15"]
+|===
+|Feilkode|Level|Type|Feilmelding|Løsningsforslag|Parametre|Cause|Java-metode
+|FP-328673|WARN|FunksjonellFeil|Det oppstod en valideringsfeil på felt %s. Vennligst kontroller at alle feltverdier er korrekte.|Kontroller at alle feltverdier er korrekte|arg0: List||feltverdiKanIkkeValideres
+|===
+
+
+== abonnent.web.app.selftest.SelftestFeil
+
+[options="header", cols="5h,5,5,20,15,15,20,15"]
+|===
+|Feilkode|Level|Type|Feilmelding|Løsningsforslag|Parametre|Cause|Java-metode
+|FP-635121|ERROR|TekniskFeil|Klarte ikke å lese build time properties fil|||IOException|klarteIkkeÅLeseBuildTimePropertiesFil
+|984256|WARN|TekniskFeil|Selftest ERROR: %s. Endpoint: %s. Responstid: %s. Feilmelding: %s.||arg0: String, arg1: String, arg2: String, arg3: String||ikkeKritiskSelftestFeilet
+|FP-409676|ERROR|TekniskFeil|Uventet feil|||IOException|uventetSelftestFeil
+|FP-287026|WARN|TekniskFeil|Dupliserte selftest navn %s||arg0: String||dupliserteSelftestNavn
+|FP-932415|ERROR|TekniskFeil|Selftest ERROR: %s. Endpoint: %s. Responstid: %s. Feilmelding: %s.||arg0: String, arg1: String, arg2: String, arg3: String||kritiskSelftestFeilet
+|===
+
+
+== abonnent.web.app.startupinfo.OppstartFeil
+
+[options="header", cols="5h,5,5,20,15,15,20,15"]
+|===
+|Feilkode|Level|Type|Feilmelding|Løsningsforslag|Parametre|Cause|Java-metode
+|FP-753407|ERROR|TekniskFeil|Uventet exception ved oppstart|||Exception|uventetExceptionVedOppstart
+|FP-753409|INFO|TekniskFeil|Selftest %s: %s. Endpoint: %s. Responstid: %s. Feilmelding: %s.||arg0: String, arg1: String, arg2: String, arg3: String, arg4: String||selftestStatus
+|===
+
+
+
