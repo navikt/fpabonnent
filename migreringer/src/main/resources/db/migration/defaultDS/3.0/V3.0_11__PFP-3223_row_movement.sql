@@ -1,1 +1,0 @@
-alter table INNGAAENDE_HENDELSE enable row movement;
