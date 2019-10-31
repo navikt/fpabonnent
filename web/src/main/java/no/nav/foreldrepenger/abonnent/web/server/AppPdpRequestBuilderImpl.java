@@ -16,7 +16,7 @@ import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 @ApplicationScoped
 @Alternative
 @Priority(2)
-public class PdpRequestBuilderImpl implements PdpRequestBuilder {
+public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
 
     private static final String ABAC_DOMAIN = "foreldrepenger";
 

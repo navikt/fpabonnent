@@ -13,7 +13,7 @@ import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlRequestBuilder;
 @Dependent
 @Alternative
 @Priority(2)
-public class XacmlRequestBuilderTjenesteImpl implements XacmlRequestBuilderTjeneste {
+public class AppXacmlRequestBuilderTjenesteImpl implements XacmlRequestBuilderTjeneste {
 
     @Override
     public XacmlRequestBuilder lagXacmlRequestBuilder(PdpRequest pdpRequest) {
