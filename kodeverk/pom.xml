@@ -56,13 +56,6 @@
             <artifactId>felles-testutilities</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <!--- bibliotek som brukes for å finne alle instanser av interface med deklarerte feil -->
-            <groupId>io.github.lukehutch</groupId>
-            <artifactId>fast-classpath-scanner</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
