@@ -56,6 +56,14 @@
             <artifactId>felles-testutilities</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <!--- bibliotek som brukes for å finne alle instanser av interface med deklarerte feil -->
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.47</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
