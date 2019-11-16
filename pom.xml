@@ -56,7 +56,7 @@
         <apache.ws.xmlschema.version>2.2.2</apache.ws.xmlschema.version>
         <joda-time.version>2.9.9</joda-time.version>
         <ow2.asm.version>7.1</ow2.asm.version>
-        <owaspencoder.version>1.2.1</owaspencoder.version>
+        <owaspencoder.version>1.2.2</owaspencoder.version>
         <sysdoc.version>1.0.8</sysdoc.version>
         <javaslang.version>2.0.6</javaslang.version>
         <swagger.spec-parser.version>1.0.28</swagger.spec-parser.version>
