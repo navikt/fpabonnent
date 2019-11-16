@@ -46,7 +46,7 @@
         <ojdbc.version>12.2.0.1</ojdbc.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
-        <logstash.version>4.10</logstash.version>
+        <logstash.version>6.2</logstash.version>
         <metrics.version>3.2.5</metrics.version>
         <resteasy-validator-provider.version>3.9.0.Final</resteasy-validator-provider.version>
         <weld-web.version>3.1.2.Final</weld-web.version>
