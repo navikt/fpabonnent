@@ -50,7 +50,7 @@
         <metrics.version>4.1.1</metrics.version>
         <resteasy-validator-provider.version>3.9.0.Final</resteasy-validator-provider.version>
         <weld-web.version>3.1.2.Final</weld-web.version>
-        <javax.el.version>3.0.1-b09</javax.el.version>
+        <javax.el.version>3.0.1-b11</javax.el.version>
 
         <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
         <apache.ws.xmlschema.version>2.2.2</apache.ws.xmlschema.version>
