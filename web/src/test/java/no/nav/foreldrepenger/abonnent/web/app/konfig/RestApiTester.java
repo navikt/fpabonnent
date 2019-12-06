@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 
-import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 
 public class RestApiTester {
 
-    static final List<Class<?>> UNNTATT = Collections.singletonList(ApiListingResource.class);
+    static final List<Class<?>> UNNTATT = Collections.singletonList(OpenApiResource.class);
 
     static Collection<Method> finnAlleRestMetoder() {
         List<Method> liste = new ArrayList<>();
@@ -30,8 +30,6 @@ public class RestApiTester {
     }
 
     static Collection<Class<?>> finnAlleRestTjenester() {
-
-
         List<Class<?>> klasser = new ArrayList<>();
 
         klasser.addAll(finnAlleRestTjenester(new ApplicationConfig()));
