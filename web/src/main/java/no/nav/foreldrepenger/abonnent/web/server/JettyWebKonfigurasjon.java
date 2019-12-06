@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.abonnent.web.server;
 
 public class JettyWebKonfigurasjon implements AppKonfigurasjon {
     private static final String CONTEXT_PATH = "/fpabonnent";
-    private static final String SWAGGER_HASH = "sha256-8Fr7yrb1MAIq0Bpf64966oCbVy9fJVy812FwQ00KfZA=";
+    private static final String SWAGGER_HASH = "sha256-TBHa3mQ+eLe+9GVre2fzMnkgL3XDebLh/ZHfNtEfyhc=";
 
     private Integer serverPort;
 

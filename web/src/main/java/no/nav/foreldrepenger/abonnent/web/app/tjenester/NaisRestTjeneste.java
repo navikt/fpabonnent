@@ -9,10 +9,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.SelftestService;
 
-@Api(tags = {"nais"})
 @Path("/")
 @Produces(TEXT_PLAIN)
 @RequestScoped
@@ -37,6 +36,7 @@ public class NaisRestTjeneste {
 
     @GET
     @Path("isAlive")
+    @Operation(description = "sjekker om poden lever", tags = "nais", hidden = true)
     public Response isAlive() {
         return Response
                 .ok(RESPONSE_OK)
@@ -46,6 +46,7 @@ public class NaisRestTjeneste {
 
     @GET
     @Path("isReady")
+    @Operation(description = "sjekker om poden er klar", tags = "nais", hidden = true)
     public Response isReady() {
         if (selftestService.kritiskTjenesteFeilet()) {
             return Response.status(Response.Status.SERVICE_UNAVAILABLE)
@@ -60,6 +61,7 @@ public class NaisRestTjeneste {
 
     @GET
     @Path("preStop")
+    @Operation(description = "kalles på før stopp", tags = "nais", hidden = true)
     public Response preStop() {
         starterService.stopServices();
         return Response.ok(RESPONSE_OK).build();
