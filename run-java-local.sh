@@ -14,7 +14,7 @@ export LOGBACK_CONFIG=${LOGBACK_CONFIG:-}
 
 export APP_CONFDIR="web/server/src/main/resources/jetty/"
 
-export SERVER_PORT="8060"
+export SERVER_PORT="8065"
 
 ## export app.properties til environment
 PROP_FILE="web/server/app.properties"
@@ -37,7 +37,7 @@ fi
 export NAV_TRUSTSTORE_PASSWORD="changeit"
 
 ## Overstyr port for lokal kjøring
-export SERVER_PORT=8060
+export SERVER_PORT=8065
 
 ## Sett opp samme struktur som i Dockerfile
 DIR="conf"
