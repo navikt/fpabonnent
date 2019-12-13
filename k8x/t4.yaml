@@ -50,6 +50,9 @@ spec:
   webproxy: false # Optional. Expose web proxy configuration to the application using the HTTP_PROXY, HTTPS_PROXY and NO_PROXY environment variables.
   vault:
     enabled: true
+    paths:
+        - mountPath: /secrets/oracle
+          kvPath: oracle/data/dev/creds/fpabonnent_t4-user
   sidecar: true # refresh token
   env:
     - name: APP_NAME
