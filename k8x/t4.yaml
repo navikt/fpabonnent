@@ -53,10 +53,10 @@ spec:
     paths:
         - mountPath: /config/oracle
           kvPath: oracle/data/dev/config/fpabonnent_t4
-        - mountPath: /secrets/serviceuser/fpabonnent
-          kvPath: serviceuser/data/test/srvfpabonnent
         - mountPath: /secrets/oracle
           kvPath: oracle/data/dev/creds/fpabonnent_t4-user
+        - mountPath: /secrets/serviceuser/fpabonnent
+          kvPath: serviceuser/data/test/srvfpabonnent
         - mountPath: /var/run/secrets/nais.io/vault
           kvPath: /kv/preprod/fss/fpabonnent/t4
   sidecar: true # refresh token
