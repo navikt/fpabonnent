@@ -57,6 +57,8 @@ spec:
           kvPath: serviceuser/data/test/srvfpabonnent
         - mountPath: /secrets/oracle
           kvPath: oracle/data/dev/creds/fpabonnent_t4-user
+        - mountPath: /var/run/secrets/nais.io/vault
+          kvPath: /kv/preprod/fss/fpabonnent/t4
   sidecar: true # refresh token
   env:
     - name: APP_NAME
