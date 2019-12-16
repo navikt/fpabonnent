@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+export DEFAULTDS_URL=$(cat /config/oracle/jdbc_url)
 export DEFAULTDS_USERNAME=$(cat /secrets/oracle/username)
 export DEFAULTDS_PASSWORD=$(cat /secrets/oracle/password)
 export SYSTEMBRUKER_USERNAME=$(cat /secrets/serviceuser/fpabonnent/username)
