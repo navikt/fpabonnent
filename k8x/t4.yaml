@@ -54,7 +54,7 @@ spec:
         - mountPath: /config/oracle
           kvPath: oracle/data/dev/config/fpabonnent_t4
         - mountPath: /secrets/serviceuser/fpabonnent
-          kvPath: serviceuser/data/dev/srvfpabonnent
+          kvPath: serviceuser/data/test/srvfpabonnent
         - mountPath: /secrets/oracle
           kvPath: oracle/data/dev/creds/fpabonnent_t4-user
   sidecar: true # refresh token
