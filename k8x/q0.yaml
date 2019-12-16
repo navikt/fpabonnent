@@ -72,19 +72,19 @@ spec:
     - name: ABAC_PDP_ENDPOINT_URL
       value: https://wasapp-q0.adeo.no/asm-pdp/authorize
     - name: SECURITYTOKENSERVICE_URL
-      value: https://sts-q0.test.local/SecurityTokenServiceProvider/
+      value: https://sts-q0.preprod.local/SecurityTokenServiceProvider/
     #Systembruker konfigurasjoner hentes fra vault.
     #OIDC
     - name: OIDC_STS_JWKS_URL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/jwks
     - name: OIDC_OPENAM_JWKSURL
-      value: https://isso-t.adeo.no:443/isso/oauth2/connect/jwk_uri
+      value: https://isso-q.adeo.no:443/isso/oauth2/connect/jwk_uri
     - name: OIDC_OPENAM_ISSUERURL
       value: https://isso-q.adeo.no:443/isso/oauth2
     - name: OIDC_OPENAM_AGENTNAME
       value: fpabonnent-q0
     - name: OIDC_OPENAM_HOSTURL
-      value: https://isso-t.adeo.no:443/isso/oauth2
+      value: https://isso-q.adeo.no:443/isso/oauth2
     - name: OIDC_STS_ISSUER_URL
       value: https://security-token-service.nais.preprod.local
     #Database konfigurasjoner hentes fra vault.
