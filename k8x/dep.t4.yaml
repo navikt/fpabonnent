@@ -2,11 +2,11 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: fpabonnent
-  namespace: NAMESPACE_VAL
+  namespace: t4
   labels:
     team: teamforeldrepenger
 spec:
-  image: repo.adeo.no:5443/fpabonnent:RELEASE_VERSION # Required. Docker image.
+  image: repo.adeo.no:5443/fpabonnent:4.0_20191216170937_b45c5e2 # Required. Docker image.
   port: 8080 # Required. The port number which is exposed by the container and should receive HTTP traffic.
   team: teamforeldrepenger
   liveness: # HTTP endpoint that signals 200 OK when the application is running.
@@ -44,7 +44,7 @@ spec:
       cpu: "600m"
       memory: "1024Mi"
   ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
-    - "ingress_url" #"https://fpabonnent-t4.nais.preprod.local/"
+    - "https://fpabonnent-t4.nais.preprod.local/" #"https://fpabonnent-t4.nais.preprod.local/"
   logformat: accesslog # Optional. The format of the logs from the container if the logs should be handled differently than plain text or json
   logtransform: dns_loglevel # Optional. The transformation of the logs, if they should be handled differently than plain text or json
   webproxy: false # Optional. Expose web proxy configuration to the application using the HTTP_PROXY, HTTPS_PROXY and NO_PROXY environment variables.
@@ -52,48 +52,48 @@ spec:
     enabled: true
     paths:
         - mountPath: /config/oracle
-          kvPath: oracle.config.kv
+          kvPath: oracle/data/dev/config/fpabonnent_t4
         - mountPath: /secrets/oracle
-          kvPath:  oracle.secret.kv
+          kvPath:  oracle/data/dev/creds/fpabonnent_t4-user
         - mountPath: /secrets/serviceuser/fpabonnent
-          kvPath: serviceuser.kv
+          kvPath: serviceuser/data/test/srvfpabonnent
         - mountPath: /var/run/secrets/nais.io/vault
-          kvPath: app.secret.kv
+          kvPath: /kv/preprod/fss/fpabonnent/t4
   sidecar: true # refresh token
   env:
     - name: APP_NAME
       value: fpabonnent
     - name: APP_VERSION
-      value: "RELEASE_VERSION"
+      value: "4.0_20191216170937_b45c5e2"
     - name: APP_TEAM
       value: teamforeldrepenger
     - name: LOADBALANCER_FQDN
-      value: loadbalancer.url
+      value: fpabonnent-t4.nais.preprod.local
     - name: ABAC_PDP_ENDPOINT_URL
-      value: abac_pdp_endpoint.url
+      value: https://wasapp-t4.adeo.no/asm-pdp/authorize
     - name: SECURITYTOKENSERVICE_URL
-      value: securitytokenservice.url
+      value: https://sts-t4.test.local/SecurityTokenServiceProvider/
       #Systembruker konfigurasjoner hentes fra vault.
     #OIDC
     - name: OIDC_OPENAM_JWKSURL
-      value: oidc_openam.jwksurl
+      value: https://isso-t.adeo.no:443/isso/oauth2/connect/jwk_uri
     - name: OIDC_OPENAM_ISSUERURL
-      value: oidc_openam.issuerurl
+      value: https://isso-t.adeo.no:443/isso/oauth2
     - name: OIDC_OPENAM_AGENTNAME
-      value: oidc_openam_agentname
+      value: fpabonnent-t4
     - name: OIDC_OPENAM_HOSTURL
-      value: oidc_openam.hosturl
+      value: https://isso-t.adeo.no:443/isso/oauth2
     - name: OIDC_STS_ISSUER_URL
-      value: oidc_sts_issuer.url
+      value: https://security-token-service-t4.nais.preprod.local
     - name: OIDC_STS_JWKS_URL
-      value: oidc_sts_jwks.url
+      value: https://security-token-service-t4.nais.preprod.local/rest/v1/sts/jwks
     #Database konfigurasjoner hentes fra vault.
     # Eksterne systemer
     - name: FPSAKHENDELSER_V1_URL
-      value: fpsakhendelser_v1.url
+      value: https://fpsak-t4.nais.preprod.local/fpsak/api/hendelser/
     - name: PERSON_FEED_V2_URL
-      value: person_feed_v2.url
+      value: dummy.url
     - name: INFOTRYGD_HENDELSER_API_URL
-      value: infotrygd_hendelser_api.url
+      value: https://infotrygd-hendelser-api-t4.nais.preprod.local/infotrygd/hendelser
     - name: BUCKET_URL
-      value: bucket.url
+      value: http://s3.nais-rook
