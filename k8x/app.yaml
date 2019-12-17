@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: fpabonnent
-  namespace: q1
+  namespace: namespace
   labels:
     team: teamforeldrepenger
 spec:
@@ -44,7 +44,7 @@ spec:
       cpu: "600m"
       memory: "1024Mi"
   ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
-    - "https://fpabonnent-q1.nais.preprod.local/"
+    - "ingresses" #"https://fpabonnent-t4.nais.preprod.local/"
   logformat: accesslog # Optional. The format of the logs from the container if the logs should be handled differently than plain text or json
   logtransform: dns_loglevel # Optional. The transformation of the logs, if they should be handled differently than plain text or json
   webproxy: false # Optional. Expose web proxy configuration to the application using the HTTP_PROXY, HTTPS_PROXY and NO_PROXY environment variables.
@@ -52,13 +52,13 @@ spec:
     enabled: true
     paths:
         - mountPath: /config/oracle
-          kvPath: oracle/data/dev/config/fpabonnent_q1
+          kvPath: oracle.config.kv
         - mountPath: /secrets/oracle
-          kvPath: oracle/data/dev/creds/fpabonnent_q1-fpabonnent_q1
+          kvPath:  oracle.secret.kv
         - mountPath: /secrets/serviceuser/fpabonnent
-          kvPath: serviceuser/data/dev/srvfpabonnent
+          kvPath: serviceuser.kv
         - mountPath: /var/run/secrets/nais.io/vault
-          kvPath: /kv/preprod/fss/fpabonnent/q1
+          kvPath: app.secret.kv
   sidecar: true # refresh token
   env:
     - name: APP_NAME
@@ -68,34 +68,32 @@ spec:
     - name: APP_TEAM
       value: teamforeldrepenger
     - name: LOADBALANCER_FQDN
-      value: fpabonnent-q1.nais.preprod.local
+      value: loadbalancer.url
     - name: ABAC_PDP_ENDPOINT_URL
-      value: https://wasapp-q1.adeo.no/asm-pdp/authorize
+      value: abac_pdp_endpoint.url
     - name: SECURITYTOKENSERVICE_URL
-      value: https://sts-q1.preprod.local/SecurityTokenServiceProvider/
-    #Systembruker konfigurasjoner hentes fra vault.
+      value: securitytokenservice.url
+      #Systembruker konfigurasjoner hentes fra vault.
     #OIDC
-    - name: OIDC_STS_JWKS_URL
-      value: https://security-token-service.nais.preprod.local/rest/v1/sts/jwks
     - name: OIDC_OPENAM_JWKSURL
-      value: https://isso-q.adeo.no:443/isso/oauth2/connect/jwk_uri
+      value: oidc_openam.jwksurl
     - name: OIDC_OPENAM_ISSUERURL
-      value: https://isso-q.adeo.no:443/isso/oauth2
+      value: oidc_openam.issuerurl
     - name: OIDC_OPENAM_AGENTNAME
-      value: fpabonnent-q1
+      value: oidc_openam_agentname
     - name: OIDC_OPENAM_HOSTURL
-      value: https://isso-q.adeo.no:443/isso/oauth2
+      value: oidc_openam.hosturl
     - name: OIDC_STS_ISSUER_URL
-      value: https://security-token-service.nais.preprod.local
+      value: oidc_sts_issuer.url
+    - name: OIDC_STS_JWKS_URL
+      value: oidc_sts_jwks.url
     #Database konfigurasjoner hentes fra vault.
     # Eksterne systemer
     - name: FPSAKHENDELSER_V1_URL
-      value: https://fpsak-q1.nais.preprod.local/fpsak/api/hendelser/
+      value: fpsakhendelser_v1.url
     - name: PERSON_FEED_V2_URL
-      value: https://person-feed-q1.nais.preprod.local/api/v2/personfeed/
+      value: person_feed_v2.url
     - name: INFOTRYGD_HENDELSER_API_URL
-      value: https://infotrygd-hendelser-api-q1.nais.preprod.local/infotrygd/hendelser
-    - name: AWS_ACCESS_KEY_ID
-      value: 0V6PSUSIGURX2DJWDGNV
+      value: infotrygd_hendelser_api.url
     - name: BUCKET_URL
-      value: http://s3.nais-rook
+      value: bucket.url
