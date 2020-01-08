@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseMapper;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.tps.DødHendelseDto;
 

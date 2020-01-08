@@ -7,6 +7,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 
 @ApplicationScoped
 public class HendelseTjenesteProvider {

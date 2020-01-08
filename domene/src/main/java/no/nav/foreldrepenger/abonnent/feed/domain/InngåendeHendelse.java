@@ -3,21 +3,18 @@ package no.nav.foreldrepenger.abonnent.feed.domain;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
-
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.foreldrepenger.abonnent.felles.BaseEntitet;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 
 @Entity(name = "InngåendeHendelse")
 @Table(name = "INNGAAENDE_HENDELSE")
@@ -34,14 +31,12 @@ public class InngåendeHendelse extends BaseEntitet {
     @Column(name = "kobling_id")
     private Long koblingId;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "feed_kode", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + FeedKode.DISCRIMINATOR + "'"))
+    @Convert(converter = FeedKode.KodeverdiConverter.class)
+    @Column(name="feed_kode", nullable = false)
     private FeedKode feedKode;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + HendelseType.DISCRIMINATOR + "'"))
+    @Convert(converter = HendelseType.KodeverdiConverter.class)
+    @Column(name="type", nullable = false)
     private HendelseType type;
 
     @Lob
@@ -54,9 +49,8 @@ public class InngåendeHendelse extends BaseEntitet {
     @Column(name = "haandteres_etter")
     private LocalDateTime håndteresEtterTidspunkt;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "haandtert_status", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + HåndtertStatusType.DISCRIMINATOR + "'"))
+    @Convert(converter = HåndtertStatusType.KodeverdiConverter.class)
+    @Column(name="haandtert_status", nullable = false)
     private HåndtertStatusType håndtertStatus = HåndtertStatusType.MOTTATT;
 
     @Column(name = "sendt_tid")

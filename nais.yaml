@@ -7,18 +7,18 @@ replicas:
 port: 8080
 healthcheck:
   liveness:
-    path: /fpabonnent/internal/isAlive
+    path: /fpabonnent/internal/health/isAlive
     initialDelay: 30
     timeout: 5
     periodSeconds: 10
     failureThreshold: 27
   readiness:
-    path: /fpabonnent/internal/isReady
+    path: /fpabonnent/internal/health/isReady
     initialDelay: 30
     timeout: 5
     periodSeconds: 10
     failureThreshold: 27
-preStopHookPath: /fpabonnent/internal/preStop
+preStopHookPath: /fpabonnent/internal/health/preStop
 resources:
   limits:
     cpu: 1000m

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.felles.NamedThreadFactory;
+import no.nav.foreldrepenger.abonnent.konfig.KonfigVerdier;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 import no.nav.vedtak.konfig.KonfigVerdi;
@@ -42,7 +43,7 @@ public class GrovsorteringManager implements AppServiceHandler {
     @Inject
     public GrovsorteringManager(GrovsorteringVurderer grovsorteringVurderer,
                                 @VLPersistenceUnit EntityManager entityManager,
-                                @KonfigVerdi(SORTERING_INTERVALL_SEKUNDER_KEY) Integer intervallSekunder) {
+                                @KonfigVerdi(value = SORTERING_INTERVALL_SEKUNDER_KEY, defaultVerdi = KonfigVerdier.SORTERING_INTERVALL_SEKUNDER_DEFAULT) Integer intervallSekunder) {
         this.grovsorteringVurderer = grovsorteringVurderer;
         this.entityManager = entityManager;
         this.intervallSekunder = intervallSekunder;

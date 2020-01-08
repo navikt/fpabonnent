@@ -11,8 +11,9 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
 import no.nav.foreldrepenger.abonnent.feed.poller.HendelseTestDataUtil;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 
 public class HendelseRepositoryTest {
 

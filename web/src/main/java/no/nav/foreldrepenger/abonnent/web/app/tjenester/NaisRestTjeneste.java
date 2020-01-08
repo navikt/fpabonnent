@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.SelftestService;
 
-@Path("/")
+@Path("/health")
 @Produces(TEXT_PLAIN)
 @RequestScoped
 public class NaisRestTjeneste {

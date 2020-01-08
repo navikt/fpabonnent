@@ -23,15 +23,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import com.codahale.metrics.MetricRegistry;
-
 import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
 import no.nav.foreldrepenger.abonnent.feed.domain.DødHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.DødfødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
 import no.nav.foreldrepenger.abonnent.feed.tps.DødfødselOpprettetHendelseTjeneste;
@@ -40,8 +37,9 @@ import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseT
 import no.nav.foreldrepenger.abonnent.feed.tps.TpsFeedPoller;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.tjenester.person.feed.common.v1.Feed;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
@@ -64,7 +62,6 @@ public class TpsFeedPollerOgInngåendeHendelseTest {
     private TpsFeedPoller poller;
     @Mock
     private InputFeed inputFeed;
-    private MetricRegistry metricRegistry;
 
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
@@ -78,8 +75,7 @@ public class TpsFeedPollerOgInngåendeHendelseTest {
         when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.DØDSMELDINGOPPRETTET), anyLong())).thenReturn(dødHendelseTjeneste);
         when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.DØDFØDSELOPPRETTET), anyLong())).thenReturn(dødfødselHendelseTjeneste);
 
-        metricRegistry = new MetricRegistry();
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, metricRegistry, "5", true);
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", true);
         inngåendeHendelseTjeneste = new InngåendeHendelseTjenesteImpl(hendelseRepository, hendelseTjenesteProvider);
         Mockito.clearInvocations(oidcRestClient);
     }

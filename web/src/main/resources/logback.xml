@@ -24,7 +24,6 @@
 				<exclude>org\.jboss\.resteasy\.core\.ResourceMethodInvoker</exclude>
 				<exclude>org\.jboss\.resteasy\.core\.SynchronousDispatcher</exclude>
 				<exclude>org\.jboss\.resteasy\.core\.interception\.PreMatchContainerRequestContext</exclude>
-				<exclude>io\.astefanutti\.metrics\.cdi\.TimedInterceptor</exclude>
 				<rootCauseFirst>false</rootCauseFirst>
 			</throwableConverter>
 		</encoder>

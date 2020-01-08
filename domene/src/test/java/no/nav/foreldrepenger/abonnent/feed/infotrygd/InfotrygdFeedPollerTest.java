@@ -24,14 +24,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import com.codahale.metrics.MetricRegistry;
-
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.FeedDto;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.FeedElement;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.InfotrygdAnnullert;
@@ -53,15 +51,13 @@ public class InfotrygdFeedPollerTest {
     private InfotrygdFeedPoller poller;
     @Mock
     private InputFeed inputFeed;
-    private MetricRegistry metricRegistry;
 
     private URI startUri = URI.create(BASE_URL_FEED + "?sistLesteSekvensId=0&maxAntall=5");
     private URI endpoint = URI.create(BASE_URL_FEED);
 
     @Before
     public void setUp() {
-        metricRegistry = new MetricRegistry();
-        poller = new InfotrygdFeedPoller(endpoint, hendelseRepository, oidcRestClient, metricRegistry, "5", true, 60);
+        poller = new InfotrygdFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", true, 60);
         Mockito.clearInvocations(oidcRestClient);
     }
 
@@ -111,19 +107,6 @@ public class InfotrygdFeedPollerTest {
     }
 
     @Test
-    public void skal_sende_2_lest_og_1_ukjent_til_metrics() {
-        // Arrange
-        when(oidcRestClient.get(startUri, FeedDto.class)).thenReturn(lagTestData(false));
-
-        // Act
-        poller.poll(inputFeed);
-
-        // Assert
-        assertThat(metricRegistry.meter(InfotrygdFeedPoller.METRIC_INFOTRYGD_MELDING_LEST).getCount()).isEqualTo(2);
-        assertThat(metricRegistry.meter(InfotrygdFeedPoller.METRIC_INFOTRYGD_MELDING_IGNORERT).getCount()).isEqualTo(1);
-    }
-
-    @Test
     public void skal_ignorere_ukjent_items() {
         // Arrange
         FeedDto feedUtenAbonnerteItems = new FeedDto.Builder()
@@ -138,7 +121,6 @@ public class InfotrygdFeedPollerTest {
 
         // Assert
         verify(hendelseRepository, times(0)).lagreInngåendeHendelse(any());
-        assertThat(metricRegistry.meter(InfotrygdFeedPoller.METRIC_INFOTRYGD_MELDING_LEST).getCount()).isEqualTo(0);
     }
 
     @Test
@@ -161,7 +143,7 @@ public class InfotrygdFeedPollerTest {
     @Test
     public void skal_ikke_polle_feed_når_deaktivert() {
         // Arrange
-        poller = new InfotrygdFeedPoller(endpoint, hendelseRepository, oidcRestClient, metricRegistry, "5", false, 60);
+        poller = new InfotrygdFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", false, 60);
 
         // Act
         poller.poll(inputFeed);
@@ -170,7 +152,6 @@ public class InfotrygdFeedPollerTest {
         verifyZeroInteractions(hendelseRepository);
         verifyZeroInteractions(oidcRestClient);
         verifyZeroInteractions(inputFeed);
-        assertThat(metricRegistry.meter(InfotrygdFeedPoller.METRIC_INFOTRYGD_MELDING_LEST).getCount()).isEqualTo(0);
     }
 
     private FeedDto lagTestData(boolean inkluderEndretHendelse) {

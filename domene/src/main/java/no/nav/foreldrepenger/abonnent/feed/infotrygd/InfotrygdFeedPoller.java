@@ -16,18 +16,16 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.annotation.Timed;
-
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
 import no.nav.foreldrepenger.abonnent.feed.poller.FeedPoller;
 import no.nav.foreldrepenger.abonnent.feed.poller.FeedPollerFeil;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
+import no.nav.foreldrepenger.abonnent.konfig.KonfigVerdier;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.FeedDto;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.FeedElement;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.Meldingstype;
@@ -44,9 +42,6 @@ public class InfotrygdFeedPoller implements FeedPoller {
     private static final String PAGE_SIZE_PARAM = "maxAntall";
     private static final String SEQUENCE_ID_PARAM = "sistLesteSekvensId";
 
-    public static final String METRIC_INFOTRYGD_MELDING_LEST = "infotrygd.melding.lest";
-    public static final String METRIC_INFOTRYGD_MELDING_IGNORERT = "infotrygd.melding.ignorert";
-
     private static final Logger log = LoggerFactory.getLogger(InfotrygdFeedPoller.class);
 
     private static final String DEAKTIVERT_LOG = "Infotrygd polling er deaktivert";
@@ -62,20 +57,17 @@ public class InfotrygdFeedPoller implements FeedPoller {
 
     private HendelseRepository hendelseRepository;
     private OidcRestClient oidcRestClient;
-    private MetricRegistry metricRegistry;
 
     @Inject
     public InfotrygdFeedPoller(@KonfigVerdi(ENDPOINT_KEY) URI endpoint,
                                HendelseRepository hendelseRepository,
                                OidcRestClient oidcRestClient,
-                               MetricRegistry metricRegistry,
-                               @KonfigVerdi(PAGE_SIZE_VALUE_KEY) String pageSize,
-                               @KonfigVerdi(POLLING_AKTIVERT_KEY) boolean pollingErAktivert,
-                               @KonfigVerdi(FORSINKELSE_MINUTTER_KEY) Integer forsinkelseMinutter) {
+                               @KonfigVerdi(value = PAGE_SIZE_VALUE_KEY, defaultVerdi = KonfigVerdier.PAGE_SIZE_VALUE_DEFAULT) String pageSize,
+                               @KonfigVerdi(value = POLLING_AKTIVERT_KEY, defaultVerdi = KonfigVerdier.INFOTRYGDFEED_POLLING_AKTIVERT_DEFAULT) boolean pollingErAktivert,
+                               @KonfigVerdi(value = FORSINKELSE_MINUTTER_KEY, defaultVerdi = KonfigVerdier.INFOTRYGD_HENDELSER_FORSINKELSE_MINUTTER_DEFAULT) Integer forsinkelseMinutter) {
         this.endpoint = endpoint;
         this.hendelseRepository = hendelseRepository;
         this.oidcRestClient = oidcRestClient;
-        this.metricRegistry = metricRegistry;
         this.pageSize = pageSize;
         this.pollingErAktivert = pollingErAktivert;
         this.forsinkelseMinutter = forsinkelseMinutter;
@@ -89,7 +81,6 @@ public class InfotrygdFeedPoller implements FeedPoller {
         return FeedKode.INFOTRYGD;
     }
 
-    @Timed
     @Override
     public void poll(InputFeed inputFeed) {
         if (!pollingErAktivert) {
@@ -118,10 +109,8 @@ public class InfotrygdFeedPoller implements FeedPoller {
                 if (AKSEPTERTE_MELDINGSTYPER.contains(feedElement.getType())) {
                     log.info("lagrer Infotrygdhendelse: {}, {}", feedElement.getSekvensId(), feedElement.getType());
                     lagreInngåendeInfotrygdMelding(feedElement, pollId);
-                    metricRegistry.meter(METRIC_INFOTRYGD_MELDING_LEST).mark();
                 } else {
                     log.info("Ignorerer Infotrygdhendelse med sekvensId {} og type {}", feedElement.getSekvensId(), feedElement.getType());
-                    metricRegistry.meter(METRIC_INFOTRYGD_MELDING_IGNORERT).mark();
                 }
                 lastSequenceId = Optional.of(feedElement.getSekvensId());
             }
@@ -161,7 +150,7 @@ public class InfotrygdFeedPoller implements FeedPoller {
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
                 .sekvensnummer(feedElement.getSekvensId())
                 .koblingId(feedElement.getKoblingId())
-                .type(new HendelseType(feedElement.getType()))
+                .type(HendelseType.fraKodeDefaultUdefinert(feedElement.getType()))
                 .payload(JsonMapper.toJson(feedElement))
                 .feedKode(FeedKode.INFOTRYGD)
                 .requestUuid(pollId)

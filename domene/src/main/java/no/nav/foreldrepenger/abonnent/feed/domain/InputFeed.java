@@ -9,8 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.foreldrepenger.abonnent.felles.BaseEntitet;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.vedtak.util.FPDateUtil;
 
 @Entity(name = "InputFeed")
@@ -61,7 +61,7 @@ public class InputFeed extends BaseEntitet {
     }
 
     public FeedKode getKode() {
-        return new FeedKode(kode);
+        return FeedKode.fraKode(kode);
     }
 
     public Optional<LocalDateTime> getSistLest() {

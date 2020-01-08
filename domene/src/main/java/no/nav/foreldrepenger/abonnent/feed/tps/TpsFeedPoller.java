@@ -16,18 +16,16 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.annotation.Timed;
-
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
 import no.nav.foreldrepenger.abonnent.feed.poller.FeedPoller;
 import no.nav.foreldrepenger.abonnent.feed.poller.FeedPollerFeil;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
+import no.nav.foreldrepenger.abonnent.konfig.KonfigVerdier;
 import no.nav.tjenester.person.feed.common.v1.Feed;
 import no.nav.tjenester.person.feed.common.v1.FeedEntry;
 import no.nav.tjenester.person.feed.v2.Meldingstype;
@@ -44,9 +42,6 @@ public class TpsFeedPoller implements FeedPoller {
     private static final String PAGE_SIZE_PARAM = "pageSize";
     private static final String SEQUENCE_ID_PARAM = "sequenceId";
 
-    public static final String METRIC_TPS_MELDING_LEST = "tps.melding.lest";
-    public static final String METRIC_TPS_MELDING_IGNORERT = "tps.melding.ignorert";
-
     private static final String DEAKTIVERT_LOG = "TPS polling er deaktivert";
 
     private static Set<String> AKSEPTERTE_MELDINGSTYPER = Stream.of(Meldingstype.FOEDSELSMELDINGOPPRETTET,
@@ -59,19 +54,16 @@ public class TpsFeedPoller implements FeedPoller {
     private String pageSize;
     private boolean pollingErAktivert;
 
-    private MetricRegistry metricRegistry;
 
     @Inject
     public TpsFeedPoller(@KonfigVerdi(ENDPOINT_KEY) URI endpoint,
             HendelseRepository hendelseRepository,
             OidcRestClient oidcRestClient,
-            MetricRegistry metricRegistry,
-            @KonfigVerdi(PAGE_SIZE_VALUE_KEY) String pageSize,
-            @KonfigVerdi(POLLING_AKTIVERT_KEY) boolean pollingErAktivert) {
+            @KonfigVerdi(value = PAGE_SIZE_VALUE_KEY, defaultVerdi = KonfigVerdier.PAGE_SIZE_VALUE_DEFAULT) String pageSize,
+            @KonfigVerdi(value = POLLING_AKTIVERT_KEY, defaultVerdi = KonfigVerdier.PERSONFEED_POLLING_AKTIVERT_DEFAULT) boolean pollingErAktivert) {
         this.endpoint = endpoint;
         this.hendelseRepository = hendelseRepository;
         this.oidcRestClient = oidcRestClient;
-        this.metricRegistry = metricRegistry;
         this.pageSize = pageSize;
         this.pollingErAktivert = pollingErAktivert;
         if (!pollingErAktivert) {
@@ -84,7 +76,6 @@ public class TpsFeedPoller implements FeedPoller {
         return FeedKode.TPS;
     }
 
-    @Timed
     @Override
     public void poll(InputFeed inputFeed) {
         if (!pollingErAktivert) {
@@ -108,9 +99,6 @@ public class TpsFeedPoller implements FeedPoller {
             for (FeedEntry entry : personFeed.getItems()) {
                 if (AKSEPTERTE_MELDINGSTYPER.contains(entry.getType())) {
                     lagreInngåendeHendelse(entry, pollId);
-                    metricRegistry.meter(METRIC_TPS_MELDING_LEST).mark();
-                } else {
-                    metricRegistry.meter(METRIC_TPS_MELDING_IGNORERT).mark();
                 }
                 lastSequenceId = Optional.of(entry.getSequence());
             }
@@ -146,7 +134,7 @@ public class TpsFeedPoller implements FeedPoller {
     private void lagreInngåendeHendelse(FeedEntry entry, String pollId) {
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
                 .sekvensnummer(entry.getSequence())
-                .type(new HendelseType(entry.getType()))
+                .type(HendelseType.fraKodeDefaultUdefinert(entry.getType()))
                 .payload(JsonMapper.toJson(entry))
                 .feedKode(FeedKode.TPS)
                 .requestUuid(pollId)

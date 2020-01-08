@@ -18,9 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.RequestContextHandler;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.vedtak.felles.jpa.TransactionHandler;
 
 public class HendelseRepositoryLockTest {

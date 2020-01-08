@@ -16,12 +16,6 @@
     </context-param>
     
     <!-- Listeners her slik at vi kan styre rekkefølgen de kjøres i: -->
-    <listener>
-        <listener-class>no.nav.foreldrepenger.abonnent.web.app.selftest.HealthCheckServletContextListener</listener-class>
-    </listener>
-     <listener>
-        <listener-class>no.nav.foreldrepenger.abonnent.web.app.metrics.MetricsServletContextListener</listener-class>
-    </listener>
      <listener>
         <listener-class>no.nav.foreldrepenger.abonnent.web.app.startupinfo.AppStartupServletContextListener</listener-class>
     </listener>
@@ -32,15 +26,7 @@
         <listener-class>no.nav.foreldrepenger.abonnent.web.app.tjenester.ApplicationContextListener</listener-class>
     </listener>
 
-    <servlet>
-        <servlet-name>metrics</servlet-name>
-        <servlet-class>no.nav.foreldrepenger.abonnent.web.app.metrics.AppMetricsServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>metrics</servlet-name>
-        <url-pattern>internal/metrics</url-pattern>
-    </servlet-mapping>
-    
+
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Ubeskyttet</web-resource-name>

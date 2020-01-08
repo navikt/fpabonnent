@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.abonnent.feed.domain;
 
 import java.util.Set;
 
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
 
 public abstract class HendelsePayload {

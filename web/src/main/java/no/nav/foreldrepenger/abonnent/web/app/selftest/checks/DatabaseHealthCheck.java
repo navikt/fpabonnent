@@ -18,7 +18,7 @@ public class DatabaseHealthCheck extends ExtHealthCheck {
 
     private String jndiName;
 
-    private static final String SQL_QUERY = "select count(1) from KODEVERK";
+    private static final String SQL_QUERY = "select sysdate from DUAL";
     // må være rask, og bruke et stabilt tabell-navn
 
     private String endpoint = null; // ukjent frem til første gangs test

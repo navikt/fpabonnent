@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 
 public class FeedPollerRepositoryImplTest {
 

@@ -53,8 +53,8 @@ public class SelftestService {
     }
 
     public Response doSelftest(String contentType, Boolean writeJsonAsHtml) {
-        SelftestResultat samletResultat = kjørSelftestTjeneste.kjørSelftester(selftests);
-
+        //SelftestResultat samletResultat = kjørSelftestTjeneste.kjørSelftester(selftests);
+        SelftestResultat samletResultat = selftests.run();
         loggSelftestResultat(samletResultat);
 
         Response.ResponseBuilder builder = Response.ok()

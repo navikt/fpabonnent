@@ -19,17 +19,15 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
-import com.codahale.metrics.MetricRegistry;
-
 import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.InfotrygdHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.infotrygd.InfotrygdHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseConsumer;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.tjenester.InngåendeHendelseTjeneste;
 import no.nav.tjenester.person.feed.v2.Meldingstype;
 import no.nav.vedtak.exception.TekniskException;
@@ -47,7 +45,6 @@ public class SendHendelseTaskTest {
     private HendelseConsumer mockHendelseConsumer;
     private ProsessTaskData prosessTaskData;
     private SendHendelseTask sendHendelseTask;
-    private MetricRegistry metricRegistry;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
     @Before
@@ -59,9 +56,8 @@ public class SendHendelseTaskTest {
         when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.ENDRET), anyLong())).thenReturn(infotrygdHendelseTjeneste);
 
         mockHendelseConsumer = mock(HendelseConsumer.class);
-        metricRegistry = new MetricRegistry();
         inngåendeHendelseTjeneste = mock(InngåendeHendelseTjeneste.class);
-        sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, metricRegistry, inngåendeHendelseTjeneste, hendelseTjenesteProvider);
+        sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste, hendelseTjenesteProvider);
 
         prosessTaskData = new ProsessTaskData(SendHendelseTask.TASKNAME);
         prosessTaskData.setSekvens("1");
@@ -97,7 +93,6 @@ public class SendHendelseTaskTest {
             assertThat(payload.getAktørIdFar().get()).contains("3");
             assertThat(payload.getFødselsdato()).isPresent().hasValue(FØDSELSDATO);
         }
-        assertThat(metricRegistry.meter(SendHendelseTask.TASKNAME).getCount()).isEqualTo(1);
     }
 
     @Test
@@ -155,7 +150,6 @@ public class SendHendelseTaskTest {
             assertThat(payload.getType()).isEqualTo(ENDRINGS_HENDELSE_TYPE);
             assertThat(payload.getAktoerId()).isEqualTo("1");
         }
-        assertThat(metricRegistry.meter(SendHendelseTask.TASKNAME).getCount()).isEqualTo(1);
     }
 
     @Test

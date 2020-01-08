@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 
 public interface InngåendeHendelseTjeneste {
 
