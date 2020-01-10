@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
@@ -40,6 +41,6 @@ public class HendelseTjenesteProviderTest {
         expectedException.expectMessage("FP-309345");
 
         // Act
-        hendelseTjenesteProvider.finnTjeneste(new HendelseType("ukjent_type"), 1L);
+        hendelseTjenesteProvider.finnTjeneste(HendelseType.fraKode("-"), 1L);
     }
 }

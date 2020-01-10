@@ -10,7 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped

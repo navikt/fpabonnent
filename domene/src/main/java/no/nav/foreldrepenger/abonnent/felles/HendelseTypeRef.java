@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+
 /**
  * Marker type som brukes for å finne hendelsespesifikke CDI-tjenester.
  */

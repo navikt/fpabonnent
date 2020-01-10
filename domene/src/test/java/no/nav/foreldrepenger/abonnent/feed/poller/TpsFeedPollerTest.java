@@ -22,8 +22,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import com.codahale.metrics.MetricRegistry;
-
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
 import no.nav.foreldrepenger.abonnent.feed.tps.TpsFeedPoller;
@@ -48,15 +46,13 @@ public class TpsFeedPollerTest {
     private TpsFeedPoller poller;
     @Mock
     private InputFeed inputFeed;
-    private MetricRegistry metricRegistry;
 
     private URI startUri = URI.create(BASE_URL_FEED + "?sequenceId=1&pageSize=5");
     private URI endpoint = URI.create(BASE_URL_FEED);
 
     @Before
     public void setUp() {
-        metricRegistry = new MetricRegistry();
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, metricRegistry, "5", true);
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", true);
         Mockito.clearInvocations(oidcRestClient);
     }
 
@@ -84,21 +80,12 @@ public class TpsFeedPollerTest {
         verify(oidcRestClient).get(startUri, Feed.class);
     }
 
-    @Test
-    public void skal_sende_2_lest_og_1_ukjent_til_metrics() {
-        when(oidcRestClient.get(startUri, Feed.class)).thenReturn(lagTestData());
-        poller.poll(inputFeed);
-
-        assertThat(metricRegistry.meter(TpsFeedPoller.METRIC_TPS_MELDING_LEST).getCount()).isEqualTo(2);
-        assertThat(metricRegistry.meter(TpsFeedPoller.METRIC_TPS_MELDING_IGNORERT).getCount()).isEqualTo(1);
-    }
 
     @Test
     public void skal_kjøre_ok_uten_items_i_feed() {
         when(oidcRestClient.get(startUri, Feed.class)).thenReturn(Feed.builder().build());
         poller.poll(inputFeed);
         verify(hendelseRepository, times(0)).lagreInngåendeHendelse(any());
-        assertThat(metricRegistry.meter(TpsFeedPoller.METRIC_TPS_MELDING_LEST).getCount()).isEqualTo(0);
     }
 
     @Test
@@ -112,7 +99,6 @@ public class TpsFeedPollerTest {
         
         poller.poll(inputFeed);
         verify(hendelseRepository, times(0)).lagreInngåendeHendelse(any());
-        assertThat(metricRegistry.meter(TpsFeedPoller.METRIC_TPS_MELDING_LEST).getCount()).isEqualTo(0);
     }
 
     @Test
@@ -125,7 +111,7 @@ public class TpsFeedPollerTest {
     @Test
     public void skal_ikke_polle_feed_når_deaktivert() {
         // Arrange
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, metricRegistry, "5", false);
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", false);
 
         // Act
         poller.poll(inputFeed);
@@ -134,7 +120,6 @@ public class TpsFeedPollerTest {
         verifyZeroInteractions(hendelseRepository);
         verifyZeroInteractions(oidcRestClient);
         verifyZeroInteractions(inputFeed);
-        assertThat(metricRegistry.meter(TpsFeedPoller.METRIC_TPS_MELDING_LEST).getCount()).isEqualTo(0);
     }
 
     @Test

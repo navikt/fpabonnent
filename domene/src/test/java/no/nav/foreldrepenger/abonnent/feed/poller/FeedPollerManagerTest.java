@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 
 import ch.qos.logback.classic.Level;
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.modig.core.test.LogSniffer;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 

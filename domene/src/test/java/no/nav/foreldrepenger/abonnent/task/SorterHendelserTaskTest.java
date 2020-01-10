@@ -26,19 +26,17 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 
-import com.codahale.metrics.MetricRegistry;
-
 import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.feed.poller.HendelseTestDataUtil;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseConsumer;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.tjenester.InngåendeHendelseTjeneste;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.FeedElement;
 import no.nav.tjenester.person.feed.common.v1.FeedEntry;
@@ -69,7 +67,6 @@ public class SorterHendelserTaskTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     private HendelseRepository hendelseRepository = new HendelseRepository(repoRule.getEntityManager());
-    private MetricRegistry metricRegistry = new MetricRegistry();
     private SorterHendelserTask sorterHendelserTask;
     private ProsessTaskData prosessTaskData;
 
@@ -87,7 +84,7 @@ public class SorterHendelserTaskTest {
         mockHendelseConsumer = mock(HendelseConsumer.class);
         mockProsessTaskRepository = mock(ProsessTaskRepository.class);
 
-        sorterHendelserTask = new SorterHendelserTask(mockProsessTaskRepository, inngåendeHendelseTjeneste, mockHendelseConsumer, metricRegistry, hendelseTjenesteProvider);
+        sorterHendelserTask = new SorterHendelserTask(mockProsessTaskRepository, inngåendeHendelseTjeneste, mockHendelseConsumer, hendelseTjenesteProvider);
 
         prosessTaskData = new ProsessTaskData(PROSESSTASK_STEG);
         prosessTaskData.setSekvens("1");
@@ -131,7 +128,6 @@ public class SorterHendelserTaskTest {
 
         // Assert
         verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
-        assertThat(metricRegistry.meter(SorterHendelserTask.METRIC_FRA_TIL_NAME).getCount()).isEqualTo(0);
         List<InngåendeHendelse> inngåendeHendelser = finnHendelserMedRequestUUID(REQ_UUID);
         assertThat(inngåendeHendelser.stream().map(InngåendeHendelse::getHåndtertStatus)).containsOnly(HåndtertStatusType.HÅNDTERT);
     }
@@ -163,7 +159,6 @@ public class SorterHendelserTaskTest {
         assertThat(data.getAktørIdFar()).isPresent();
         assertThat(data.getAktørIdFar().get()).contains("1312345678909");
         assertThat(data.getFødselsdato()).isPresent().hasValue(FØDSELSDATO.toString());
-        assertThat(metricRegistry.meter(SorterHendelserTask.METRIC_FRA_TIL_NAME).getCount()).isEqualTo(1);
     }
 
     @Test
@@ -187,7 +182,6 @@ public class SorterHendelserTaskTest {
         verify(mockProsessTaskRepository, times(2)).lagre(argumentCaptor.capture());
         List<ProsessTaskData> sendt = argumentCaptor.getAllValues();
         assertThat(sendt).hasSize(2);
-        assertThat(metricRegistry.meter(SorterHendelserTask.METRIC_FRA_TIL_NAME).getCount()).isEqualTo(2);
     }
 
     @Test
@@ -212,7 +206,6 @@ public class SorterHendelserTaskTest {
         verify(mockProsessTaskRepository, times(2)).lagre(argumentCaptor.capture());
         List<ProsessTaskData> sendt = argumentCaptor.getAllValues();
         assertThat(sendt).hasSize(2);
-        assertThat(metricRegistry.meter(SorterHendelserTask.METRIC_FRA_TIL_NAME).getCount()).isEqualTo(2);
     }
 
     @Test
@@ -239,7 +232,6 @@ public class SorterHendelserTaskTest {
         ProsessTaskData sendt = argumentCaptor.getValue();
         assertThat(sendt).isNotNull();
         assertThat(sendt.getTaskType()).isEqualTo(SendHendelseTask.TASKNAME);
-        assertThat(metricRegistry.meter(SorterHendelserTask.METRIC_FRA_TIL_NAME).getCount()).isEqualTo(1);
 
         List<InngåendeHendelse> inngåendeHendelser = repoRule.getEntityManager().createQuery("from InngåendeHendelse", InngåendeHendelse.class).getResultList();
         assertThat(inngåendeHendelser).hasSize(1);
@@ -299,7 +291,6 @@ public class SorterHendelserTaskTest {
         assertThat(new HendelserDataWrapper(sendt.get(0)).getHendelseSekvensnummer().get()).isEqualTo(3L);
         assertThat(new HendelserDataWrapper(sendt.get(1)).getHendelseSekvensnummer().get()).isEqualTo(4L);
         assertThat(new HendelserDataWrapper(sendt.get(2)).getHendelseSekvensnummer().get()).isEqualTo(5L);
-        assertThat(metricRegistry.meter(SorterHendelserTask.METRIC_FRA_TIL_NAME).getCount()).isEqualTo(3);
     }
 
     private HendelserDataWrapper lagDefaultDataWrapper() {

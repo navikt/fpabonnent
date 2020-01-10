@@ -9,7 +9,6 @@
         <non-jta-data-source>jdbc/defaultDS</non-jta-data-source>
 
         <mapping-file>META-INF/hendelser-orm.xml</mapping-file>
-        <mapping-file>META-INF/konfigverdi-orm.xml</mapping-file>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle12cDialect"/>

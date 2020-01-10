@@ -9,12 +9,12 @@ import java.util.Objects;
 import java.util.Set;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InfotrygdHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.FeedElement;
 import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.InfotrygdEndret;
 import no.nav.tjenester.person.feed.common.v1.FeedEntry;

@@ -11,15 +11,6 @@
     <name>fpabonnent :: Domene</name>
 
     <dependencies>
-        <!-- Reaktor -->
-        <dependency>
-            <groupId>no.nav.foreldrepenger.abonnent</groupId>
-            <artifactId>kodeverk</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.abonnent</groupId>
-            <artifactId>konfig</artifactId>
-        </dependency>
 
         <!-- Foreldrepengeprosjektet -->
         <dependency>
@@ -87,26 +78,8 @@
             <groupId>org.glassfish</groupId>
             <artifactId>javax.el</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-annotation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.astefanutti.metrics.cdi</groupId>
-            <artifactId>metrics-cdi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-        </dependency>
 
         <!-- Test avhengigheter -->
-        <dependency>
-            <groupId>no.nav.foreldrepenger.abonnent</groupId>
-            <artifactId>kodeverk</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.abonnent</groupId>
             <artifactId>migreringer</artifactId>

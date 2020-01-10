@@ -12,10 +12,10 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.FeedKode;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 
 @ApplicationScoped
 public class InngåendeHendelseTjenesteImpl implements InngåendeHendelseTjeneste {

@@ -14,18 +14,15 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.annotation.Timed;
-
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.feed.domain.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
-import no.nav.foreldrepenger.abonnent.felles.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseConsumer;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.tjenester.InngåendeHendelseTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -37,30 +34,25 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 public class SorterHendelserTask implements ProsessTaskHandler {
 
     public static final String TASKNAME = "hendelser.grovsorter";
-    public static final String METRIC_FRA_TIL_NAME = "abonnent.task.fra." + TASKNAME + ".til." + SendHendelseTask.TASKNAME;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SorterHendelserTask.class);
 
     private ProsessTaskRepository prosessTaskRepository;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
     private HendelseConsumer hendelseConsumer;
-    private MetricRegistry metricRegistry;
     private HendelseTjenesteProvider hendelseTjenesteProvider;
 
     @Inject
     public SorterHendelserTask(ProsessTaskRepository prosessTaskRepository,
                                InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
                                HendelseConsumer hendelseConsumer,
-                               MetricRegistry metricRegistry,
                                HendelseTjenesteProvider hendelseTjenesteProvider) {
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.prosessTaskRepository = prosessTaskRepository;
         this.hendelseConsumer = hendelseConsumer;
-        this.metricRegistry = metricRegistry;
         this.hendelseTjenesteProvider = hendelseTjenesteProvider;
     }
 
-    @Timed
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
@@ -80,7 +72,7 @@ public class SorterHendelserTask implements ProsessTaskHandler {
         if (!relevanteHendelser.isEmpty()) {
             for (HendelsePayload payload : relevanteHendelser) {
                 HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(
-                        new HendelseType(payload.getType()), payload.getSekvensnummer());
+                        HendelseType.fraKodeDefaultUdefinert(payload.getType()), payload.getSekvensnummer());
 
                 if (payload.erAtomisk() || hendelseTjeneste.ikkeAtomiskHendelseSkalSendes(payload)) {
                     HendelserDataWrapper nesteSteg = dataWrapper.nesteSteg(SendHendelseTask.TASKNAME);
@@ -89,7 +81,6 @@ public class SorterHendelserTask implements ProsessTaskHandler {
                     hendelseTjeneste.populerDatawrapper(payload, nesteSteg);
 
                     prosessTaskRepository.lagre(nesteSteg.getProsessTaskData());
-                    metricRegistry.meter(METRIC_FRA_TIL_NAME).mark();
                     inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelserMap.get(payload.getSekvensnummer()), HåndtertStatusType.GROVSORTERT);
                 } else {
                     inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelserMap.get(payload.getSekvensnummer()), HåndtertStatusType.HÅNDTERT);

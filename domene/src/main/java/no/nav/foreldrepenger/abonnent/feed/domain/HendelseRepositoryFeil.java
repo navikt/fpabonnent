@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.abonnent.feed.domain;
 
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
