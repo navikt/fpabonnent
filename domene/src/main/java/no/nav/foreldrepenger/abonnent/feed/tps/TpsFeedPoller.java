@@ -38,11 +38,13 @@ public class TpsFeedPoller implements FeedPoller {
 
     private static final String ENDPOINT_KEY = "person.feed.v2.url";
     private static final String POLLING_AKTIVERT_KEY = "personfeed.polling.aktivert";
+    private static final String POLLING_AKTIVERT_VALUE = "aktiv";
     private static final String PAGE_SIZE_VALUE_KEY = "feed.pagesize.value";
     private static final String PAGE_SIZE_PARAM = "pageSize";
     private static final String SEQUENCE_ID_PARAM = "sequenceId";
 
     private static final String DEAKTIVERT_LOG = "TPS polling er deaktivert";
+    private static final String AKTIVERT_LOG = "TPS polling er aktivert";
 
     private static Set<String> AKSEPTERTE_MELDINGSTYPER = Stream.of(Meldingstype.FOEDSELSMELDINGOPPRETTET,
             Meldingstype.DOEDSMELDINGOPPRETTET, Meldingstype.DOEDFOEDSELOPPRETTET)
@@ -60,14 +62,15 @@ public class TpsFeedPoller implements FeedPoller {
             HendelseRepository hendelseRepository,
             OidcRestClient oidcRestClient,
             @KonfigVerdi(value = PAGE_SIZE_VALUE_KEY, defaultVerdi = KonfigVerdier.PAGE_SIZE_VALUE_DEFAULT) String pageSize,
-            @KonfigVerdi(value = POLLING_AKTIVERT_KEY, converter = KonfigVerdi.BooleanConverter.class,
-                    defaultVerdi = KonfigVerdier.PERSONFEED_POLLING_AKTIVERT_DEFAULT) Boolean pollingErAktivert) {
+            @KonfigVerdi(value = POLLING_AKTIVERT_KEY, defaultVerdi = KonfigVerdier.PERSONFEED_POLLING_AKTIVERT_DEFAULT) String pollingErAktivert) {
         this.endpoint = endpoint;
         this.hendelseRepository = hendelseRepository;
         this.oidcRestClient = oidcRestClient;
         this.pageSize = pageSize;
-        this.pollingErAktivert = pollingErAktivert;
-        if (!pollingErAktivert) {
+        this.pollingErAktivert = POLLING_AKTIVERT_VALUE.equalsIgnoreCase(pollingErAktivert);
+        if (this.pollingErAktivert) {
+            log.info(AKTIVERT_LOG);
+        } else {
             log.info(DEAKTIVERT_LOG);
         }
     }
