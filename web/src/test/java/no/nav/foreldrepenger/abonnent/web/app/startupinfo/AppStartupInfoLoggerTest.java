@@ -48,7 +48,7 @@ public class AppStartupInfoLoggerTest {
         when(mockSelftests.run()).thenReturn(samletResultat);
         ContainerLogin mockContainerLogin = Mockito.mock(ContainerLogin.class);
 
-        logger = new AppStartupInfoLogger(mockSelftests, mockContainerLogin);
+        logger = new AppStartupInfoLogger(mockSelftests);
     }
 
     @Test
