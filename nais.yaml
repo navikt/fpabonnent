@@ -41,7 +41,7 @@ fasitResources:
       password: SYSTEMBRUKER_PASSWORD
   - alias: fpsakhendelser_v1
     resourceType: restservice
-  - alias: person-feed-v2
+  - alias: person.feed.v2
     resourceType: restservice
   - alias: infotrygd.hendelser.api
     resourceType: restservice
