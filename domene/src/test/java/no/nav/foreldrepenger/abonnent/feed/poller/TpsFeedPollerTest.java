@@ -52,7 +52,7 @@ public class TpsFeedPollerTest {
 
     @Before
     public void setUp() {
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", true);
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv");
         Mockito.clearInvocations(oidcRestClient);
     }
 
@@ -111,7 +111,7 @@ public class TpsFeedPollerTest {
     @Test
     public void skal_ikke_polle_feed_når_deaktivert() {
         // Arrange
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", false);
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "false");
 
         // Act
         poller.poll(inputFeed);

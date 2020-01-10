@@ -57,7 +57,7 @@ public class InfotrygdFeedPollerTest {
 
     @Before
     public void setUp() {
-        poller = new InfotrygdFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", true, 60);
+        poller = new InfotrygdFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv", 60);
         Mockito.clearInvocations(oidcRestClient);
     }
 
@@ -143,7 +143,7 @@ public class InfotrygdFeedPollerTest {
     @Test
     public void skal_ikke_polle_feed_når_deaktivert() {
         // Arrange
-        poller = new InfotrygdFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", false, 60);
+        poller = new InfotrygdFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "false", 60);
 
         // Act
         poller.poll(inputFeed);
