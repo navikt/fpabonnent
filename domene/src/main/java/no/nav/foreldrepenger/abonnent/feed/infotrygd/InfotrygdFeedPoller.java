@@ -63,7 +63,8 @@ public class InfotrygdFeedPoller implements FeedPoller {
                                HendelseRepository hendelseRepository,
                                OidcRestClient oidcRestClient,
                                @KonfigVerdi(value = PAGE_SIZE_VALUE_KEY, defaultVerdi = KonfigVerdier.PAGE_SIZE_VALUE_DEFAULT) String pageSize,
-                               @KonfigVerdi(value = POLLING_AKTIVERT_KEY, defaultVerdi = KonfigVerdier.INFOTRYGDFEED_POLLING_AKTIVERT_DEFAULT) boolean pollingErAktivert,
+                               @KonfigVerdi(value = POLLING_AKTIVERT_KEY, converter = KonfigVerdi.BooleanConverter.class,
+                                       defaultVerdi = KonfigVerdier.INFOTRYGDFEED_POLLING_AKTIVERT_DEFAULT) Boolean pollingErAktivert,
                                @KonfigVerdi(value = FORSINKELSE_MINUTTER_KEY, defaultVerdi = KonfigVerdier.INFOTRYGD_HENDELSER_FORSINKELSE_MINUTTER_DEFAULT) Integer forsinkelseMinutter) {
         this.endpoint = endpoint;
         this.hendelseRepository = hendelseRepository;

@@ -60,7 +60,8 @@ public class TpsFeedPoller implements FeedPoller {
             HendelseRepository hendelseRepository,
             OidcRestClient oidcRestClient,
             @KonfigVerdi(value = PAGE_SIZE_VALUE_KEY, defaultVerdi = KonfigVerdier.PAGE_SIZE_VALUE_DEFAULT) String pageSize,
-            @KonfigVerdi(value = POLLING_AKTIVERT_KEY, defaultVerdi = KonfigVerdier.PERSONFEED_POLLING_AKTIVERT_DEFAULT) boolean pollingErAktivert) {
+            @KonfigVerdi(value = POLLING_AKTIVERT_KEY, converter = KonfigVerdi.BooleanConverter.class,
+                    defaultVerdi = KonfigVerdier.PERSONFEED_POLLING_AKTIVERT_DEFAULT) Boolean pollingErAktivert) {
         this.endpoint = endpoint;
         this.hendelseRepository = hendelseRepository;
         this.oidcRestClient = oidcRestClient;
