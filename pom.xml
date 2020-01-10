@@ -29,7 +29,7 @@
             UNNTAK: feature-brancher og lokalt
         -->
         <felles.version>1.4.2-20191218142505-f63b3cc</felles.version>
-        <fp-kontrakter.version>5.1_20191210141010_6a7f399</fp-kontrakter.version>
+        <fp-kontrakter.version>5.1_20191223122121_321af1f</fp-kontrakter.version>
 
         <!-- Eksterne tjenestekontrakter -->
         <person-api-feed.version>1.1.0</person-api-feed.version>
