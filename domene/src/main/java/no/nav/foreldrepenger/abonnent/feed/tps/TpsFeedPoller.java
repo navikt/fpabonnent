@@ -36,7 +36,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 public class TpsFeedPoller implements FeedPoller {
     private static final Logger log = LoggerFactory.getLogger(TpsFeedPoller.class);
 
-    private static final String ENDPOINT_KEY = "person-feed-v2.url";
+    private static final String ENDPOINT_KEY = "person.feed.v2.url";
     private static final String POLLING_AKTIVERT_KEY = "personfeed.polling.aktivert";
     private static final String PAGE_SIZE_VALUE_KEY = "feed.pagesize.value";
     private static final String PAGE_SIZE_PARAM = "pageSize";

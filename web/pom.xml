@@ -12,6 +12,16 @@
     <packaging>jar</packaging>
     <name>fpabonnent :: Webapp</name>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>swagger-ui</artifactId>
+                <version>3.24.3</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Foreldrepengeprosjektet -->
         <dependency>
@@ -102,7 +112,6 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>swagger-ui</artifactId>
-            <version>3.24.3</version>
         </dependency>
 
         <!-- Jetty -->

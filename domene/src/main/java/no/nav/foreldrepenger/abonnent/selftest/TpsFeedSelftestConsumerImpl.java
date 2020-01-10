@@ -15,7 +15,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 @ApplicationScoped
 public class TpsFeedSelftestConsumerImpl implements TpsFeedSelftestConsumer {
 
-    private static final String HENDELSE_BASE_ENDPOINT = "person-feed-v2.url";
+    private static final String HENDELSE_BASE_ENDPOINT = "person.feed.v2.url";
 
     private OidcRestClient oidcRestClient;
     private URI endpointUrl;
