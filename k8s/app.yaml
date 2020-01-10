@@ -67,6 +67,10 @@ spec:
       value: "RELEASE_VERSION"
     - name: APP_TEAM
       value: teamforeldrepenger
+    - name: PERSONFEED_POLLING_AKTIVERT
+      value: personfeed.polling.aktivert
+    - name: INFOTRYGDFEED_POLLING_AKTIVERT
+      value: infotrygdfeed.polling.aktivert
     - name: LOADBALANCER_FQDN
       value: loadbalancer.url
     - name: ABAC_PDP_ENDPOINT_URL
