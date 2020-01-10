@@ -11,13 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.health.HealthCheck;
 
-import no.nav.foreldrepenger.abonnent.felles.ContainerLoginCDI;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.SelftestResultat;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.Selftests;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.checks.ExtHealthCheck;
 import no.nav.vedtak.log.mdc.MDCOperations;
 import no.nav.vedtak.log.util.LoggerUtils;
-import no.nav.vedtak.sikkerhet.loginmodule.ContainerLogin;
 
 @ApplicationScoped
 class AppStartupInfoLogger {
@@ -25,7 +23,6 @@ class AppStartupInfoLogger {
     private static final Logger logger = LoggerFactory.getLogger(AppStartupInfoLogger.class);
 
     private Selftests selftests;
-    private ContainerLogin containerLogin;
 
     private static final String OPPSTARTSINFO = "OPPSTARTSINFO";
     private static final String HILITE_SLUTT = "********";
@@ -47,9 +44,8 @@ class AppStartupInfoLogger {
     }
 
     @Inject
-    AppStartupInfoLogger(Selftests selftests, @ContainerLoginCDI ContainerLogin containerLogin) {
+    AppStartupInfoLogger(Selftests selftests) {
         this.selftests = selftests;
-        this.containerLogin = containerLogin;
     }
 
     void logAppStartupInfo() {
@@ -90,18 +86,20 @@ class AppStartupInfoLogger {
 
         // callId er påkrevd på utgående kall og må settes før selftest kjøres
         MDCOperations.putCallId();
-        containerLogin.login();
-        SelftestResultat samletResultat = selftests.run();
-        containerLogin.logout();
-        MDCOperations.removeCallId();
+        try {
+            SelftestResultat samletResultat = selftests.run();
+            MDCOperations.removeCallId();
 
-        for (HealthCheck.Result result : samletResultat.getAlleResultater()) {
-            log(result);
+            for (HealthCheck.Result result : samletResultat.getAlleResultater()) {
+                log(result);
+            }
+
+            log(APPLIKASJONENS_STATUS + ": {}", samletResultat.getAggregateResult());
+
+            log(SELFTEST + " " + SLUTT);
+        } catch (Exception e) {
+            logger.info("SELFTEST ERROR ", e);
         }
-
-        log(APPLIKASJONENS_STATUS + ": {}", samletResultat.getAggregateResult());
-
-        log(SELFTEST + " " + SLUTT);
     }
 
     private void log(String msg, Object... args) {
