@@ -107,9 +107,7 @@ public class TpsFeedPoller implements FeedPoller {
                 lastSequenceId = Optional.of(entry.getSequence());
             }
 
-            if (lastSequenceId.isPresent()) {
-                inputFeed.oppdaterLestOk(SEQUENCE_ID_PARAM + "=" + (lastSequenceId.get() + 1));
-            }
+            lastSequenceId.ifPresent(aLong -> inputFeed.oppdaterLestOk(SEQUENCE_ID_PARAM + "=" + (aLong + 1)));
         } else {
             inputFeed.oppdaterLestOk(inputFeed.getNextUrl().orElse(null));
         }

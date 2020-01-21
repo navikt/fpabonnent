@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.sql.DataSource;
 
@@ -142,108 +141,6 @@ public class SjekkDbStrukturTest {
 
     }
 
-    @Test
-    public void skal_ha_KL_prefiks_for_kodeverk_kolonne_i_source_tabell() throws Exception {
-        String sql = "Select cola.table_name, cola.column_name From All_Constraints Uc  " +
-            "Inner Join All_Cons_Columns Cola On Cola.Constraint_Name=Uc.Constraint_Name And Cola.Owner=Uc.Owner " +
-            "Inner Join All_Cons_Columns Colb On Colb.Constraint_Name=Uc.r_Constraint_Name And Colb.Owner=Uc.Owner " +
-            " " +
-            "Where Uc.Constraint_Type='R' And Uc.Owner= upper(?) " +
-            "And Colb.Column_Name='KODEVERK' And Colb.Table_Name='KODELISTE' " +
-            "And Colb.Position=Cola.Position " +
-            "And Cola.Table_Name Not Like 'KODELI%' " +
-            "and cola.column_name not like 'KL_%' ";
-
-        List<String> avvik = new ArrayList<>();
-        StringBuilder tekst = new StringBuilder();
-        opprettAvvikOgTekst(sql, avvik, tekst);
-
-        int sz = avvik.size();
-        String feilTekst = "Feil navn på kolonner som refererer KODELISTE, skal ha 'KL_' prefiks. Antall feil=";
-        
-        assertThat(avvik).withFailMessage(feilTekst + sz + ".\n\nTabell, kolonne\n" + tekst).isEmpty();
-
-    }
-    
-    @Test
-    public void skal_ha_virtual_column_defnisjon_for_kodeverk_kolonne_i_source_tabell() throws Exception {
-        String sql = "SELECT T.TABLE_NAME, T.CONSTRAINT_NAME, LISTAGG(COLC.COLUMN_NAME, ',') WITHIN GROUP (ORDER BY COLC.POSITION) AS COLUMNS FROM ALL_CONSTRAINTS T\n" + 
-            "INNER JOIN ALL_CONS_COLUMNS COLC ON COLC.CONSTRAINT_NAME=T.CONSTRAINT_NAME AND COLC.TABLE_NAME = T.TABLE_NAME AND COLC.OWNER=T.OWNER \n" + 
-            "WHERE T.OWNER = UPPER(?) AND COLC.OWNER = UPPER(?) \n" + 
-            "AND EXISTS\n" + 
-            "  (SELECT 1 FROM ALL_CONSTRAINTS UC\n" + 
-            "    INNER JOIN ALL_CONS_COLUMNS COLA ON COLA.CONSTRAINT_NAME=UC.CONSTRAINT_NAME AND COLA.OWNER =UC.OWNER \n" + 
-            "    INNER JOIN ALL_CONS_COLUMNS COLB ON COLB.CONSTRAINT_NAME=UC.R_CONSTRAINT_NAME AND COLB.OWNER =UC.OWNER AND COLB.OWNER=UC.OWNER AND COLB.OWNER=COLA.OWNER\n" + 
-            "    INNER JOIN ALL_TAB_COLS AT ON AT.COLUMN_NAME       =COLA.COLUMN_NAME AND AT.TABLE_NAME       =COLA.TABLE_NAME AND AT.OWNER =COLA.OWNER\n" + 
-            "    WHERE UC.CONSTRAINT_TYPE=T.CONSTRAINT_TYPE AND UC.CONSTRAINT_NAME = T.CONSTRAINT_NAME AND UC.OWNER = T.OWNER\n" + 
-            "      AND COLA.TABLE_NAME = T.TABLE_NAME AND T.TABLE_NAME=COLA.TABLE_NAME AND COLA.owner=T.OWNER AND COLA.CONSTRAINT_NAME=T.CONSTRAINT_NAME AND COLB.OWNER=T.OWNER \n" + 
-            "      AND COLB.COLUMN_NAME    ='KODEVERK' AND COLB.TABLE_NAME ='KODELISTE' AND COLB.POSITION =COLA.POSITION\n" + 
-            "      AND COLA.TABLE_NAME NOT LIKE 'KODELI%'\n" + 
-            "      AND AT.VIRTUAL_COLUMN='NO'\n" +
-            "      AND UC.OWNER = UPPER(?) AND AT.OWNER = UPPER(?) AND COLA.OWNER = UPPER(?) AND COLB.OWNER = UPPER(?) \n" +
-            "  )\n" + 
-            "\n" + 
-            "GROUP BY T.TABLE_NAME, T.CONSTRAINT_NAME\n" + 
-            "ORDER BY 1, 2";
-
-        List<String> avvik = new ArrayList<>();
-        StringBuilder tekst = new StringBuilder();
-        try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql);) {
-
-            stmt.setString(1, schema);
-            stmt.setString(2, schema);
-            stmt.setString(3, schema);
-            stmt.setString(4, schema);
-            stmt.setString(5, schema);
-            stmt.setString(6, schema);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String table = rs.getString(1);
-                    String fk = rs.getString(2);
-                    String cols = rs.getString(3);
-                    
-                    if(ignoreColumn(table, cols)) {
-                        continue;
-                    }
-                    
-                    @SuppressWarnings("unused")
-                    String klCol = cols.split(",\\s*")[1];
-                    
-                    String t = table + ", " + fk + ", " + cols;
-                    avvik.add(t);
-                    tekst.append(t).append("\n");
-                }
-            }
-
-        }
-
-        int sz = avvik.size();
-        String feilTekst = "Feil definisjon på kolonner som refererer KODELISTE, definieres som virtual column, ikke med default eller annet. Antall feil=";
-        
-        assertThat(avvik).withFailMessage(feilTekst + sz + ".\n\nTabell, kolonne\n" + tekst).isEmpty();
-
-    }
-
-    private boolean ignoreColumn(String table, String cols) {
-        String[][] ignored = new String [] []{
-                {"IAY_INNTEKTSPOST", "KL_YTELSE_TYPE"},
-                {"YF_FORDELING_PERIODE", "KL_AARSAK_TYPE"},
-                {"UTTAK_RESULTAT_PERIODE", "KL_PERIODE_RESULTAT_AARSAK"},
-        };
-        
-        table = table.toUpperCase(Locale.getDefault());
-        cols = cols.toUpperCase(Locale.getDefault());
-        
-        for(String[] ignore: ignored) {
-            if(ignore[0].equals(table) && cols.contains(ignore[1])) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @Test
     public void skal_ha_primary_key_i_hver_tabell_som_begynner_med_PK() throws Exception {
