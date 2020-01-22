@@ -6,7 +6,6 @@
                  version="2.1">
 
     <sequence-generator name="SEQ_INNGAAENDE_HENDELSE" allocation-size="50" sequence-name="SEQ_INNGAAENDE_HENDELSE"/>
-    <sequence-generator name="SEQ_KODELISTE_NAVN_I18N" allocation-size="50" sequence-name="SEQ_KODELISTE_NAVN_I18N"/>
 
     <entity class="no.nav.foreldrepenger.abonnent.feed.domain.InputFeed"/>
     <entity class="no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse"/>

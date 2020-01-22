@@ -11,7 +11,6 @@ import javax.persistence.Table;
 
 import no.nav.foreldrepenger.abonnent.felles.BaseEntitet;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
-import no.nav.vedtak.util.FPDateUtil;
 
 @Entity(name = "InputFeed")
 @Table(name = "INPUT_FEED")
@@ -50,13 +49,13 @@ public class InputFeed extends BaseEntitet {
     }
 
     public void oppdaterLestOk(String nextUrl) {
-        sistLest = LocalDateTime.now(FPDateUtil.getOffset());
+        sistLest = LocalDateTime.now();
         feiletAntall = 0;
         this.nextUrl = nextUrl;
     }
 
     public void oppdaterFeilet() {
-        sistFeilet = LocalDateTime.now(FPDateUtil.getOffset());
+        sistFeilet = LocalDateTime.now();
         feiletAntall++;
     }
 

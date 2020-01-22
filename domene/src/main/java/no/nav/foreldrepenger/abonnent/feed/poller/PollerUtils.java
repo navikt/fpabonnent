@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
-import no.nav.vedtak.util.FPDateUtil;
 
 class PollerUtils {
 
@@ -27,7 +26,7 @@ class PollerUtils {
         } else {
             nesteTidspunkt = sistLest.get().plus(konfig.getVentetidFerdiglest());
         }
-        return LocalDateTime.now(FPDateUtil.getOffset()).isAfter(nesteTidspunkt);
+        return LocalDateTime.now().isAfter(nesteTidspunkt);
     }
 
 }

@@ -37,8 +37,6 @@ import jdk.javadoc.doclet.Reporter;
 import no.nav.vedtak.feil.doc.FeilmeldingDoclet;
 import no.nav.vedtak.felles.db.doc.JdbcDoclet;
 import no.nav.vedtak.felles.integrasjon.felles.ws.doc.WebServiceDoclet;
-import no.nav.vedtak.felles.prosesstask.doc.ProsessTaskDoclet;
-import no.nav.vedtak.konfig.doc.KonfigverdiDoclet;
 
 /** Aggregert doclet for å kunne håndtere alle sammen samtidig. */
 public class Sysdoclet implements Doclet {
@@ -55,9 +53,7 @@ public class Sysdoclet implements Doclet {
     private List<Doclet> doclets = Arrays.asList(
             new FeilmeldingDoclet(),
             new JdbcDoclet(),
-            new WebServiceDoclet(),
-            new KonfigverdiDoclet(),
-            new ProsessTaskDoclet());
+            new WebServiceDoclet());
 
     @Override
     public void init(Locale locale, Reporter reporter) {
