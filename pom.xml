@@ -622,7 +622,7 @@
         <repository>
             <id>fpfordel</id>
             <name>Github navikt Maven Packages</name>
-            <url>https://maven.pkg.github.com/navikt/fpfordel</url>
+            <url>https://maven.pkg.github.com/navikt/fpabonnent</url>
         </repository>
     </distributionManagement>
 
