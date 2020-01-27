@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 import javax.persistence.TypedQuery;
@@ -49,16 +50,25 @@ import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 @RunWith(CdiRunner.class)
 public class SorterHendelserTaskTest {
 
+    static {
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"));
+    }
+
     private static final String PROSESSTASK_STEG = "hendelser.grovsorter";
 
     private static final LocalDate FØDSELSDATO = LocalDate.of(2018, 1, 25);
     private static final String REQ_UUID = "req_uuid";
 
-    private static final FeedEntry FMELDING_1 = lagFødselsmelding(of(lagAktørIdIdent("1112345678909")), of(lagAktørIdIdent("1212345678909")), of(lagAktørIdIdent("1312345678909")), FØDSELSDATO);
-    private static final FeedEntry FMELDING_2 = lagFødselsmelding(of(lagAktørIdIdent("2112345678909")), of(lagAktørIdIdent("1212345678909")), of(lagAktørIdIdent("1312345678909")), FØDSELSDATO);
-    private static final FeedEntry FMELDING_3 = lagFødselsmelding(of(lagAktørIdIdent("3112345678909")), of(lagAktørIdIdent("3212345678909")), of(lagAktørIdIdent("1312345678909")), FØDSELSDATO);
-    private static final FeedEntry FMELDING_4 = lagFødselsmelding(of(lagAktørIdIdent("4112345678909")), of(lagAktørIdIdent("3312345678909")), null, FØDSELSDATO);
-    private static final FeedEntry FMELDING_5 = lagFødselsmelding(of(lagAktørIdIdent("4212345678909")), null, of(lagAktørIdIdent("1412345678909")), FØDSELSDATO);
+    private static final FeedEntry FMELDING_1 = lagFødselsmelding(of(lagAktørIdIdent("1112345678909")),
+            of(lagAktørIdIdent("1212345678909")), of(lagAktørIdIdent("1312345678909")), FØDSELSDATO);
+    private static final FeedEntry FMELDING_2 = lagFødselsmelding(of(lagAktørIdIdent("2112345678909")),
+            of(lagAktørIdIdent("1212345678909")), of(lagAktørIdIdent("1312345678909")), FØDSELSDATO);
+    private static final FeedEntry FMELDING_3 = lagFødselsmelding(of(lagAktørIdIdent("3112345678909")),
+            of(lagAktørIdIdent("3212345678909")), of(lagAktørIdIdent("1312345678909")), FØDSELSDATO);
+    private static final FeedEntry FMELDING_4 = lagFødselsmelding(of(lagAktørIdIdent("4112345678909")),
+            of(lagAktørIdIdent("3312345678909")), null, FØDSELSDATO);
+    private static final FeedEntry FMELDING_5 = lagFødselsmelding(of(lagAktørIdIdent("4212345678909")), null,
+            of(lagAktørIdIdent("1412345678909")), FØDSELSDATO);
 
     @Rule
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
@@ -84,7 +94,8 @@ public class SorterHendelserTaskTest {
         mockHendelseConsumer = mock(HendelseConsumer.class);
         mockProsessTaskRepository = mock(ProsessTaskRepository.class);
 
-        sorterHendelserTask = new SorterHendelserTask(mockProsessTaskRepository, inngåendeHendelseTjeneste, mockHendelseConsumer, hendelseTjenesteProvider);
+        sorterHendelserTask = new SorterHendelserTask(mockProsessTaskRepository, inngåendeHendelseTjeneste,
+                mockHendelseConsumer, hendelseTjenesteProvider);
 
         prosessTaskData = new ProsessTaskData(PROSESSTASK_STEG);
         prosessTaskData.setSekvens("1");
@@ -129,7 +140,8 @@ public class SorterHendelserTaskTest {
         // Assert
         verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
         List<InngåendeHendelse> inngåendeHendelser = finnHendelserMedRequestUUID(REQ_UUID);
-        assertThat(inngåendeHendelser.stream().map(InngåendeHendelse::getHåndtertStatus)).containsOnly(HåndtertStatusType.HÅNDTERT);
+        assertThat(inngåendeHendelser.stream().map(InngåendeHendelse::getHåndtertStatus))
+                .containsOnly(HåndtertStatusType.HÅNDTERT);
     }
 
     @Test
@@ -168,7 +180,7 @@ public class SorterHendelserTaskTest {
         List<String> eksisterendeAktørIder = Arrays.asList("1234567890123", "1312345678909");
 
         InngåendeHendelse hendelse1 = lagInngåendeTPSHendelse(FMELDING_1, 1);
-        InngåendeHendelse hendelse2 = lagInngåendeTPSHendelse(FMELDING_2, 2); //Samme foreldre
+        InngåendeHendelse hendelse2 = lagInngåendeTPSHendelse(FMELDING_2, 2); // Samme foreldre
         hendelseRepository.lagreInngåendeHendelse(hendelse1);
         hendelseRepository.lagreInngåendeHendelse(hendelse2);
         repoRule.getEntityManager().flush();
@@ -233,7 +245,8 @@ public class SorterHendelserTaskTest {
         assertThat(sendt).isNotNull();
         assertThat(sendt.getTaskType()).isEqualTo(SendHendelseTask.TASKNAME);
 
-        List<InngåendeHendelse> inngåendeHendelser = repoRule.getEntityManager().createQuery("from InngåendeHendelse", InngåendeHendelse.class).getResultList();
+        List<InngåendeHendelse> inngåendeHendelser = repoRule.getEntityManager()
+                .createQuery("from InngåendeHendelse", InngåendeHendelse.class).getResultList();
         assertThat(inngåendeHendelser).hasSize(1);
         assertThat(inngåendeHendelser.get(0).getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
     }
@@ -255,7 +268,8 @@ public class SorterHendelserTaskTest {
 
         // Assert
         verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
-        List<InngåendeHendelse> inngåendeHendelser = repoRule.getEntityManager().createQuery("from InngåendeHendelse", InngåendeHendelse.class).getResultList();
+        List<InngåendeHendelse> inngåendeHendelser = repoRule.getEntityManager()
+                .createQuery("from InngåendeHendelse", InngåendeHendelse.class).getResultList();
         assertThat(inngåendeHendelser).hasSize(1);
         assertThat(inngåendeHendelser.get(0).getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
     }
@@ -267,15 +281,20 @@ public class SorterHendelserTaskTest {
         List<String> eksisterendeAktørIder = Arrays.asList(HendelseTestDataUtil.INFOTRYGD_AKTØR_ID, "1000045443922");
         when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
 
-        InngåendeHendelse hendelse1 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(1L, 0L), 1L, 0L);
+        InngåendeHendelse hendelse1 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(1L, 0L),
+                1L, 0L);
         hendelseRepository.lagreInngåendeHendelse(hendelse1); // Skal sorteres ut på grunn av hendelse3
-        InngåendeHendelse hendelse2 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(2L, 1L), 2L, 1L);
+        InngåendeHendelse hendelse2 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(2L, 1L),
+                2L, 1L);
         hendelseRepository.lagreInngåendeHendelse(hendelse2); // Skal sorteres ut på grunn av hendelse3
-        InngåendeHendelse hendelse3 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(3L, 1L), 3L, 1L);
+        InngåendeHendelse hendelse3 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(3L, 1L),
+                3L, 1L);
         hendelseRepository.lagreInngåendeHendelse(hendelse3); // Skal sendes
-        InngåendeHendelse hendelse4 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(4L, 0L), 4L, 0L);
+        InngåendeHendelse hendelse4 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(4L, 0L),
+                4L, 0L);
         hendelseRepository.lagreInngåendeHendelse(hendelse4); // Skal sendes
-        InngåendeHendelse hendelse5 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(5L, 0L), 5L, 0L);
+        InngåendeHendelse hendelse5 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(5L, 0L),
+                5L, 0L);
         hendelseRepository.lagreInngåendeHendelse(hendelse5); // Skal sendes
         repoRule.getEntityManager().flush();
 
@@ -310,7 +329,8 @@ public class SorterHendelserTaskTest {
                 .build();
     }
 
-    private InngåendeHendelse lagInngåendeInfotrygdHendelse(FeedElement feedElement, long sekvensnummer, long koblingId) {
+    private InngåendeHendelse lagInngåendeInfotrygdHendelse(FeedElement feedElement, long sekvensnummer,
+            long koblingId) {
         return InngåendeHendelse.builder()
                 .sekvensnummer(sekvensnummer)
                 .koblingId(koblingId)
