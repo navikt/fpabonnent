@@ -184,13 +184,13 @@
             <artifactId>resteasy-servlet-initializer</artifactId>
         </dependency>
 
-        <!-- Test avhengigheter -->
+        <!-- Test avhengigheter 
         <dependency>
             <groupId>no.nav.modig</groupId>
             <artifactId>modig-core-test</artifactId>
             <version>1.0.0</version>
-            <scope>test</scope>
-        </dependency>
+            <scope>test</scope> 
+        </dependency> -->
         <dependency>
             <groupId>no.nav.foreldrepenger.abonnent</groupId>
             <artifactId>migreringer</artifactId>
