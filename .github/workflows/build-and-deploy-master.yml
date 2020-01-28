@@ -1,0 +1,96 @@
+name: Build, push, and deploy
+
+on:
+  push:
+    branches:
+      - master 
+env:
+  APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+  ORACLE_IMAGE: docker.pkg.github.com/navikt/vtp/foreldrepenger-oracle
+  CLUSTER: dev-fss
+  NAMESPACE: t4
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fpabonnent
+         
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+     
+      - name: Sjekk ut kode
+        uses: actions/checkout@v2
+      - run:  git fetch --prune --unshallow
+    
+      - name: Cache maven repository
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+     
+      - name: Setup Java 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+          
+      - name: Hent tag    
+        run: echo "::set-env name=TAG::$(git log -1 --pretty='%ad' --date=format:'%Y%m%d%H%M%S')-$(echo $GITHUB_SHA | cut -c1-7)"  
+           
+      - name: Hent og start Oracle image
+        id: oracle
+        shell: bash
+        run: |
+          echo  $GITHUB_TOKEN | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
+          echo "Henter og starter Oracle image $ORACLE_IMAGE"
+          docker-compose -f oracle/docker-compose.yml pull
+          rm -f nohup.out
+          docker-compose -f oracle/docker-compose.yml up oracle >nohup.out 2>&1 &
+          sh -c 'tail -n +0 -f nohup.out | { sed "/Disconnected/q" && kill $$; }' || true
+    
+      - name: Kompiler
+        run: |
+          echo "::set-env name=IMAGE::$IMAGE_BASE:$TAG" 
+          mvn install -e --batch-mode --settings .github/workflows/.m2/settings.xml   
+          #mvn jacoco:prepare-agent install -e --batch-mode --settings .github/workflows/.m2/settings.xml   -Djacoco.destFile=$(pwd)/target/jacoco.exec
+          #mvn jacoco:report sonar:sonar -e --batch-mode --settings .github/workflows/.m2/settings.xml -Djacoco.dataFile=$(pwd)/target/jacoco.exec  -Dsonar.login=${SONAR} -Dsonar.projectKey=navikt_fpfordel
+        env:
+          TZ: Europe/Oslo
+          GITHUB_USERNAME: x-access-token
+          GITHUB_PASSWORD: ${{ secrets.NOTIFICATION }}
+          SONAR: ${{ secrets.SONAR }}  
+     
+    
+      - name: Bygg, tag og push Docker image  
+        run: |
+          docker build  --tag $IMAGE .
+          echo  $GITHUB_TOKEN | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} --password-stdin
+          docker push $IMAGE_BASE  
+          
+      - name: Opprett deployment issue
+        if: success()
+        uses: maxkomarychev/oction-create-issue@v0.7.1
+        id: createdeployissue
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Bygg av ${{ env.TAG }}
+          body: |
+            Kommenter med <b>/promote ${{ env.TAG }} cluster namespace</b>, hvor <b>cluster</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
+            <table>
+            <tr><th>Cluster</th><th>Namespace</th></tr>
+            <tr><td>dev-fss</td><td>t4,q1</td></tr>
+            <tr><td>prod-fss</td><td>default</td></tr>
+            </table>        
+
+      - name: Trigg deploy til dev-fss t4
+        if: success()
+        uses: actions/github-script@0.3.0
+        with:
+          github-token: ${{secrets.NOTIFICATION}}
+          script: |
+            const issue = { owner: context.issue.owner,
+                            repo: context.issue.repo,
+                            issue_number: ${{ steps.createdeployissue.outputs.number }} }
+            github.issues.createComment({...issue,
+                                    title: 'Deploy av ${{ env.TAG }}',
+                                    body: '/promote ${{ env.TAG }} ${{ env.CLUSTER }} ${{ env.NAMESPACE }}'})
+

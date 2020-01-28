@@ -1,0 +1,64 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: fpabonnent
+  namespace: {{namespace}}
+  labels:
+    team: teamforeldrepenger
+spec:
+  image: {{namespace}}
+  port: 8080 
+  team: teamforeldrepenger
+  liveness: 
+    path: /fpabonnent/internal/health/isAlive
+    initialDelay: 30
+    timeout: 5
+    periodSeconds: 10  
+    failureThreshold: 27 
+  readiness: 
+    path: /fpabonnent/internal/health/isReady
+    initialDelay: 30
+    timeout: 5
+    periodSeconds: 10
+    failureThreshold: 27
+  replicas: 
+    min: 2 
+    max: 2 
+    cpuThresholdPercentage: 80 
+  leaderElection: false 
+  preStopHookPath: /fpabonnent/internal/health/preStop 
+  prometheus: 
+    enabled: true 
+    path: /fpabonnent/internal/metrics/prometheus 
+  istio: 
+    enabled: false 
+  resources: 
+    limits:
+      cpu: "2000m" 
+      memory: "2048Mi"  
+    requests: 
+      cpu: "600m"
+      memory: "1024Mi"
+  ingresses: 
+{{#each ingresses as |url|}}
+    - {{url}}
+{{/each}}
+  logformat: accesslog 
+  logtransform: dns_loglevel 
+  webproxy: false 
+  vault:
+    enabled: true
+    paths:
+    - kvPath: {{oraclecredskv}}
+      mountPath: /secrets/oracle/ 
+    - kvPath: {{oracleconfigkv}}
+      mountPath: /config/oracle
+    - kvPath: {{serviceuserkv}}
+      mountPath: /secrets/serviceuser/ 
+
+  sidecar: true 
+  env:
+{{#each env}}
+   - name: {{@key}}
+     value: "{{this}}"
+{{/each}}

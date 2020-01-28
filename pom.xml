@@ -9,7 +9,7 @@
 
     <modules>
         <module>migreringer</module>
-        <module>docs</module>
+<!--        <module>docs</module> -->
         <module>domene</module>
         <module>web</module>
     </modules>
@@ -24,10 +24,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- Foreldrepengeprosjektet
-            Disse skal ALLTID være en RELEASE-avhengighet
-            UNNTAK: feature-brancher og lokalt
-        -->
         <felles.version>1.5.0-20200116143541-6449112</felles.version>
         <prosesstask.version>2.0.0-20200118092644-2782011</prosesstask.version>
         <fp-kontrakter.version>5.1_20200117132228_47cdf2f</fp-kontrakter.version>
@@ -620,16 +616,10 @@
 
     <distributionManagement>
         <repository>
-            <id>m2internal</id>
-            <name>NAV Maven2 Internal Repository</name>
-            <url>http://maven.adeo.no/nexus/content/repositories/m2internal</url>
+            <id>fpabonnent</id>
+            <name>Github navikt Maven Packages</name>
+            <url>https://maven.pkg.github.com/navikt/fpabonnent</url>
         </repository>
-        <snapshotRepository>
-            <id>m2snapshot</id>
-            <name>NAV Maven2 Snapshot Repository</name>
-            <url>http://maven.adeo.no/nexus/content/repositories/m2snapshot</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
     </distributionManagement>
 
 </project>

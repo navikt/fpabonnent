@@ -1,4 +1,9 @@
 FROM navikt/java:11-appdynamics
+ENV APPD_ENABLED=false
+ENV APP_NAME=fpabonnent
+ENV APPDYNAMICS_CONTROLLER_HOST_NAME=appdynamics.adeo.no
+ENV APPDYNAMICS_CONTROLLER_PORT=443
+ENV APPDYNAMICS_CONTROLLER_SSL_ENABLED=true
 
 RUN mkdir /app/lib
 RUN mkdir /app/conf
@@ -11,14 +16,11 @@ COPY web/target/classes/jetty/jaspi-conf.xml /app/conf/
 COPY web/target/app.jar /app/
 COPY web/target/lib/*.jar /app/lib/
 
+
 # Application Start Command
 COPY run-java.sh /
 RUN chmod +x /run-java.sh
 
 # Export vault properties
 COPY export-vault.sh /init-scripts/export-vault.sh
-
-# Upload heapdump to s3
-COPY s3upload-init.sh /init-scripts/
-COPY s3upload.sh /
-RUN chmod +x /s3upload.sh
+RUN chmod +x /init-scripts/*
