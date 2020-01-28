@@ -27,6 +27,7 @@ jobs:
       - name: Promoter til cluster og namespace
         uses: nais/deploy/actions/deploy@v1
         env:
+          PRINT_PAYLOAD: true
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ env.CLUSTER }}
           RESOURCE: nais/naiserator.yaml
