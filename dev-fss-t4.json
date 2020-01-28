@@ -1,0 +1,24 @@
+{
+	"cluster": "preprod",
+	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_t4",
+	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_t4-user",
+	"serviceuserkv": "/serviceuser/data/test/srvfpabonnent",
+	"namespace": "t4",
+	"ingresses": [
+		"https://fpabonnent-t4.nais.preprod.local/"
+	],
+	"env": {
+           "LOADBALANCER_URL": "fpabonnent-t4.nais.preprod.local",
+           "ABAC_PDP_ENDPOINT_URL": "https://wasapp-t4.adeo.no/asm-pdp/authorize",
+           "SECURITYTOKENSERVICE_URL": "https://sts-t4.test.local/SecurityTokenServiceProvider/",
+           "OIDC_OPENAM_JWKSURL": "https://isso-t.adeo.no:443/isso/oauth2/connect/jwk_uri",
+           "OIDC_OPENAM_ISSUERURL": "https://isso-t.adeo.no:443/isso/oauth2",
+           "OIDC_OPENAM_AGENTNAME": "fpabonnent-t4",
+           "OIDC_OPENAM_HOSTURL": "https://isso-t.adeo.no:443/isso/oauth2",
+           "OIDC_STS_ISSUER_URL": "https://security-token-service-t4.nais.preprod.local",
+           "OIDC_STS_JWKS_URL": "https://security-token-service-t4.nais.preprod.local/rest/v1/sts/jwks",
+           "FPSAKHENDELSER_V1_URL": "https://fpsak-t4.nais.preprod.local/fpsak/api/hendelser/",
+           "PERSON_FEED_V2_URL": "dummy.url",
+           "INFOTRYGD_HENDELSER_API_URL" : "https://infotrygd-hendelser-api-t4.nais.preprod.local/infotrygd/hendelser"
+      }
+}
