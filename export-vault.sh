@@ -22,12 +22,12 @@ fi
 
 if test -f /secrets/serviceuser/username;
 then
-   export  SYSTEMBRUKER_USERNAME=$(cat /secrets/serviceuser/fpabonnent/username)
+   export  SYSTEMBRUKER_USERNAME=$(cat /secrets/serviceuser/username)
    echo "Setter SYSTEMBRUKER_USERNAME til $SYSTEMBRUKER_USERNAME"   
 fi
 
 if test -f /secrets/serviceuser/password;
 then
-   export  SYSTEMBRUKER_PASSWORD=$(cat /secrets/serviceuser/fpabonnent/password)
+   export  SYSTEMBRUKER_PASSWORD=$(cat /secrets/serviceuser/password)
    echo "Setter SYSTEMBRUKER_PASSWORD"   
 fi
