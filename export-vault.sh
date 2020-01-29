@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+echo "Running  $0"
 
 if test -f /config/oracle/jdbc_url;
 then
