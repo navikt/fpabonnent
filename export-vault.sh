@@ -20,13 +20,13 @@ then
    echo "Setter DEFAULTDS_PASSWORD"   
 fi
 
-if test -f /secrets/serviceuser/fpabonnent/username;
+if test -f /secrets/serviceuser/username;
 then
    export  SYSTEMBRUKER_USERNAME=$(cat /secrets/serviceuser/fpabonnent/username)
    echo "Setter SYSTEMBRUKER_USERNAME til $SYSTEMBRUKER_USERNAME"   
 fi
 
-if test -f /secrets/serviceuser/fpabonnent/password;
+if test -f /secrets/serviceuser/password;
 then
    export  SYSTEMBRUKER_PASSWORD=$(cat /secrets/serviceuser/fpabonnent/password)
    echo "Setter SYSTEMBRUKER_PASSWORD"   

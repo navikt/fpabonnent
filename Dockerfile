@@ -8,6 +8,10 @@ ENV APPDYNAMICS_CONTROLLER_SSL_ENABLED=true
 RUN mkdir /app/lib
 RUN mkdir /app/conf
 
+# Export vault properties
+COPY export-vault.sh /init-scripts/export-vault.sh
+RUN chmod +x /init-scripts/*
+
 # Config
 COPY web/target/classes/logback.xml /app/conf/
 COPY web/target/classes/jetty/jaspi-conf.xml /app/conf/
@@ -21,6 +25,3 @@ COPY web/target/lib/*.jar /app/lib/
 COPY run-java.sh /
 RUN chmod +x /run-java.sh
 
-# Export vault properties
-COPY export-vault.sh /init-scripts/export-vault.sh
-RUN chmod +x /init-scripts/*
