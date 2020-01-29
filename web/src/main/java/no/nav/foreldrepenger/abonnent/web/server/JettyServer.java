@@ -17,8 +17,11 @@ import no.nav.foreldrepenger.abonnent.web.app.konfig.ApplicationConfig;
 import no.nav.foreldrepenger.abonnent.web.server.DataSourceKonfig.DBConnProp;
 import no.nav.vedtak.isso.IssoApplication;
 import no.nav.vedtak.isso.config.ServerInfo;
+import no.nav.vedtak.util.env.Environment;
 
 public class JettyServer extends AbstractJettyServer {
+
+    private static final Environment ENV = Environment.current();
 
     private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
@@ -37,7 +40,6 @@ public class JettyServer extends AbstractJettyServer {
     }
 
     public static void main(String[] args) throws Exception {
-        LOG.info("Serverinfo 1", ServerInfo.instance().toString());
         JettyServer jettyServer;
         if (args.length > 0) {
             int serverPort = Integer.parseUnsignedInt(args[0]);
@@ -61,11 +63,12 @@ public class JettyServer extends AbstractJettyServer {
     }
 
     private void loadBalancerFqdnTilLoadBalancerUrl() {
-        if (System.getenv("LOADBALANCER_FQDN") != null) {
-            String loadbalancerFqdn = System.getenv("LOADBALANCER_FQDN");
+        ENV.getProperty("LOADBALANCER_FQDN");
+        if (ENV.getProperty("LOADBALANCER_FQDN") != null) {
+            String loadbalancerFqdn = ENV.getProperty("LOADBALANCER_FQDN");
             String protocol = (loadbalancerFqdn.startsWith("localhost")) ? "http" : "https";
             System.setProperty("loadbalancer.url", protocol + "://" + loadbalancerFqdn);
-            LOG.info("Setter loadbalancer.url fra {} til {}", loadbalancerFqdn, System.getProperty("loadbalancer.url"));
+            LOG.info("Setter loadbalancer.url fra {} til {}", loadbalancerFqdn, ENV.getProperty("loadbalancer.url"));
         }
     }
 
