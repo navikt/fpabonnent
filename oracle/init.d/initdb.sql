@@ -1,4 +1,5 @@
-alter database set TIME_ZONE='Europe/Oslo';
+--alter database set TIME_ZONE='Europe/Oslo';
+alter database set TIME_ZONE='+00:00';
 alter system set recyclebin=OFF DEFERRED;
 alter profile default limit password_life_time unlimited;
 alter system set processes=150 scope=spfile;
