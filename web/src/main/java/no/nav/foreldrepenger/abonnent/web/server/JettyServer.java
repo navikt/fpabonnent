@@ -54,21 +54,21 @@ public class JettyServer extends AbstractJettyServer {
     protected void konfigurerMiljø() throws Exception {
         dataSourceKonfig = new DataSourceKonfig();
         hacks4Nais();
-        LOG.info("Serverinfo 2", ServerInfo.instance().toString());
+        LOG.info("Serverinfo 2 {}", ServerInfo.instance().toString());
     }
 
     private void hacks4Nais() {
-        loadBalancerFqdnTilLoadBalancerUrl();
+        // loadBalancerFqdnTilLoadBalancerUrl();
         temporært();
     }
 
     private void loadBalancerFqdnTilLoadBalancerUrl() {
-        ENV.getProperty("LOADBALANCER_FQDN");
-        if (ENV.getProperty("LOADBALANCER_FQDN") != null) {
-            String loadbalancerFqdn = ENV.getProperty("LOADBALANCER_FQDN");
-            String protocol = (loadbalancerFqdn.startsWith("localhost")) ? "http" : "https";
-            System.setProperty("loadbalancer.url", protocol + "://" + loadbalancerFqdn);
-            LOG.info("Setter loadbalancer.url fra {} til {}", loadbalancerFqdn, ENV.getProperty("loadbalancer.url"));
+        String fqdn = ENV.getProperty("LOADBALANCER_FQDN");
+        LOG.info("FQDN er {}", fqdn);
+        if (fqdn != null) {
+            String protocol = (fqdn.startsWith("localhost")) ? "http" : "https";
+            System.setProperty("loadbalancer.url", protocol + "://" + fqdn);
+            LOG.info("Setter loadbalancer.url fra {} til {}", fqdn, ENV.getProperty("loadbalancer.url"));
         }
     }
 
