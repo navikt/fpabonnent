@@ -10,12 +10,16 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.MetaData;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.web.app.konfig.ApplicationConfig;
 import no.nav.foreldrepenger.abonnent.web.server.DataSourceKonfig.DBConnProp;
 import no.nav.vedtak.isso.IssoApplication;
 
 public class JettyServer extends AbstractJettyServer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
     private DataSourceKonfig dataSourceKonfig;
 
@@ -57,16 +61,19 @@ public class JettyServer extends AbstractJettyServer {
         if (System.getenv("LOADBALANCER_FQDN") != null) {
             String loadbalancerFqdn = System.getenv("LOADBALANCER_FQDN");
             String protocol = (loadbalancerFqdn.startsWith("localhost")) ? "http" : "https";
+            LOG.info("Setter loadbalancer.url fra {}", loadbalancerFqdn);
             System.setProperty("loadbalancer.url", protocol + "://" + loadbalancerFqdn);
         }
     }
 
     private void temporært() {
-        // FIXME : PFP-1176 Skriv om i OpenAmIssoHealthCheck og AuthorizationRequestBuilder når Jboss dør
+        // FIXME : PFP-1176 Skriv om i OpenAmIssoHealthCheck og
+        // AuthorizationRequestBuilder når Jboss dør
         if (System.getenv("OIDC_OPENAM_HOSTURL") != null) {
             System.setProperty("OpenIdConnect.issoHost", System.getenv("OIDC_OPENAM_HOSTURL"));
         }
-        // FIXME : PFP-1176 Skriv om i AuthorizationRequestBuilder og IdTokenAndRefreshTokenProvider når Jboss dør
+        // FIXME : PFP-1176 Skriv om i AuthorizationRequestBuilder og
+        // IdTokenAndRefreshTokenProvider når Jboss dør
         if (System.getenv("OIDC_OPENAM_AGENTNAME") != null) {
             System.setProperty("OpenIdConnect.username", System.getenv("OIDC_OPENAM_AGENTNAME"));
         }
