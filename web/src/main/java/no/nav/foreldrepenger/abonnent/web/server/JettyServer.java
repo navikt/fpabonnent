@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.abonnent.web.app.konfig.ApplicationConfig;
 import no.nav.foreldrepenger.abonnent.web.server.DataSourceKonfig.DBConnProp;
 import no.nav.vedtak.isso.IssoApplication;
+import no.nav.vedtak.isso.config.ServerInfo;
 
 public class JettyServer extends AbstractJettyServer {
 
@@ -36,6 +37,7 @@ public class JettyServer extends AbstractJettyServer {
     }
 
     public static void main(String[] args) throws Exception {
+        LOG.info("Serverinfo 1", ServerInfo.instance().toString());
         JettyServer jettyServer;
         if (args.length > 0) {
             int serverPort = Integer.parseUnsignedInt(args[0]);
@@ -50,6 +52,7 @@ public class JettyServer extends AbstractJettyServer {
     protected void konfigurerMiljø() throws Exception {
         dataSourceKonfig = new DataSourceKonfig();
         hacks4Nais();
+        LOG.info("Serverinfo 2", ServerInfo.instance().toString());
     }
 
     private void hacks4Nais() {
@@ -61,8 +64,8 @@ public class JettyServer extends AbstractJettyServer {
         if (System.getenv("LOADBALANCER_FQDN") != null) {
             String loadbalancerFqdn = System.getenv("LOADBALANCER_FQDN");
             String protocol = (loadbalancerFqdn.startsWith("localhost")) ? "http" : "https";
-            LOG.info("Setter loadbalancer.url fra {}", loadbalancerFqdn);
             System.setProperty("loadbalancer.url", protocol + "://" + loadbalancerFqdn);
+            LOG.info("Setter loadbalancer.url fra {} til {}", loadbalancerFqdn, System.getProperty("loadbalancer.url"));
         }
     }
 
