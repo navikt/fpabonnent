@@ -1,5 +1,4 @@
 {
-	"cluster": "preprod",
 	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_t4",
 	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_t4-user",
 	"serviceuserkv": "/serviceuser/data/test/srvfpabonnent",
@@ -8,7 +7,6 @@
 		"https://fpabonnent-t4.nais.preprod.local/"
 	],
 	"env": {
-           "LOADBALANCER_URL": "https://fpabonnent-t4.nais.preprod.local",
            "ABAC_PDP_ENDPOINT_URL": "https://wasapp-t4.adeo.no/asm-pdp/authorize",
            "SECURITYTOKENSERVICE_URL": "https://sts-t4.test.local/SecurityTokenServiceProvider/",
            "OIDC_OPENAM_JWKSURL": "https://isso-t.adeo.no:443/isso/oauth2/connect/jwk_uri",
