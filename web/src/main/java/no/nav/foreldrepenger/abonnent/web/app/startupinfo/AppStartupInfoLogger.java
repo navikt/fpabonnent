@@ -1,7 +1,13 @@
 package no.nav.foreldrepenger.abonnent.web.app.startupinfo;
 
+import static com.google.common.collect.Maps.fromProperties;
+import static java.util.Map.Entry.comparingByKey;
+import static no.nav.vedtak.konfig.StandardPropertySource.APP_PROPERTIES;
+import static no.nav.vedtak.konfig.StandardPropertySource.ENV_PROPERTIES;
+import static no.nav.vedtak.konfig.StandardPropertySource.SYSTEM_PROPERTIES;
+
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.SortedMap;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -11,16 +17,18 @@ import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.health.HealthCheck;
 
-import no.nav.foreldrepenger.abonnent.web.app.selftest.SelftestResultat;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.Selftests;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.checks.ExtHealthCheck;
+import no.nav.vedtak.konfig.StandardPropertySource;
 import no.nav.vedtak.log.mdc.MDCOperations;
-import no.nav.vedtak.log.util.LoggerUtils;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 class AppStartupInfoLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppStartupInfoLogger.class);
+    private static final List<String> SECRETS = List.of("passord", "password", "passwd");
+
+    private static final Logger LOG = LoggerFactory.getLogger(AppStartupInfoLogger.class);
 
     private Selftests selftests;
 
@@ -30,17 +38,15 @@ class AppStartupInfoLogger {
     private static final String KONFIGURASJON = "Konfigurasjon";
     private static final String SELFTEST = "Selftest";
     private static final String APPLIKASJONENS_STATUS = "Applikasjonens status";
-    private static final String SYSPROP = "System property";
-    private static final String ENVVAR = "Env. var";
     private static final String START = "start:";
     private static final String SLUTT = "slutt.";
 
-    private static final String SKIP_LOG_SYS_PROPS = "skipLogSysProps";
-    private static final String SKIP_LOG_ENV_VARS = "skipLogEnvVars";
-    private static final String TRUE = "true";
+    private static final List<String> IGNORE = List.of("TCP_ADDR", "PORT_HTTP", "SERVICE_HOST",
+            "TCP_PROTO", "_TCP", "_PORT");
+
+    private static final Environment ENV = Environment.current();
 
     AppStartupInfoLogger() {
-        // for CDI proxy
     }
 
     @Inject
@@ -57,28 +63,17 @@ class AppStartupInfoLogger {
 
     private void logKonfigurasjon() {
         log(KONFIGURASJON + " " + START);
-
-        SystemPropertiesHelper sysPropsHelper = SystemPropertiesHelper.getInstance();
-        boolean skipSysProps = TRUE.equalsIgnoreCase(System.getProperty(SKIP_LOG_SYS_PROPS));
-        boolean skipEnvVars = TRUE.equalsIgnoreCase(System.getProperty(SKIP_LOG_ENV_VARS));
-
-        if (!skipSysProps) {
-            SortedMap<String, String> sysPropsMap = sysPropsHelper.filteredSortedProperties();
-            String sysPropFormat = SYSPROP + ": {}={}";
-            for (Entry<String, String> entry : sysPropsMap.entrySet()) {
-                log(sysPropFormat, LoggerUtils.removeLineBreaks(entry.getKey()), LoggerUtils.removeLineBreaks(entry.getValue()));
-            }
-        }
-
-        if (!skipEnvVars) {
-            SortedMap<String, String> envVarsMap = sysPropsHelper.filteredSortedEnvVars();
-            for (Entry<String, String> entry : envVarsMap.entrySet()) {
-                String envVarFormat = ENVVAR + ": {}={}";
-                log(envVarFormat, LoggerUtils.removeLineBreaks(entry.getKey()), LoggerUtils.removeLineBreaks(entry.getValue()));
-            }
-        }
-
+        log(SYSTEM_PROPERTIES);
+        log(ENV_PROPERTIES);
+        log(APP_PROPERTIES);
         log(KONFIGURASJON + " " + SLUTT);
+    }
+
+    private void log(StandardPropertySource source) {
+        fromProperties(ENV.getProperties(source).getVerdier()).entrySet()
+                .stream()
+                .sorted(comparingByKey())
+                .forEach(e -> log(source, e));
     }
 
     private void logSelftest() {
@@ -86,47 +81,74 @@ class AppStartupInfoLogger {
 
         // callId er påkrevd på utgående kall og må settes før selftest kjøres
         MDCOperations.putCallId();
-        try {
-            SelftestResultat samletResultat = selftests.run();
-            MDCOperations.removeCallId();
+        var samletResultat = selftests.run();
+        MDCOperations.removeCallId();
 
-            for (HealthCheck.Result result : samletResultat.getAlleResultater()) {
-                log(result);
+        samletResultat.getAlleResultater().stream()
+                .forEach(AppStartupInfoLogger::log);
+
+        log(APPLIKASJONENS_STATUS + ": {}", samletResultat.getAggregateResult());
+        log(SELFTEST + " " + SLUTT);
+    }
+
+    private static void log(StandardPropertySource source, Entry<String, String> entry) {
+        String value = secret(entry.getKey()) ? hide(entry.getValue()) : entry.getValue();
+        log(ignore(entry.getKey()), "{}: {}={}", source.getName(), entry.getKey(), value);
+    }
+
+    private static boolean ignore(String key) {
+        for (String ignore : IGNORE) {
+            if (key.toLowerCase().endsWith(ignore.toLowerCase())) {
+                return true;
             }
+        }
+        return false;
+    }
 
-            log(APPLIKASJONENS_STATUS + ": {}", samletResultat.getAggregateResult());
+    private static boolean secret(String key) {
+        for (String secret : SECRETS) {
+            if (key.toLowerCase().endsWith(secret.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-            log(SELFTEST + " " + SLUTT);
-        } catch (Exception e) {
-            logger.info("SELFTEST ERROR ", e);
+    private static String hide(String val) {
+        return "*".repeat(val.length());
+    }
+
+    private static void log(String msg, Object... args) {
+        log(false, msg, args);
+    }
+
+    private static void log(boolean ignore, String msg, Object... args) {
+        if (ignore) {
+            LOG.debug(msg, args);
+        } else {
+            LOG.info(msg, args);
         }
     }
 
-    private void log(String msg, Object... args) {
-        logger.info(msg, args); //NOSONAR
-    }
-
-    private void log(HealthCheck.Result result) {
+    private static void log(HealthCheck.Result result) {
         if (result.getDetails() != null) {
             OppstartFeil.FACTORY.selftestStatus(
                     getStatus(result.isHealthy()),
                     (String) result.getDetails().get(ExtHealthCheck.DETAIL_DESCRIPTION),
                     (String) result.getDetails().get(ExtHealthCheck.DETAIL_ENDPOINT),
                     (String) result.getDetails().get(ExtHealthCheck.DETAIL_RESPONSE_TIME),
-                    result.getMessage()
-            ).log(logger);
+                    result.getMessage()).log(LOG);
         } else {
             OppstartFeil.FACTORY.selftestStatus(
                     getStatus(result.isHealthy()),
                     null,
                     null,
                     null,
-                    result.getMessage()
-            ).log(logger);
+                    result.getMessage()).log(LOG);
         }
     }
 
-    private String getStatus(boolean isHealthy) {
+    private static String getStatus(boolean isHealthy) {
         return isHealthy ? "OK" : "ERROR";
     }
 }
