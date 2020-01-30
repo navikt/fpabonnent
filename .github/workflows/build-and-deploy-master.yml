@@ -50,21 +50,17 @@ jobs:
       - name: Kompiler
         run: |
           echo "::set-env name=IMAGE::$IMAGE_BASE:$TAG" 
-          mvn install -e --batch-mode --settings .github/workflows/.m2/settings.xml   
-          #mvn jacoco:prepare-agent install -e --batch-mode --settings .github/workflows/.m2/settings.xml   -Djacoco.destFile=$(pwd)/target/jacoco.exec
-          #mvn jacoco:report sonar:sonar -e --batch-mode --settings .github/workflows/.m2/settings.xml -Djacoco.dataFile=$(pwd)/target/jacoco.exec  -Dsonar.login=${SONAR} -Dsonar.projectKey=navikt_fpfordel
+          mvn test -e --batch-mode --settings .github/workflows/.m2/settings.xml   
+          ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
+          cp migreringer/src/main/resources/db/V4_0__baseline.sql.orig  migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
+          mvn install -Dmaven.test.skip=false  -e --batch-mode --settings .github/workflows/.m2/settings.xml   
+          ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
+
         env:
           TZ: Europe/Oslo
           GITHUB_USERNAME: x-access-token
           GITHUB_PASSWORD: ${{ secrets.NOTIFICATION }}
           SONAR: ${{ secrets.SONAR }}  
-
-      - name: Test
-        run: |
-          ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
-          cp migreringer/src/main/resources/db/V4_0__baseline.sql.orig  migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
-          ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
-     
     
       - name: Bygg, tag og push Docker image  
         run: |
