@@ -58,6 +58,12 @@ jobs:
           GITHUB_USERNAME: x-access-token
           GITHUB_PASSWORD: ${{ secrets.NOTIFICATION }}
           SONAR: ${{ secrets.SONAR }}  
+
+      - name: Test
+        run: |
+          ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
+          cp migreringer/src/main/resources/db/V4_0__baseline.sql.orig  migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
+          ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
      
     
       - name: Bygg, tag og push Docker image  
