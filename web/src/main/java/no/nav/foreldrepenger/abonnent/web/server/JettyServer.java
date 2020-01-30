@@ -53,23 +53,12 @@ public class JettyServer extends AbstractJettyServer {
     @Override
     protected void konfigurerMiljø() throws Exception {
         dataSourceKonfig = new DataSourceKonfig();
-        hacks4Nais();
+        // hacks4Nais();
         LOG.info("Serverinfo 2 {}", ServerInfo.instance().toString());
     }
 
     private void hacks4Nais() {
-        // loadBalancerFqdnTilLoadBalancerUrl();
-        temporært();
-    }
-
-    private void loadBalancerFqdnTilLoadBalancerUrl() {
-        String fqdn = ENV.getProperty("LOADBALANCER_FQDN");
-        LOG.info("FQDN er {}", fqdn);
-        if (fqdn != null) {
-            String protocol = (fqdn.startsWith("localhost")) ? "http" : "https";
-            System.setProperty("loadbalancer.url", protocol + "://" + fqdn);
-            LOG.info("Setter loadbalancer.url fra {} til {}", fqdn, ENV.getProperty("loadbalancer.url"));
-        }
+        // temporært();
     }
 
     private void temporært() {
