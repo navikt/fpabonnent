@@ -52,7 +52,7 @@ public class TpsFeedPollerTest {
 
     @Before
     public void setUp() {
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv");
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", true);
         Mockito.clearInvocations(oidcRestClient);
     }
 
@@ -63,23 +63,22 @@ public class TpsFeedPollerTest {
         verify(hendelseRepository, times(2)).lagreInngåendeHendelse(any());
         verify(inputFeed).oppdaterLestOk("sequenceId=4");
     }
-    
+
     @Test
     public void skal_lese_fra_feed_hvor_next_url_satt() throws Exception {
         when(inputFeed.getNextUrl()).thenReturn(Optional.of("sequenceId=2"));
         poller.poll(inputFeed);
-        
+
         verify(oidcRestClient).get(URI.create(BASE_URL_FEED + "?sequenceId=2&pageSize=5"), Feed.class);
     }
-    
+
     @Test
     public void skal_defaulte_til_base_url_hvis_next_url_invalid() throws Exception {
         when(inputFeed.getNextUrl()).thenReturn(Optional.of("foobar=2"));
         poller.poll(inputFeed);
-        
+
         verify(oidcRestClient).get(startUri, Feed.class);
     }
-
 
     @Test
     public void skal_kjøre_ok_uten_items_i_feed() {
@@ -96,7 +95,7 @@ public class TpsFeedPollerTest {
                         lagEntry(2, new UkjentMelding())))
                 .build();
         when(oidcRestClient.get(startUri, Feed.class)).thenReturn(feedUtenAbonnerteItems);
-        
+
         poller.poll(inputFeed);
         verify(hendelseRepository, times(0)).lagreInngåendeHendelse(any());
     }
@@ -111,7 +110,7 @@ public class TpsFeedPollerTest {
     @Test
     public void skal_ikke_polle_feed_når_deaktivert() {
         // Arrange
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "false");
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", false);
 
         // Act
         poller.poll(inputFeed);
@@ -135,7 +134,7 @@ public class TpsFeedPollerTest {
 
     private String lesPayloadFraFil(String filnavn) throws IOException {
         try (InputStream resource = getClass().getResourceAsStream(filnavn);
-             Scanner scanner = new Scanner(resource, "UTF-8")) {
+                Scanner scanner = new Scanner(resource, "UTF-8")) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : null;
         }
