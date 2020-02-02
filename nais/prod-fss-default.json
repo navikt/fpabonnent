@@ -1,0 +1,25 @@
+{
+	"cluster": "prod",
+	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
+	"oraclecredskv": "/oracle/data/prod/creds/fpabonnent_p-fpabonnent_p",
+	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",
+	"othercredskv": "/kv/prod/fss/fpabonnent/default",
+	"namespace": "default",
+	"ingresses": [ "https://fpabonnent.nais.adeo.no" ],
+	"env": {
+		"ABAC_PDP_ENDPOINT_URL": "https://wasapp.adeo.no/asm-pdp/authorize",
+		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
+		"LOADBALANCER_URL": "https://fpabonnent.nais.adeo.no",
+		"OIDC_OPENAM_ISSUERURL": "https://isso.adeo.no:443/isso/oauth2",
+		"OIDC_OPENAM_JWKSURL": "https://isso.adeo.no:443/isso/oauth2/connect/jwk_uri",
+		"OIDC_STS_ISSUER_URL": "https://security-token-service.nais.adeo.no",
+		"OIDC_STS_JWKS_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts/jwks",
+		"OPENIDCONNECT_USERNAME": "fpabonnent-p",
+		"OPENIDCONNECT_ISSOHOST": "https://isso.adeo.no:443/isso/oauth2",
+		"SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
+		"FPSAKHENDELSER_V1_URL": "https://fpsak.nais.adeo.no/fpsak/api/hendelser/",
+		"INFOTRYGD_HENDELSER_API_URL" : "https://infotrygd-hendelser-api.nais.adeo.no/infotrygd/hendelser",
+		"PERSON_FEED_V2_URL": "https://person-feed.nais.adeo.no/api/v2/personfeed/",
+		"PERSONFEED_POLLING_AKTIVERT": "aktiv"
+	}
+}
