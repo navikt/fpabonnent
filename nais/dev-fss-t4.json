@@ -2,6 +2,7 @@
 	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_t4",
 	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_t4-user",
 	"serviceuserkv": "/serviceuser/data/test/srvfpabonnent",
+    "othercredskv": "/kv/preprod/fss/fpabonnent/t4",
 	"namespace": "t4",
 	"ingresses": [
 		"https://fpabonnent-t4.nais.preprod.local/"
