@@ -49,15 +49,14 @@ spec:
   vault:
     enabled: true
     paths:
-    - mountPath: /config/oracle
-      kvPath: {{oracleconfigkv}}
-    - mountPath: /secrets/oracle
-      kvPath:  {{oraclecredskv}}
-    - mountPath: /secrets/serviceuser/fpabonnent
-      kvPath: {{serviceuserkv}}
-    - mountPath: /var/run/secrets/nais.io/vault
-      kvPath: {{othercredskv}}
-
+    - kvPath: {{oraclecredskv}}
+      mountPath: /secrets/oracle/
+    - kvPath: {{oracleconfigkv}}
+      mountPath: /config/oracle
+    - kvPath: {{serviceuserkv}}
+      mountPath: /secrets/serviceuser/
+    - kvPath: {{othercredskv}}
+      mountPath: /var/run/secrets/nais.io/vault 
   sidecar: true 
   env:
 {{#each env}}
