@@ -18,7 +18,8 @@
            "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
            "OIDC_STS_JWKS_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
            "FPSAKHENDELSER_V1_URL": "https://fpsak-q1.nais.preprod.local/fpsak/api/hendelser/",
-           "PERSON_FEED_V2_URL": "dummy.url",
-           "INFOTRYGD_HENDELSER_API_URL" : "https://infotrygd-hendelser-api-q1.nais.preprod.local/infotrygd/hendelser"
+           "PERSON_FEED_V2_URL": "https://person-feed-q1.nais.preprod.local/api/v2/personfeed/",
+           "INFOTRYGD_HENDELSER_API_URL" : "https://infotrygd-hendelser-api-q1.nais.preprod.local/infotrygd/hendelser",
+           "PERSONFEED_POLLING_AKTIVERT": "true"
       }
 }
