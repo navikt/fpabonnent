@@ -25,13 +25,10 @@ spec:
     min: 2 
     max: 2 
     cpuThresholdPercentage: 80 
-  leaderElection: false 
   preStopHookPath: /fpabonnent/internal/health/preStop 
   prometheus: 
     enabled: true 
     path: /fpabonnent/internal/metrics/prometheus 
-  istio: 
-    enabled: false 
   resources: 
     limits:
       cpu: "2000m" 
@@ -43,9 +40,6 @@ spec:
 {{#each ingresses as |url|}}
     - {{url}}
 {{/each}}
-  logformat: accesslog 
-  logtransform: dns_loglevel 
-  webproxy: false 
   vault:
     enabled: true
     paths:
@@ -57,7 +51,6 @@ spec:
       mountPath: /secrets/serviceuser/
     - kvPath: {{othercredskv}}
       mountPath: /var/run/secrets/nais.io/vault 
-  sidecar: true 
   env:
 {{#each env}}
    - name: {{@key}}
