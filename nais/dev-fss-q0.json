@@ -1,0 +1,25 @@
+{
+	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q0",
+	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_q0-fpabonnent_q0",
+	"serviceuserkv": "/serviceuser/data/dev/srvfpabonnent",
+    "othercredskv": "/kv/preprod/fss/fpabonnent/q0",
+	"namespace": "q0",
+	"ingresses": [
+		"https://fpabonnent-q0.nais.preprod.local/"
+	],
+	"env": {
+           "LOADBALANCER_URL": "https://fpabonnent-q0.nais.preprod.local",
+           "ABAC_PDP_ENDPOINT_URL": "https://wasapp-q0.adeo.no/asm-pdp/authorize",
+           "SECURITYTOKENSERVICE_URL": "https://sts-q0.test.local/SecurityTokenServiceProvider/",
+           "OIDC_OPENAM_JWKSURL": "https://isso-q.adeo.no:443/isso/oauth2/connect/jwk_uri",
+           "OIDC_OPENAM_ISSUERURL": "https://isso-q.adeo.no:443/isso/oauth2",
+           "OPENIDCONNECT_USERNAME": "fpabonnent-q0",
+           "OPENIDCONNECT_ISSOHOST": "https://isso-q.adeo.no:443/isso/oauth2",
+           "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
+           "OIDC_STS_JWKS_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
+           "FPSAKHENDELSER_V1_URL": "https://fpsak-q0.nais.preprod.local/fpsak/api/hendelser/",
+           "PERSON_FEED_V2_URL": "https://person-feed-q0.nais.preprod.local/api/v2/personfeed/",
+           "INFOTRYGD_HENDELSER_API_URL" : "https://infotrygd-hendelser-api-q0.nais.preprod.local/infotrygd/hendelser",
+           "PERSONFEED_POLLING_AKTIVERT": "aktiv"
+      }
+}
