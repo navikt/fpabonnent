@@ -1,6 +1,6 @@
 {
 	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q0",
-	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_q0-fpabonnent_q0",
+	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_q0-user",
 	"serviceuserkv": "/serviceuser/data/dev/srvfpabonnent",
     "othercredskv": "/kv/preprod/fss/fpabonnent/q0",
 	"namespace": "q0",
