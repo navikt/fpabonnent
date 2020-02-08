@@ -5,6 +5,6 @@ services:
     shm_size: 2gb
     ports:
       - 1521:1521
-    container_name: oraclefpfordel
+    container_name: oraclefpabonnent
     volumes:
       - ./init.d:/docker-entrypoint-initdb.d/
