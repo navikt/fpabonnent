@@ -17,11 +17,8 @@ import no.nav.foreldrepenger.abonnent.web.app.konfig.ApplicationConfig;
 import no.nav.foreldrepenger.abonnent.web.server.DataSourceKonfig.DBConnProp;
 import no.nav.vedtak.isso.IssoApplication;
 import no.nav.vedtak.isso.config.ServerInfo;
-import no.nav.vedtak.util.env.Environment;
-
 public class JettyServer extends AbstractJettyServer {
 
-    private static final Environment ENV = Environment.current();
 
     private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
@@ -53,29 +50,6 @@ public class JettyServer extends AbstractJettyServer {
     @Override
     protected void konfigurerMiljø() throws Exception {
         dataSourceKonfig = new DataSourceKonfig();
-        // hacks4Nais();
-        LOG.info("Serverinfo 2 {}", ServerInfo.instance().toString());
-    }
-
-    private void hacks4Nais() {
-        // temporært();
-    }
-
-    private void temporært() {
-        // FIXME : PFP-1176 Skriv om i OpenAmIssoHealthCheck og
-        // AuthorizationRequestBuilder når Jboss dør
-        if (System.getenv("OIDC_OPENAM_HOSTURL") != null) {
-            System.setProperty("OpenIdConnect.issoHost", System.getenv("OIDC_OPENAM_HOSTURL"));
-        }
-        // FIXME : PFP-1176 Skriv om i AuthorizationRequestBuilder og
-        // IdTokenAndRefreshTokenProvider når Jboss dør
-        if (System.getenv("OIDC_OPENAM_AGENTNAME") != null) {
-            System.setProperty("OpenIdConnect.username", System.getenv("OIDC_OPENAM_AGENTNAME"));
-        }
-        // FIXME : PFP-1176 Skriv om i IdTokenAndRefreshTokenProvider når Jboss dør
-        if (System.getenv("OIDC_OPENAM_PASSWORD") != null) {
-            System.setProperty("OpenIdConnect.password", System.getenv("OIDC_OPENAM_PASSWORD"));
-        }
     }
 
     @Override
