@@ -20,8 +20,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
-import no.nav.foreldrepenger.abonnent.feed.domain.InfotrygdHendelsePayload;
-import no.nav.foreldrepenger.abonnent.feed.infotrygd.InfotrygdHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
@@ -36,7 +34,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 public class SendHendelseTaskTest {
 
     private static final String FØDSELSMELDINGSTYPE = Meldingstype.FOEDSELSMELDINGOPPRETTET.name();
-    private static final String ENDRINGS_HENDELSE_TYPE = no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.Meldingstype.INFOTRYGD_ENDRET.getType();
     private static final LocalDate FØDSELSDATO = LocalDate.parse("2018-01-01");
 
     @Rule
@@ -51,9 +48,7 @@ public class SendHendelseTaskTest {
     public void setup() {
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         HendelseTjeneste fødselHendelseTjeneste = new FødselsmeldingOpprettetHendelseTjeneste();
-        HendelseTjeneste infotrygdHendelseTjeneste = new InfotrygdHendelseTjeneste();
         when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.FØDSELSMELDINGOPPRETTET), anyLong())).thenReturn(fødselHendelseTjeneste);
-        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.ENDRET), anyLong())).thenReturn(infotrygdHendelseTjeneste);
 
         mockHendelseConsumer = mock(HendelseConsumer.class);
         inngåendeHendelseTjeneste = mock(InngåendeHendelseTjeneste.class);
@@ -125,31 +120,6 @@ public class SendHendelseTaskTest {
         assertThat(payload.getAktørIdFar()).isPresent();
         assertThat(payload.getAktørIdFar().get()).containsExactly("6","7");
         assertThat(payload.getFødselsdato()).isPresent().hasValue(FØDSELSDATO);
-    }
-
-    @Test
-    public void skal_sende_infotrygdhendelse() {
-        // Arrange
-        HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
-        dataWrapper.setHendelseRequestUuid("req_uuid");
-        dataWrapper.setHendelseSekvensnummer(1L);
-        dataWrapper.setHendelseType(ENDRINGS_HENDELSE_TYPE);
-        dataWrapper.setAktørId("1");
-
-        ArgumentCaptor<InfotrygdHendelsePayload> captor = ArgumentCaptor.forClass(InfotrygdHendelsePayload.class);
-
-        // Act
-        sendHendelseTask.doTask(dataWrapper.getProsessTaskData());
-
-        // Assert
-        verify(mockHendelseConsumer).sendHendelse(captor.capture());
-        verify(inngåendeHendelseTjeneste, times(1)).oppdaterHendelseSomSendtNå(captor.capture());
-        assertThat(captor.getAllValues()).hasSize(2);
-        for (InfotrygdHendelsePayload payload : captor.getAllValues()) {
-            assertThat(payload.getSekvensnummer()).isEqualTo(1L);
-            assertThat(payload.getType()).isEqualTo(ENDRINGS_HENDELSE_TYPE);
-            assertThat(payload.getAktoerId()).isEqualTo("1");
-        }
     }
 
     @Test

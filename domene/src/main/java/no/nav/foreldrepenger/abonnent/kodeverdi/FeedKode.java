@@ -18,7 +18,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum FeedKode implements Kodeverdi {
 
     TPS("JF_TPS"),
-    INFOTRYGD("JF_INFOTRYGD"),
+    @Deprecated
+    INFOTRYGD("JF_INFOTRYGD"), // Ligger igjen til evt databaseopprydding
 
     /**
      * Alle kodeverk må ha en verdi, det kan ikke være null i databasen. Denne koden gjør samme nytten.

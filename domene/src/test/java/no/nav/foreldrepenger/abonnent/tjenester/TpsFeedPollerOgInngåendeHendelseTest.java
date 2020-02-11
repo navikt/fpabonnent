@@ -83,7 +83,7 @@ public class TpsFeedPollerOgInngåendeHendelseTest {
                 .thenReturn(dødfødselHendelseTjeneste);
 
         poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv");
-        inngåendeHendelseTjeneste = new InngåendeHendelseTjenesteImpl(hendelseRepository, hendelseTjenesteProvider);
+        inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, hendelseTjenesteProvider);
         Mockito.clearInvocations(oidcRestClient);
     }
 
