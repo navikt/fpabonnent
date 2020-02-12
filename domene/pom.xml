@@ -38,10 +38,6 @@
             <groupId>no.nav.foreldrepenger.kontrakter</groupId>
             <artifactId>abonnent-v1</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
-            <artifactId>infotrygd-hendelser-feed</artifactId>
-        </dependency>
 
         <!-- NAV -->
         <dependency>

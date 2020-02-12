@@ -25,7 +25,6 @@ public @interface HendelseTypeRef {
     String FØDSELSMELDINGOPPRETTET = "FOEDSELSMELDINGOPPRETTET";
     String DØDSMELDINGOPPRETTET = "DOEDSMELDINGOPPRETTET";
     String DØDFØDSELOPPRETTET = "DOEDFOEDSELOPPRETTET";
-    String YTELSE_HENDELSE = "YTELSE_HENDELSE";
 
     /**
      * Settes til navn på hendelsen slik den defineres i FeedEntry, eller til YTELSE_HENDELSE.
@@ -40,11 +39,7 @@ public @interface HendelseTypeRef {
         private String navn;
 
         public HendelseTypeRefLiteral(HendelseType hendelseType) {
-            if (HendelseType.erYtelseHendelseType(hendelseType)) {
-                this.navn = YTELSE_HENDELSE;
-            } else {
-                this.navn = hendelseType.getKode();
-            }
+            this.navn = hendelseType.getKode();
         }
 
         @Override

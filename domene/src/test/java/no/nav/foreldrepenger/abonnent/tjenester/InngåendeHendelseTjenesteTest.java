@@ -21,9 +21,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.feed.domain.InfotrygdHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
@@ -35,7 +35,7 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.tjenester.person.feed.common.v1.FeedEntry;
 import no.nav.tjenester.person.feed.v2.foedselsmelding.FoedselsmeldingOpprettet;
 
-public class InngåendeHendelseTjenesteImplTest {
+public class InngåendeHendelseTjenesteTest {
 
     private static final String REQ_UUID = "req_uuid";
 
@@ -49,7 +49,7 @@ public class InngåendeHendelseTjenesteImplTest {
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         HendelseTjeneste hendelseTjeneste = new FødselsmeldingOpprettetHendelseTjeneste();
         when(hendelseTjenesteProvider.finnTjeneste(any(HendelseType.class), anyLong())).thenReturn(hendelseTjeneste);
-        inngåendeHendelseTjeneste = new InngåendeHendelseTjenesteImpl(hendelseRepository, hendelseTjenesteProvider);
+        inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, hendelseTjenesteProvider);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class InngåendeHendelseTjenesteImplTest {
         when(hendelseRepository.finnGrovsortertHendelse(any(FeedKode.class), anyLong())).thenReturn(Optional.of(hendelse));
 
         // Act
-        InfotrygdHendelsePayload payload = new InfotrygdHendelsePayload.Builder().sekvensnummer(1L).build();
+        var payload = new FødselHendelsePayload.Builder().sekvensnummer(1L).build();
         inngåendeHendelseTjeneste.oppdaterHendelseSomSendtNå(payload);
 
         // Assert

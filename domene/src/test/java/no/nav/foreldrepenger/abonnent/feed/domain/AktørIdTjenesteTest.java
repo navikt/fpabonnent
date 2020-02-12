@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -15,8 +16,8 @@ public class AktørIdTjenesteTest {
     @Test
     public void skal_bare_returnere_gyldige_aktørIder() {
         // Arrange
-        HendelsePayload gyldig = new InfotrygdHendelsePayload.Builder().aktørId(GYLDIG).build();
-        HendelsePayload ugyldig = new InfotrygdHendelsePayload.Builder().aktørId(UGYLDIG).build();
+        HendelsePayload gyldig = new FødselHendelsePayload.Builder().aktørIdMor(Set.of(GYLDIG)).build();
+        HendelsePayload ugyldig = new FødselHendelsePayload.Builder().aktørIdMor(Set.of(UGYLDIG)).build();
 
         List<HendelsePayload> hendelser = asList(gyldig, ugyldig);
 

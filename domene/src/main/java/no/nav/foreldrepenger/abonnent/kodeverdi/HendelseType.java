@@ -20,9 +20,13 @@ public enum HendelseType implements Kodeverdi {
     FØDSELSMELDINGOPPRETTET("FOEDSELSMELDINGOPPRETTET"),
     DØDSMELDINGOPPRETTET("DOEDSMELDINGOPPRETTET"),
     DØDFØDSELOPPRETTET("DOEDFOEDSELOPPRETTET"),
-    OPPHØERT("OPPHOERT_v1"),
+    @Deprecated
+    OPPHØERT("OPPHOERT_v1"), // Beholdes så lende det finnes data i tabeller
+    @Deprecated
     INNVILGET("INNVILGET_v1"),
+    @Deprecated
     ANNULLERT("ANNULLERT_v1"),
+    @Deprecated
     ENDRET("ENDRET_v1"),
 
     /**
@@ -86,13 +90,6 @@ public enum HendelseType implements Kodeverdi {
                 throw new IllegalArgumentException("Duplikat : " + v.kode);
             }
         }
-    }
-
-    public static boolean erYtelseHendelseType(HendelseType hendelseType) {
-        return OPPHØERT.equals(hendelseType)
-                || INNVILGET.equals(hendelseType)
-                || ANNULLERT.equals(hendelseType)
-                || ENDRET.equals(hendelseType);
     }
 
     @Converter(autoApply = true)

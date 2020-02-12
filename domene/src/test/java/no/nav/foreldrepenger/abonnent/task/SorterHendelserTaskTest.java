@@ -30,7 +30,6 @@ import org.mockito.ArgumentCaptor;
 import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.feed.poller.HendelseTestDataUtil;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
@@ -39,7 +38,6 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.tjenester.InngåendeHendelseTjeneste;
-import no.nav.foreldrepenger.kontrakter.feed.infotrygd.v1.FeedElement;
 import no.nav.tjenester.person.feed.common.v1.FeedEntry;
 import no.nav.tjenester.person.feed.v2.Meldingstype;
 import no.nav.vedtak.exception.TekniskException;
@@ -221,37 +219,6 @@ public class SorterHendelserTaskTest {
     }
 
     @Test
-    public void skal_opprette_SendHendelseTask_for_relevant_infotrygd_hendelse() {
-        // Arrange
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
-
-        List<String> eksisterendeAktørIder = Arrays.asList(HendelseTestDataUtil.INFOTRYGD_AKTØR_ID, "1000045443922");
-
-        InngåendeHendelse hendelse = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(), 1L, 0);
-
-        hendelseRepository.lagreInngåendeHendelse(hendelse);
-        repoRule.getEntityManager().flush();
-
-        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
-
-        ArgumentCaptor<ProsessTaskData> argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-
-        // Act
-        sorterHendelserTask.doTask(dataWrapper.getProsessTaskData());
-
-        // Assert
-        verify(mockProsessTaskRepository, times(1)).lagre(argumentCaptor.capture());
-        ProsessTaskData sendt = argumentCaptor.getValue();
-        assertThat(sendt).isNotNull();
-        assertThat(sendt.getTaskType()).isEqualTo(SendHendelseTask.TASKNAME);
-
-        List<InngåendeHendelse> inngåendeHendelser = repoRule.getEntityManager()
-                .createQuery("from InngåendeHendelse", InngåendeHendelse.class).getResultList();
-        assertThat(inngåendeHendelser).hasSize(1);
-        assertThat(inngåendeHendelser.get(0).getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
-    }
-
-    @Test
     public void skal_ikke_opprette_SendHendelseTask_for_ikke_relevant_aktørid() {
         // Arrange
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
@@ -274,43 +241,6 @@ public class SorterHendelserTaskTest {
         assertThat(inngåendeHendelser.get(0).getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
     }
 
-    @Test
-    public void skal_bare_opprette_send_hendelse_for_infotrygd_hendelser_som_ikke_har_koblingId_som_matcher() {
-        // Arrange
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
-        List<String> eksisterendeAktørIder = Arrays.asList(HendelseTestDataUtil.INFOTRYGD_AKTØR_ID, "1000045443922");
-        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
-
-        InngåendeHendelse hendelse1 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(1L, 0L),
-                1L, 0L);
-        hendelseRepository.lagreInngåendeHendelse(hendelse1); // Skal sorteres ut på grunn av hendelse3
-        InngåendeHendelse hendelse2 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(2L, 1L),
-                2L, 1L);
-        hendelseRepository.lagreInngåendeHendelse(hendelse2); // Skal sorteres ut på grunn av hendelse3
-        InngåendeHendelse hendelse3 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(3L, 1L),
-                3L, 1L);
-        hendelseRepository.lagreInngåendeHendelse(hendelse3); // Skal sendes
-        InngåendeHendelse hendelse4 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(4L, 0L),
-                4L, 0L);
-        hendelseRepository.lagreInngåendeHendelse(hendelse4); // Skal sendes
-        InngåendeHendelse hendelse5 = lagInngåendeInfotrygdHendelse(HendelseTestDataUtil.lagInfotrygdMelding(5L, 0L),
-                5L, 0L);
-        hendelseRepository.lagreInngåendeHendelse(hendelse5); // Skal sendes
-        repoRule.getEntityManager().flush();
-
-        ArgumentCaptor<ProsessTaskData> argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-
-        // Act
-        sorterHendelserTask.doTask(dataWrapper.getProsessTaskData());
-
-        // Assert
-        verify(mockProsessTaskRepository, times(3)).lagre(argumentCaptor.capture());
-        List<ProsessTaskData> sendt = argumentCaptor.getAllValues();
-        assertThat(sendt).hasSize(3);
-        assertThat(new HendelserDataWrapper(sendt.get(0)).getHendelseSekvensnummer().get()).isEqualTo(3L);
-        assertThat(new HendelserDataWrapper(sendt.get(1)).getHendelseSekvensnummer().get()).isEqualTo(4L);
-        assertThat(new HendelserDataWrapper(sendt.get(2)).getHendelseSekvensnummer().get()).isEqualTo(5L);
-    }
 
     private HendelserDataWrapper lagDefaultDataWrapper() {
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
@@ -324,19 +254,6 @@ public class SorterHendelserTaskTest {
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload(JsonMapper.toJson(feedEntry))
                 .feedKode(FeedKode.TPS)
-                .requestUuid(REQ_UUID)
-                .håndtertStatus(HåndtertStatusType.SENDT_TIL_SORTERING)
-                .build();
-    }
-
-    private InngåendeHendelse lagInngåendeInfotrygdHendelse(FeedElement feedElement, long sekvensnummer,
-            long koblingId) {
-        return InngåendeHendelse.builder()
-                .sekvensnummer(sekvensnummer)
-                .koblingId(koblingId)
-                .type(HendelseType.ENDRET)
-                .payload(JsonMapper.toJson(feedElement))
-                .feedKode(FeedKode.INFOTRYGD)
                 .requestUuid(REQ_UUID)
                 .håndtertStatus(HåndtertStatusType.SENDT_TIL_SORTERING)
                 .build();

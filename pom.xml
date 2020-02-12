@@ -26,7 +26,7 @@
 
         <felles.version>1.5-20200204090057-9b4d00e</felles.version>
         <prosesstask.version>2.0.0-20200118083448-d87fd6d</prosesstask.version>
-        <fp-kontrakter.version>5.1_20200117132228_47cdf2f</fp-kontrakter.version>
+        <fp-kontrakter.version>5.1-20200211164354-f6cea52</fp-kontrakter.version>
 
         <!-- Eksterne tjenestekontrakter -->
         <person-api-feed.version>1.1.0</person-api-feed.version>
@@ -144,11 +144,6 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>abonnent-v1</artifactId>
-                <version>${fp-kontrakter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.kontrakter</groupId>
-                <artifactId>infotrygd-hendelser-feed</artifactId>
                 <version>${fp-kontrakter.version}</version>
             </dependency>
 

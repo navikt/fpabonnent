@@ -18,7 +18,6 @@
 		"OPENIDCONNECT_ISSOHOST": "https://isso.adeo.no:443/isso/oauth2",
 		"SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
 		"FPSAKHENDELSER_V1_URL": "https://fpsak.nais.adeo.no/fpsak/api/hendelser/",
-		"INFOTRYGD_HENDELSER_API_URL" : "https://infotrygd-hendelser-api.nais.adeo.no/infotrygd/hendelser",
 		"PERSON_FEED_V2_URL": "https://person-feed.nais.adeo.no/api/v2/personfeed/",
 		"PERSONFEED_POLLING_AKTIVERT": "aktiv"
 	}

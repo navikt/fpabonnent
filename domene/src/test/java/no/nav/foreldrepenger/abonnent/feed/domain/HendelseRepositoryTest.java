@@ -79,12 +79,12 @@ public class HendelseRepositoryTest {
     }
 
     @Test
-    public void skal_hente_alle_hendelser_som_ikke_er_håndterte_og_kommer_fra_infotrygd_feed() {
+    public void skal_hente_alle_hendelser_som_ikke_er_håndterte_og_kommer_fra_tps_feed() {
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
                 .sekvensnummer(ID)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
-                .feedKode(FeedKode.INFOTRYGD)
+                .feedKode(FeedKode.TPS)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.HÅNDTERT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
@@ -102,7 +102,7 @@ public class HendelseRepositoryTest {
                 .sekvensnummer(ID + 2)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
-                .feedKode(FeedKode.INFOTRYGD)
+                .feedKode(FeedKode.TPS)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.SENDT_TIL_SORTERING)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
@@ -111,7 +111,7 @@ public class HendelseRepositoryTest {
                 .sekvensnummer(ID + 3)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
-                .feedKode(FeedKode.INFOTRYGD)
+                .feedKode(FeedKode.TPS)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
@@ -122,9 +122,9 @@ public class HendelseRepositoryTest {
         hendelseRepository.lagreInngåendeHendelse(hendelse4);
         repoRule.getEntityManager().flush();
 
-        List<InngåendeHendelse> hendelser = hendelseRepository.finnAlleIkkeSorterteHendelserFraFeed(FeedKode.INFOTRYGD);
-        assertThat(hendelser).hasSize(2);
-        assertThat(hendelser).containsExactly(hendelse3, hendelse4);
+        List<InngåendeHendelse> hendelser = hendelseRepository.finnAlleIkkeSorterteHendelserFraFeed(FeedKode.TPS);
+        assertThat(hendelser).hasSize(3);
+        assertThat(hendelser).containsExactly(hendelse3, hendelse2, hendelse4);
     }
 
     @Test
@@ -158,12 +158,12 @@ public class HendelseRepositoryTest {
     }
 
     @Test
-    public void skal_returnere_hendelse_fra_infotrygd_som_er_grovsortert() {
+    public void skal_returnere_hendelse_fra_tps_som_er_grovsortert() {
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
                 .sekvensnummer(ID)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload1")
-                .feedKode(FeedKode.INFOTRYGD)
+                .feedKode(FeedKode.TPS)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.GROVSORTERT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
@@ -181,7 +181,7 @@ public class HendelseRepositoryTest {
                 .sekvensnummer(ID + 1)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload3")
-                .feedKode(FeedKode.INFOTRYGD)
+                .feedKode(FeedKode.TPS)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.GROVSORTERT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
@@ -190,7 +190,7 @@ public class HendelseRepositoryTest {
                 .sekvensnummer(ID)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload4")
-                .feedKode(FeedKode.INFOTRYGD)
+                .feedKode(FeedKode.TPS)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
@@ -201,10 +201,10 @@ public class HendelseRepositoryTest {
         hendelseRepository.lagreInngåendeHendelse(hendelse4);
         repoRule.getEntityManager().flush();
 
-        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(FeedKode.INFOTRYGD, ID);
+        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(FeedKode.TPS, ID);
         assertThat(hendelse).isPresent();
         assertThat(hendelse.get().getSekvensnummer()).isEqualTo(ID);
-        assertThat(hendelse.get().getFeedKode()).isEqualTo(FeedKode.INFOTRYGD);
+        assertThat(hendelse.get().getFeedKode()).isEqualTo(FeedKode.TPS);
         assertThat(hendelse.get().getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
         assertThat(hendelse.get().getPayload()).isEqualTo("payload1");
     }
