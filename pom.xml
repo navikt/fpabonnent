@@ -44,7 +44,7 @@
         <logstash.version>6.3</logstash.version>
         <metrics.version>4.1.2</metrics.version>
         <prometheus.version>0.8.1</prometheus.version>
-        <resteasy-validator-provider.version>3.10.0.Final</resteasy-validator-provider.version>
+        <resteasy-validator-provider.version>3.11.0.Final</resteasy-validator-provider.version>
         <weld-web.version>3.1.3.Final</weld-web.version>
         <javax.el.version>3.0.1-b11</javax.el.version>
         <swagger.version>2.1.1</swagger.version>
