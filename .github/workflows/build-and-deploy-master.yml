@@ -87,7 +87,7 @@ jobs:
         if: success()
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          token: ${{ secrets.NOTIFICATION }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
           body: /promote dev-fss t4
 
