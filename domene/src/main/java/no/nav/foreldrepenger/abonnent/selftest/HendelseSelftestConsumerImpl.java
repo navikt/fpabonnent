@@ -11,7 +11,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 @ApplicationScoped
 class HendelseSelftestConsumerImpl implements HendelseSelftestConsumer {
 
-    private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser_v1.url";
+    private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
 
     private OidcRestClient oidcRestClient;
     private URI endpointUrl;

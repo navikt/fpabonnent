@@ -17,7 +17,6 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -88,7 +87,6 @@ public class TpsFeedPollerOgInngåendeHendelseTest {
     }
 
     @Test
-    @Ignore
     public void skal_kunne_konvertere_json_fra_person_feed_til_hendelse() throws IOException {
         // Last inn eksempel json og poll denne.
         String eksempelJson = lesPayloadFraFil("/eksempel-gyldig-person-feed-v2.json");

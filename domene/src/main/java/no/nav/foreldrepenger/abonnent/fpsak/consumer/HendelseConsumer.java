@@ -17,7 +17,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class HendelseConsumer {
-    private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser_v1.url";
+    private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
     // URI append paths
     private static final String SEND_HENDELSE_PATH = "hendelse";
     private static final String GROVSORTER_HENDELSE_PATH = "grovsorter";
