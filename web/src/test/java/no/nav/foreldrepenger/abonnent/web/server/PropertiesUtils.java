@@ -21,6 +21,7 @@ class PropertiesUtils {
 
     private static String DEV_FILNAVN = "app.properties";
     private static String DEV_FILNAVN_LOCAL = "app-local.properties";
+    private static String VTP_FILNAVN_LOCAL = "app-vtp.properties";
 
     private PropertiesUtils() {
     }
@@ -61,10 +62,13 @@ class PropertiesUtils {
         }
     }
 
-    static void initProperties() {
+    static void initProperties(boolean vtp) {
         File devFil = new File(DEV_FILNAVN);
         loadPropertyFile(devFil);
         loadPropertyFile(new File(DEV_FILNAVN_LOCAL));
+        if (vtp) {
+            loadPropertyFile(new File(VTP_FILNAVN_LOCAL));
+        }
     }
 
     private static void loadPropertyFile(File devFil) {

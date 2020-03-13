@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -29,7 +28,6 @@ public class HendelseRepositoryTest {
     private HendelseRepository hendelseRepository = new HendelseRepository(repoRule.getEntityManager());
 
     @Test
-    @Ignore
     public void skal_hente_alle_hendelser_som_er_klare_til_grovsortering_og_sortere_på_opprettet_tid() {
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
                 .sekvensnummer(ID)

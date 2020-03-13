@@ -12,7 +12,6 @@ import javax.persistence.EntityManager;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -25,7 +24,6 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.vedtak.felles.jpa.TransactionHandler;
 
-@Ignore
 public class HendelseRepositoryLockTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(HendelseRepositoryLockTest.class);
 
