@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -24,6 +25,8 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.vedtak.felles.jpa.TransactionHandler;
 
+@Ignore // Feiler innimellom på GHA. Nå som formula-annotasjon på HåndtertStatusType i InngåendeHendelse
+// er borte kan låsingen trolig gå direkte mot InngåendeHendelse, og bør derfor skrives om - TFP-2932
 public class HendelseRepositoryLockTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(HendelseRepositoryLockTest.class);
 
