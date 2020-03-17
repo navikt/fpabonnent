@@ -79,7 +79,7 @@ jobs:
             Kommenter med <b>/promote env namespace</b>, hvor <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
             <table>
             <tr><th>Cluster</th><th>Namespace</th></tr>
-            <tr><td>dev-fss</td><td>t4, q1</td></tr>
+            <tr><td>dev-fss</td><td>t4, q1, q0</td></tr>
             <tr><td>prod-fss</td><td>default</td></tr>
             </table>
 
