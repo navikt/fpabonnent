@@ -83,11 +83,19 @@ jobs:
             <tr><td>prod-fss</td><td>default</td></tr>
             </table>
 
-      - name: Trigg deploy til dev
+      - name: Trigg deploy til T4
         if: success()
         uses: peter-evans/create-or-update-comment@v1
         with:
           token: ${{ secrets.NOTIFICATION }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
           body: /promote dev-fss t4
+
+      - name: Trigg deploy til Q1
+        if: success()
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.NOTIFICATION }}
+          issue-number: ${{ steps.createdeployissue.outputs.number }}
+          body: /promote dev-fss q1
 
