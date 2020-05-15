@@ -33,7 +33,7 @@
         <person-api-feed-common.version>1.0.1</person-api-feed-common.version>
 
         <!-- Eksterne -->
-        <assertj.version>3.15.0</assertj.version>
+        <assertj.version>3.16.1</assertj.version>
         <flyway.version>4.2.0</flyway.version>
         <hamcrest.version>1.3</hamcrest.version>
         <junit.version>5.5.2</junit.version>
@@ -42,22 +42,22 @@
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
         <logstash.version>6.3</logstash.version>
-        <metrics.version>4.1.5</metrics.version>
-        <prometheus.version>0.8.1</prometheus.version>
-        <resteasy-validator-provider.version>3.11.0.Final</resteasy-validator-provider.version>
-        <weld-web.version>3.1.3.Final</weld-web.version>
+        <metrics.version>4.1.8</metrics.version>
+        <prometheus.version>0.9.0</prometheus.version>
+        <resteasy-validator-provider.version>3.12.0.Final</resteasy-validator-provider.version>
+        <weld-web.version>3.1.4.Final</weld-web.version>
         <javax.el.version>3.0.1-b11</javax.el.version>
-        <swagger.version>2.1.1</swagger.version>
+        <swagger.version>2.1.2</swagger.version>
         <kafka.version>2.5.0</kafka.version>
         <avro.version>1.9.1</avro.version>
         <confluent.version>5.5.0</confluent.version>
 
         <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
-        <joda-time.version>2.10.5</joda-time.version>
+        <joda-time.version>2.10.6</joda-time.version>
         <ow2.asm.version>7.3.1</ow2.asm.version>
         <owaspencoder.version>1.2.2</owaspencoder.version>
         <javaslang.version>2.0.6</javaslang.version>
-        <swagger.spec-parser.version>1.0.50</swagger.spec-parser.version>
+        <swagger.spec-parser.version>1.0.51</swagger.spec-parser.version>
     </properties>
 
     <dependencies>
@@ -473,7 +473,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
-                    <version>1.2.1</version>
+                    <version>1.2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
