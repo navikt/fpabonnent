@@ -44,7 +44,7 @@ public class PdlLeesahHendelseProperties {
                                        @KonfigVerdi(value = "javax.net.ssl.trustStore") String trustStorePath,
                                        @KonfigVerdi(value = "javax.net.ssl.trustStorePassword") String trustStorePassword,
                                        @KonfigVerdi("kafka.topic.pdl.leesah.hendelse") String topic,
-                                       @KonfigVerdi(KAFKA_AVRO_SERDE_CLASS) String kafkaAvroSerdeClass) {
+                                       @KonfigVerdi(value = KAFKA_AVRO_SERDE_CLASS, defaultVerdi = "io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde") String kafkaAvroSerdeClass) {
         this.personhendelseTopic = new Topic<>(topic, Serdes.String(), getSerde(kafkaAvroSerdeClass));
         this.bootstrapServers = bootstrapServers;
         this.schemaRegistryUrl = schemaRegistry;
