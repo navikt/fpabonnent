@@ -37,7 +37,10 @@ public class PdlLeesahHendelseStream implements AppServiceHandler {
                                    Unleash unleash) {
         this.topic = pdlLeesahHendelseProperties.getTopic();
         if (unleash.isEnabled(FPABONNENT_KONSUMERE_PDL, false)) {
+            LOG.info("Starter konsumering av PDL Kafka topic");
             this.stream = createKafkaStreams(topic, pdlLeesahHendelseHåndterer, pdlLeesahHendelseProperties);
+        } else {
+            LOG.info("Starter ikke konsumering av PDL Kafka topic");
         }
         this.unleash = unleash;
     }
