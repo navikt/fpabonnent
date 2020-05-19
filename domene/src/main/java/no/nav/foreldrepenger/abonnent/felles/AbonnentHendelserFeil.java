@@ -18,19 +18,19 @@ public interface AbonnentHendelserFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FP-730005", feilmelding = "Kan ikke konvertere feed-content. type=%s, sekvensnummer=%s", logLevel = LogLevel.ERROR)
     Feil kanIkkeKonvertereFeedContent(String type, long sekvensnummer);
     
-    @TekniskFeil(feilkode = "FP-309345", feilmelding = "Ukjent meldingstype - kan ikke finne hendelsestjeneste. type=%s, sekvensnummer=%s", logLevel = LogLevel.ERROR)
-    Feil ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(String type, long sekvensnummer);
+    @TekniskFeil(feilkode = "FP-309345", feilmelding = "Ukjent meldingstype - kan ikke finne hendelsestjeneste. type=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
+    Feil ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(String type, String hendelseId);
 
-    @TekniskFeil(feilkode = "FP-125639", feilmelding = "Mer enn en hendelsestjeneste funnet. type=%s, sekvensnummer=%s", logLevel = LogLevel.ERROR)
-    Feil merEnnEnHendelseTjenesteFunnet(String type, long sekvensnummer);
+    @TekniskFeil(feilkode = "FP-125639", feilmelding = "Mer enn en hendelsestjeneste funnet. type=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
+    Feil merEnnEnHendelseTjenesteFunnet(String type, String hendelseId);
 
     @TekniskFeil(feilkode = "FP-846675", feilmelding = "Ukjent Hendelse Type <%s>", logLevel = LogLevel.WARN)
     Feil ukjentHendelseType(String feedType);
 
-    @TekniskFeil(feilkode = "FP-195374", feilmelding = "Finner ingen aktørId på sekvensnummer=%s", logLevel = LogLevel.WARN)
-    Feil finnerIngenAktørId(long sekvensnummer);
+    @TekniskFeil(feilkode = "FP-195374", feilmelding = "Finner ingen aktørId på hendelseId=%s", logLevel = LogLevel.WARN)
+    Feil finnerIngenAktørId(String hendelseId);
 
-    @TekniskFeil(feilkode = "FP-295374", feilmelding = "Finner ikke unik aktørId. Fant %s aktørId på sekvensnummer=%s", logLevel = LogLevel.INFO)
-    Feil merEnnEnAktørId(int antall, long sekvensnummer);
+    @TekniskFeil(feilkode = "FP-295374", feilmelding = "Finner ikke unik aktørId. Fant %s aktørId på hendelseId=%s", logLevel = LogLevel.INFO)
+    Feil merEnnEnAktørId(int antall, String hendelseId);
 
 }

@@ -2,8 +2,6 @@ package no.nav.foreldrepenger.abonnent.feed.domain;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,25 +10,19 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.tps.FødselHendelseDto;
 
-public class FødselHendelsePayload extends HendelsePayload {
-
-    private Set<String> aktørIdMor;
-
-    private Set<String> aktørIdFar;
+public class PdlFødselHendelsePayload extends HendelsePayload {
 
     private Set<String> aktørIdBarn;
 
     private LocalDate fødselsdato;
 
-    public FødselHendelsePayload() {
+    public PdlFødselHendelsePayload() {
     }
 
-    private FødselHendelsePayload(Builder builder) {
+    private PdlFødselHendelsePayload(Builder builder) {
         this.hendelseId = builder.hendelseId;
         this.type = builder.type;
-        this.endringstype = "OPPRETTET";
-        this.aktørIdMor = builder.aktørIdMor;
-        this.aktørIdFar = builder.aktørIdFar;
+        this.endringstype = builder.endringstype;
         this.aktørIdBarn = builder.aktørIdBarn;
         this.fødselsdato = builder.fødselsdato;
     }
@@ -38,25 +30,9 @@ public class FødselHendelsePayload extends HendelsePayload {
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
         FødselHendelseDto dto = new FødselHendelseDto();
-        dto.setId(HendelseMapper.FØDSEL_HENDELSE_TYPE + this.getHendelseId());
-        dto.setAktørIdForeldre(finnAktørIdForeldre(this));
+        dto.setId(HendelseMapper.FØDSEL_HENDELSE_TYPE + "_" + getHendelseId());
         this.getFødselsdato().ifPresent(dto::setFødselsdato);
         return HendelseWrapperDto.lagDto(dto);
-    }
-
-    private List<String> finnAktørIdForeldre(FødselHendelsePayload payload) {
-        List<String> aktørIder = new LinkedList<>();
-        payload.getAktørIdFar().ifPresent(aktørIder::addAll);
-        payload.getAktørIdMor().ifPresent(aktørIder::addAll);
-        return aktørIder;
-    }
-
-    public Optional<Set<String>> getAktørIdMor() {
-        return Optional.ofNullable(aktørIdMor);
-    }
-
-    public Optional<Set<String>> getAktørIdFar() {
-        return Optional.ofNullable(aktørIdFar);
     }
 
     public Optional<Set<String>> getAktørIdBarn() {
@@ -70,12 +46,8 @@ public class FødselHendelsePayload extends HendelsePayload {
     @Override
     public Set<String> getAktørIderForSortering() {
         Set<String> set = new HashSet<>();
-        if (aktørIdFar != null) {
-            set.addAll(aktørIdFar);
-        }
-
-        if (aktørIdMor != null) {
-            set.addAll(aktørIdMor);
+        if (aktørIdBarn != null) {
+            set.addAll(aktørIdBarn);
         }
         return set;
     }
@@ -87,7 +59,7 @@ public class FødselHendelsePayload extends HendelsePayload {
 
     @Override
     public FeedKode getFeedKode() {
-        return FeedKode.TPS;
+        return FeedKode.PDL;
     }
 
     @Override
@@ -95,13 +67,12 @@ public class FødselHendelsePayload extends HendelsePayload {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        FødselHendelsePayload payload = (FødselHendelsePayload) o;
+        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) o;
 
         if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null)
             return false;
         if (type != null ? !type.equals(payload.type) : payload.type != null) return false;
-        if (aktørIdMor != null ? !aktørIdMor.equals(payload.aktørIdMor) : payload.aktørIdMor != null) return false;
-        if (aktørIdFar != null ? !aktørIdFar.equals(payload.aktørIdFar) : payload.aktørIdFar != null) return false;
+        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
         if (aktørIdBarn != null ? !aktørIdBarn.equals(payload.aktørIdBarn) : payload.aktørIdBarn != null) return false;
         return fødselsdato != null ? fødselsdato.equals(payload.fødselsdato) : payload.fødselsdato == null;
     }
@@ -110,8 +81,7 @@ public class FødselHendelsePayload extends HendelsePayload {
     public int hashCode() {
         int result = hendelseId != null ? hendelseId.hashCode() : 0;
         result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (aktørIdMor != null ? aktørIdMor.hashCode() : 0);
-        result = 31 * result + (aktørIdFar != null ? aktørIdFar.hashCode() : 0);
+        result = 31 * result + (endringstype != null ? endringstype.hashCode() : 0);
         result = 31 * result + (aktørIdBarn != null ? aktørIdBarn.hashCode() : 0);
         result = 31 * result + (fødselsdato != null ? fødselsdato.hashCode() : 0);
         return result;
@@ -120,8 +90,7 @@ public class FødselHendelsePayload extends HendelsePayload {
     public static class Builder {
         private String hendelseId;
         private String type;
-        private Set<String> aktørIdMor;
-        private Set<String> aktørIdFar;
+        private String endringstype;
         private Set<String> aktørIdBarn;
         private LocalDate fødselsdato;
 
@@ -135,13 +104,8 @@ public class FødselHendelsePayload extends HendelsePayload {
             return this;
         }
 
-        public Builder aktørIdMor(Set<String> aktørIdMor) {
-            this.aktørIdMor = aktørIdMor;
-            return this;
-        }
-
-        public Builder aktørIdFar(Set<String> aktørIdFar) {
-            this.aktørIdFar = aktørIdFar;
+        public Builder endringstype(String endringstype) {
+            this.endringstype = endringstype;
             return this;
         }
 
@@ -155,8 +119,8 @@ public class FødselHendelsePayload extends HendelsePayload {
             return this;
         }
 
-        public FødselHendelsePayload build() {
-            return new FødselHendelsePayload(this);
+        public PdlFødselHendelsePayload build() {
+            return new PdlFødselHendelsePayload(this);
         }
     }
 }

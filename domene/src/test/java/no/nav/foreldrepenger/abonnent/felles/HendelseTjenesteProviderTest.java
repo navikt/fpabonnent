@@ -27,7 +27,7 @@ public class HendelseTjenesteProviderTest {
     @Test
     public void skal_finne_hendelsetjeneste() {
         // Act
-        HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(HendelseType.FØDSELSMELDINGOPPRETTET, 1L);
+        HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(HendelseType.FØDSELSMELDINGOPPRETTET, "1");
 
         // Assert
         assertThat(hendelseTjeneste).isNotNull();
@@ -41,6 +41,6 @@ public class HendelseTjenesteProviderTest {
         expectedException.expectMessage("FP-309345");
 
         // Act
-        hendelseTjenesteProvider.finnTjeneste(HendelseType.fraKode("-"), 1L);
+        hendelseTjenesteProvider.finnTjeneste(HendelseType.fraKode("-"), "1");
     }
 }

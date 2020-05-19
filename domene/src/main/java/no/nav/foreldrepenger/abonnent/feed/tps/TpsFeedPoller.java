@@ -135,7 +135,7 @@ public class TpsFeedPoller implements FeedPoller {
 
     private void lagreInngåendeHendelse(FeedEntry entry, String pollId) {
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
-                .sekvensnummer(entry.getSequence())
+                .hendelseId("" + entry.getSequence())
                 .type(HendelseType.fraKodeDefaultUdefinert(entry.getType()))
                 .payload(JsonMapper.toJson(entry))
                 .feedKode(FeedKode.TPS)

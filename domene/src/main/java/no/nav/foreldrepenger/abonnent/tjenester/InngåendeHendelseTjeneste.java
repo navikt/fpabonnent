@@ -14,7 +14,6 @@ import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
-import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 
 @ApplicationScoped
@@ -43,18 +42,18 @@ public class InngåendeHendelseTjeneste {
     }
 
     public void oppdaterHendelseSomSendtNå(HendelsePayload hendelsePayload) {
-        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(hendelsePayload.getFeedKode(), hendelsePayload.getSekvensnummer());
+        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(hendelsePayload.getFeedKode(), hendelsePayload.getHendelseId());
         if (hendelse.isPresent()) {
             hendelseRepository.markerHendelseSomSendtNå(hendelse.get());
             hendelseRepository.oppdaterHåndtertStatus(hendelse.get(), HåndtertStatusType.HÅNDTERT);
         }
     }
 
-    public void markerIkkeRelevanteHendelserSomHåndtert(Map<Long, InngåendeHendelse> inngåendeHendelserMap, List<HendelsePayload> relevanteHendelser) {
-        List<Long> relevanteSekvensnumre = relevanteHendelser.stream()
-                .map(HendelsePayload::getSekvensnummer).collect(Collectors.toList());
-        for (Map.Entry<Long,InngåendeHendelse> entry : inngåendeHendelserMap.entrySet()) {
-            if (!relevanteSekvensnumre.contains(entry.getKey())) {
+    public void markerIkkeRelevanteHendelserSomHåndtert(Map<String, InngåendeHendelse> inngåendeHendelserMap, List<HendelsePayload> relevanteHendelser) {
+        List<String> relevanteHendelseIder = relevanteHendelser.stream()
+                .map(HendelsePayload::getHendelseId).collect(Collectors.toList());
+        for (Map.Entry<String,InngåendeHendelse> entry : inngåendeHendelserMap.entrySet()) {
+            if (!relevanteHendelseIder.contains(entry.getKey())) {
                 InngåendeHendelse inngåendeHendelse = entry.getValue();
                 hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.HÅNDTERT);
                 hendelseRepository.fjernPayload(inngåendeHendelse);
@@ -65,12 +64,8 @@ public class InngåendeHendelseTjeneste {
     public List<HendelsePayload> getPayloadsForInngåendeHendelser(List<InngåendeHendelse> inngåendeHendelserListe) {
         List<HendelsePayload> payloadListe = new ArrayList<>();
         if (inngåendeHendelserListe != null) {
-            inngåendeHendelserListe.forEach(innHendelse -> payloadListe.add(hendelseTjenesteProvider.finnTjeneste(innHendelse.getType(), innHendelse.getSekvensnummer()).payloadFraString(innHendelse.getPayload())));
+            inngåendeHendelserListe.forEach(innHendelse -> payloadListe.add(hendelseTjenesteProvider.finnTjeneste(innHendelse.getType(), innHendelse.getHendelseId()).payloadFraString(innHendelse.getPayload())));
         }
         return payloadListe;
-    }
-
-    public List<InngåendeHendelse> finnAlleIkkeSorterteHendelserFraFeed(FeedKode feedKode) {
-        return hendelseRepository.finnAlleIkkeSorterteHendelserFraFeed(feedKode);
     }
 }

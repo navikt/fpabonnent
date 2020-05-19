@@ -52,8 +52,8 @@ public class HendelserDataWrapperTest {
     @Test
     public void skal_hente_hendelse_sekvensnummer_fra_properties() {
         HendelserDataWrapper wrapper = new HendelserDataWrapper(eksisterendeData);
-        wrapper.setHendelseSekvensnummer(1L);
-        assertThat(wrapper.getHendelseSekvensnummer()).hasValue(1L);
+        wrapper.setHendelseId("1");
+        assertThat(wrapper.getHendelseId()).hasValue("1");
     }
 
     @Test

@@ -20,6 +20,7 @@ public enum FeedKode implements Kodeverdi {
     TPS("JF_TPS"),
     @Deprecated
     INFOTRYGD("JF_INFOTRYGD"), // Ligger igjen til evt databaseopprydding
+    PDL("KAFKA_PDL"),
 
     /**
      * Alle kodeverk må ha en verdi, det kan ikke være null i databasen. Denne koden gjør samme nytten.

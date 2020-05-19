@@ -10,35 +10,35 @@ import java.util.Set;
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.tps.DødfødselHendelseDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.tps.DødHendelseDto;
 
-public class DødfødselHendelsePayload extends HendelsePayload {
+public class PdlDødHendelsePayload extends HendelsePayload {
 
     private Set<String> aktørId;
 
-    private LocalDate dødfødselsdato;
+    private LocalDate dødsdato;
 
-    public DødfødselHendelsePayload() {
+    public PdlDødHendelsePayload() {
     }
 
-    private DødfødselHendelsePayload(DødfødselHendelsePayload.Builder builder) {
+    private PdlDødHendelsePayload(PdlDødHendelsePayload.Builder builder) {
         this.hendelseId = builder.hendelseId;
         this.type = builder.type;
-        this.endringstype = "OPPRETTET";
+        this.endringstype = builder.endringstype;
         this.aktørId = builder.aktørId;
-        this.dødfødselsdato = builder.dødfødselsdato;
+        this.dødsdato = builder.dødsdato;
     }
 
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
-        DødfødselHendelseDto dto = new DødfødselHendelseDto();
-        dto.setId(HendelseMapper.DØDFØDSEL_HENDELSE_TYPE + this.getHendelseId());
+        DødHendelseDto dto = new DødHendelseDto();
+        dto.setId(HendelseMapper.DØD_HENDELSE_TYPE + "_" + getHendelseId());
         dto.setAktørId(finnAktørId(this));
-        this.getDødfødselsdato().ifPresent(dto::setDødfødselsdato);
+        this.getDødsdato().ifPresent(dto::setDødsdato);
         return HendelseWrapperDto.lagDto(dto);
     }
 
-    private List<String> finnAktørId(DødfødselHendelsePayload payload) {
+    private List<String> finnAktørId(PdlDødHendelsePayload payload) {
         List<String> aktørIder = new LinkedList<>();
         payload.getAktørId().ifPresent(aktørIder::addAll);
         return aktørIder;
@@ -48,8 +48,8 @@ public class DødfødselHendelsePayload extends HendelsePayload {
         return Optional.ofNullable(aktørId);
     }
 
-    public Optional<LocalDate> getDødfødselsdato() {
-        return Optional.ofNullable(dødfødselsdato);
+    public Optional<LocalDate> getDødsdato() {
+        return Optional.ofNullable(dødsdato);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class DødfødselHendelsePayload extends HendelsePayload {
 
     @Override
     public FeedKode getFeedKode() {
-        return FeedKode.TPS;
+        return FeedKode.PDL;
     }
 
     @Override
@@ -76,52 +76,57 @@ public class DødfødselHendelsePayload extends HendelsePayload {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DødfødselHendelsePayload payload = (DødfødselHendelsePayload) o;
+        PdlDødHendelsePayload payload = (PdlDødHendelsePayload) o;
 
-        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null)
-            return false;
         if (type != null ? !type.equals(payload.type) : payload.type != null) return false;
+        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
         if (aktørId != null ? !aktørId.equals(payload.aktørId) : payload.aktørId != null) return false;
-        return dødfødselsdato != null ? dødfødselsdato.equals(payload.dødfødselsdato) : payload.dødfødselsdato == null;
+        return dødsdato != null ? dødsdato.equals(payload.dødsdato) : payload.dødsdato == null;
     }
 
     @Override
     public int hashCode() {
-        int result = hendelseId != null ? hendelseId.hashCode() : 0;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (endringstype != null ? endringstype.hashCode() : 0);
         result = 31 * result + (aktørId != null ? aktørId.hashCode() : 0);
-        result = 31 * result + (dødfødselsdato != null ? dødfødselsdato.hashCode() : 0);
+        result = 31 * result + (dødsdato != null ? dødsdato.hashCode() : 0);
         return result;
     }
 
     public static class Builder {
         private String hendelseId;
         private String type;
+        private String endringstype;
         private Set<String> aktørId;
-        private LocalDate dødfødselsdato;
+        private LocalDate dødsdato;
 
-        public DødfødselHendelsePayload.Builder hendelseId(String hendelseId) {
+        public Builder hendelseId(String hendelseId) {
             this.hendelseId = hendelseId;
             return this;
         }
 
-        public DødfødselHendelsePayload.Builder type(String type) {
+        public Builder type(String type) {
             this.type = type;
             return this;
         }
 
-        public DødfødselHendelsePayload.Builder aktørId(Set<String> aktørId) {
+        public Builder endringstype(String endringstype) {
+            this.endringstype = endringstype;
+            return this;
+        }
+
+        public Builder aktørId(Set<String> aktørId) {
             this.aktørId = aktørId;
             return this;
         }
 
-        public DødfødselHendelsePayload.Builder dødfødselsdato(LocalDate dødfødselsdato) {
-            this.dødfødselsdato = dødfødselsdato;
+        public Builder dødsdato(LocalDate dødsdato) {
+            this.dødsdato = dødsdato;
             return this;
         }
 
-        public DødfødselHendelsePayload build() {
-            return new DødfødselHendelsePayload(this);
+        public PdlDødHendelsePayload build() {
+            return new PdlDødHendelsePayload(this);
         }
     }
 }

@@ -250,7 +250,7 @@ public class SorterHendelserTaskTest {
 
     private InngåendeHendelse lagInngåendeTPSHendelse(FeedEntry feedEntry, long id) {
         return InngåendeHendelse.builder()
-                .sekvensnummer(id)
+                .hendelseId("" + id)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload(JsonMapper.toJson(feedEntry))
                 .feedKode(FeedKode.TPS)

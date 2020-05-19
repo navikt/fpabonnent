@@ -25,8 +25,8 @@ public class InngåendeHendelse extends BaseEntitet {
     @Column(name = "id")
     private Long id;
     
-    @Column(name = "sekvensnummer")
-    private Long sekvensnummer;
+    @Column(name = "hendelse_id")
+    private String hendelseId;
 
     @Column(name = "kobling_id")
     private Long koblingId;
@@ -62,7 +62,7 @@ public class InngåendeHendelse extends BaseEntitet {
 
     private InngåendeHendelse(Builder builder) {
         this.id = builder.id;
-        this.sekvensnummer = builder.sekvensnummer;
+        this.hendelseId = builder.hendelseId;
         this.koblingId = builder.koblingId;
         this.feedKode = builder.feedKode;
         this.type = builder.type;
@@ -77,8 +77,8 @@ public class InngåendeHendelse extends BaseEntitet {
         return id;
     }
     
-    public Long getSekvensnummer() {
-        return sekvensnummer;
+    public String getHendelseId() {
+        return hendelseId;
     }
 
     public Long getKoblingId() {
@@ -127,7 +127,7 @@ public class InngåendeHendelse extends BaseEntitet {
 
     public static class Builder {
         private Long id;
-        private Long sekvensnummer;
+        private String hendelseId;
         private Long koblingId;
         private FeedKode feedKode;
         private HendelseType type;
@@ -142,8 +142,8 @@ public class InngåendeHendelse extends BaseEntitet {
             return this;
         }
         
-        public Builder sekvensnummer(Long sekvensnummer) {
-            this.sekvensnummer = sekvensnummer;
+        public Builder hendelseId(String hendelseId) {
+            this.hendelseId = hendelseId;
             return this;
         }
 

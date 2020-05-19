@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.abonnent.feed.tps;
 
-import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.hentUtAktørIder;
+import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.hentUtAktørIderFraIdent;
 import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.optionalStringTilLocalDate;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -32,9 +32,9 @@ public class DødfødselOpprettetHendelseTjeneste implements HendelseTjeneste<D�
             throw AbonnentHendelserFeil.FACTORY.kanIkkeKonvertereFeedContent(entry.getType(), entry.getSequence()).toException();
         }
         return new DødfødselHendelsePayload.Builder()
-                .sekvensnummer(entry.getSequence())
+                .hendelseId("" + entry.getSequence())
                 .type(entry.getType())
-                .aktørId(hentUtAktørIder(dødfødsel.getIdenter(), entry.getSequence()))
+                .aktørId(hentUtAktørIderFraIdent(dødfødsel.getIdenter(), entry.getSequence()))
                 .dødfødselsdato(dødfødsel.getDoedfoedselsdato())
                 .build();
     }
@@ -42,7 +42,7 @@ public class DødfødselOpprettetHendelseTjeneste implements HendelseTjeneste<D�
     @Override
     public DødfødselHendelsePayload payloadFraWrapper(HendelserDataWrapper dataWrapper) {
         return new DødfødselHendelsePayload.Builder()
-                .sekvensnummer(dataWrapper.getHendelseSekvensnummer().orElse(null))
+                .hendelseId(dataWrapper.getHendelseId().orElse(null))
                 .type(dataWrapper.getHendelseType().orElse(null))
                 .aktørId(dataWrapper.getAktørIdListe().orElse(null))
                 .dødfødselsdato(optionalStringTilLocalDate(dataWrapper.getDødfødselsdato()))

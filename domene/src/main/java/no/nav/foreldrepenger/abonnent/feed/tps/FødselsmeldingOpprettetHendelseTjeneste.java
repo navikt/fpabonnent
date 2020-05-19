@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.abonnent.feed.tps;
 
-import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.hentUtAktørIder;
+import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.hentUtAktørIderFraIdent;
 import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.optionalStringTilLocalDate;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -32,11 +32,11 @@ public class FødselsmeldingOpprettetHendelseTjeneste implements HendelseTjenest
             throw AbonnentHendelserFeil.FACTORY.kanIkkeKonvertereFeedContent(entry.getType(), entry.getSequence()).toException();
         }
         return new FødselHendelsePayload.Builder()
-                .sekvensnummer(entry.getSequence())
+                .hendelseId("" + entry.getSequence())
                 .type(entry.getType())
-                .aktørIdBarn(hentUtAktørIder(foedselsmelding.getPersonIdenterBarn(), entry.getSequence()))
-                .aktørIdMor(hentUtAktørIder(foedselsmelding.getPersonIdenterMor(), entry.getSequence()))
-                .aktørIdFar(hentUtAktørIder(foedselsmelding.getPersonIdenterFar(), entry.getSequence()))
+                .aktørIdBarn(hentUtAktørIderFraIdent(foedselsmelding.getPersonIdenterBarn(), entry.getSequence()))
+                .aktørIdMor(hentUtAktørIderFraIdent(foedselsmelding.getPersonIdenterMor(), entry.getSequence()))
+                .aktørIdFar(hentUtAktørIderFraIdent(foedselsmelding.getPersonIdenterFar(), entry.getSequence()))
                 .fødselsdato(foedselsmelding.getFoedselsdato())
                 .build();
     }
@@ -44,7 +44,7 @@ public class FødselsmeldingOpprettetHendelseTjeneste implements HendelseTjenest
     @Override
     public FødselHendelsePayload payloadFraWrapper(HendelserDataWrapper dataWrapper) {
         return new FødselHendelsePayload.Builder()
-                .sekvensnummer(dataWrapper.getHendelseSekvensnummer().orElse(null))
+                .hendelseId(dataWrapper.getHendelseId().orElse(null))
                 .type(dataWrapper.getHendelseType().orElse(null))
                 .aktørIdBarn(dataWrapper.getAktørIdBarn().orElse(null))
                 .aktørIdMor(dataWrapper.getAktørIdMor().orElse(null))

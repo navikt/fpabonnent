@@ -10,6 +10,7 @@ public class HendelseMapper {
     public static final String FØDSEL_HENDELSE_TYPE = "FØDSEL";
     public static final String DØD_HENDELSE_TYPE = "DØD";
     public static final String DØDFØDSEL_HENDELSE_TYPE = "DØDFØDSEL";
+    public static final String FORELDRERELASJON_HENDELSE_TYPE = "FORELDRERELASJON";
 
     public HendelseWrapperDto map(HendelsePayload payload) {
         return payload.mapPayloadTilDto();

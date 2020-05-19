@@ -32,7 +32,7 @@ public class TpsHendelseHjelper {
      * @param identer liste av forskjellige identer for en person(fnr, dnr, aktørid).
      * @return Liste av AktørId, normalt bare en
      */
-    public static Set<String> hentUtAktørIder(Set<Ident> identer, Long sekvensnummer) {
+    public static Set<String> hentUtAktørIderFraIdent(Set<Ident> identer, Long sekvensnummer) {
         if (Objects.isNull(identer)) {
             return null; // NOSONAR - ønsker ikke å returnere tomt Set, for da må man sjekke !isEmpty() i tillegg til isPresent()
         }
@@ -42,18 +42,49 @@ public class TpsHendelseHjelper {
                 .map(Ident::getIdent)
                 .collect(Collectors.toSet());
 
-        if (aktørIder.isEmpty()) {
-            AbonnentHendelserFeil.FACTORY.finnerIngenAktørId(sekvensnummer).log(LOGGER);
-        }
-        if (aktørIder.size() > 1) {
-            AbonnentHendelserFeil.FACTORY.merEnnEnAktørId(aktørIder.size(), sekvensnummer).log(LOGGER);
-        }
+        validerResultat("" + sekvensnummer, aktørIder);
 
         return aktørIder;
     }
 
-    public static boolean erAktørId(Ident ident) {
+    /**
+     * Identer inneholder flere identer for en person. fnr/dnr, aktørid osv.
+     * Vi må hente ut det som er aktørId fra dette settet.
+     *
+     * En person kan ha flere aktørIder, gjerne der en av dem er knyttet til et D-nummer.
+     *
+     * @param identer liste av forskjellige identer for en person(fnr, dnr, aktørid).
+     * @return Liste av AktørId, normalt bare en
+     */
+    public static Set<String> hentUtAktørIderFraString(Set<String> identer, String hendelseId) {
+        if (Objects.isNull(identer)) {
+            return null; // NOSONAR - ønsker ikke å returnere tomt Set, for da må man sjekke !isEmpty() i tillegg til isPresent()
+        }
+
+        Set<String> aktørIder = identer.stream()
+                .filter(TpsHendelseHjelper::erAktørId)
+                .collect(Collectors.toSet());
+
+        validerResultat(hendelseId, aktørIder);
+
+        return aktørIder;
+    }
+
+    private static boolean erAktørId(Ident ident) {
         return ident != null && AKTØR_ID_IDENT_TYPE.equals(ident.getType());
+    }
+
+    private static boolean erAktørId(String string) {
+        return string != null && string.length() == 13 && string.matches("\\d+");
+    }
+
+    private static void validerResultat(String hendelseId, Set<String> aktørIder) {
+        if (aktørIder.isEmpty()) {
+            AbonnentHendelserFeil.FACTORY.finnerIngenAktørId(hendelseId).log(LOGGER);
+        }
+        if (aktørIder.size() > 1) {
+            AbonnentHendelserFeil.FACTORY.merEnnEnAktørId(aktørIder.size(), hendelseId).log(LOGGER);
+        }
     }
 
     public static LocalDate optionalStringTilLocalDate(Optional<String> innDato) {

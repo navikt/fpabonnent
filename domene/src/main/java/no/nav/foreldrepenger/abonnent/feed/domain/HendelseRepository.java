@@ -39,7 +39,7 @@ public class HendelseRepository {
     private static final String HÅNDTERES_ETTER_TIDSPUNKT = "håndteresEtterTidspunkt";
     private static final String FEED_KODE = "feedKode";
     private static final String REQUEST_UUID = "requestUuid";
-    private static final String SEKVENSNUMMER = "sekvensnummer";
+    private static final String HENDELSE_ID = "hendelseId";
 
     private EntityManager entityManager;
 
@@ -135,21 +135,21 @@ public class HendelseRepository {
         inngåendeHendelse.setSendtTidspunkt(LocalDateTime.now());
     }
 
-    public Optional<InngåendeHendelse> finnGrovsortertHendelse(FeedKode feedKode, Long sekvensnummer) {
+    public Optional<InngåendeHendelse> finnGrovsortertHendelse(FeedKode feedKode, String hendelseId) {
         TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
                 "from InngåendeHendelse where feedKode = :feedKode " + //$NON-NLS-1$
-                        "and sekvensnummer = :sekvensnummer " + //$NON-NLS-1$
+                        "and hendelseId = :hendelseId " + //$NON-NLS-1$
                         "and håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
                         SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
         query.setParameter(FEED_KODE, feedKode);
-        query.setParameter(SEKVENSNUMMER, sekvensnummer);
+        query.setParameter(HENDELSE_ID, hendelseId);
         query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.GROVSORTERT);
 
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelse(feedKode.getKode(), sekvensnummer, HåndtertStatusType.GROVSORTERT).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelse(feedKode.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
         } else if (resultater.isEmpty()) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantIkkeHendelse(feedKode.getKode(), sekvensnummer, HåndtertStatusType.GROVSORTERT).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantIkkeHendelse(feedKode.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
             return Optional.empty();
         }
         return Optional.of(resultater.get(0));

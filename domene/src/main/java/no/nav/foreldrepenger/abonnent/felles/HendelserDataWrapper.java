@@ -17,8 +17,9 @@ public class HendelserDataWrapper {
     public static final String DEFAULT_BESKRIVELSE = "Hendelseoppgave";
 
     public static final String HENDELSE_REQUEST_UUID = "hendelse.requestUuid";
-    private static final String HENDELSE_SEKVENSNUMMER = "hendelse.sekvensnummer";
+    private static final String HENDELSE_ID = "hendelse.sekvensnummer";
     private static final String HENDELSE_TYPE = "hendelse.type";
+    private static final String ENDRINGSTYPE = "hendelse.endringstype";
     public static final String AKTØR_ID_MOR = "hendelse.aktoerIdMor";
     public static final String AKTØR_ID_FAR = "hendelse.aktoerIdFar";
     public static final String AKTØR_ID_BARN = "hendelse.aktoerIdBarn";
@@ -90,15 +91,12 @@ public class HendelserDataWrapper {
         prosessTaskData.setProperty(HENDELSE_REQUEST_UUID, hendelseRequestUuid);
     }
 
-    public Optional<Long> getHendelseSekvensnummer() {
-        String prop = prosessTaskData.getPropertyValue(HENDELSE_SEKVENSNUMMER);
-        Long sekvensnummer = prop != null ? Long.parseLong(prop) : null;
-        return Optional.ofNullable(sekvensnummer);
+    public Optional<String> getHendelseId() {
+        return Optional.ofNullable(prosessTaskData.getPropertyValue(HENDELSE_ID));
     }
 
-    public void setHendelseSekvensnummer(Long sekvensnummer) {
-        String prop = sekvensnummer != null ? sekvensnummer.toString() : null;
-        prosessTaskData.setProperty(HENDELSE_SEKVENSNUMMER, prop);
+    public void setHendelseId(String hendelseId) {
+        prosessTaskData.setProperty(HENDELSE_ID, hendelseId);
     }
 
     public Optional<String> getHendelseType() {
@@ -107,6 +105,14 @@ public class HendelserDataWrapper {
 
     public void setHendelseType(String type) {
         prosessTaskData.setProperty(HENDELSE_TYPE, type);
+    }
+
+    public Optional<String> getEndringstype() {
+        return Optional.ofNullable(prosessTaskData.getPropertyValue(ENDRINGSTYPE));
+    }
+
+    public void setEndringstype(String endringstype) {
+        prosessTaskData.setProperty(ENDRINGSTYPE, endringstype);
     }
 
     public Optional<Set<String>> getAktørIdMor() {

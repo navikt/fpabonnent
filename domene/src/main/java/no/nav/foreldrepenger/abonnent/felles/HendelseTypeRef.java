@@ -26,9 +26,11 @@ public @interface HendelseTypeRef {
     String DØDSMELDINGOPPRETTET = "DOEDSMELDINGOPPRETTET";
     String DØDFØDSELOPPRETTET = "DOEDFOEDSELOPPRETTET";
 
-    /**
-     * Settes til navn på hendelsen slik den defineres i FeedEntry, eller til YTELSE_HENDELSE.
-     */
+    String PDL_FØDSEL_HENDELSE = "PDL_FØDSEL_HENDELSE";
+    String PDL_DØD_HENDELSE = "PDL_DØD_HENDELSE";
+    String PDL_DØDFØDSEL_HENDELSE = "PDL_DØDFØDSEL_HENDELSE";
+    String PDL_FAMILIERELASJON_HENDELSE = "PDL_FAMILIERELASJON_HENDELSE";
+
     String value();
 
     /**
@@ -39,7 +41,17 @@ public @interface HendelseTypeRef {
         private String navn;
 
         public HendelseTypeRefLiteral(HendelseType hendelseType) {
-            this.navn = hendelseType.getKode();
+            if (HendelseType.erPdlFødselHendelseType(hendelseType)) {
+                this.navn = PDL_FØDSEL_HENDELSE;
+            } else if (HendelseType.erPdlDødHendelseType(hendelseType)) {
+                this.navn = PDL_DØD_HENDELSE;
+            } else if (HendelseType.erPdlDødfødselHendelseType(hendelseType)) {
+                this.navn = PDL_DØDFØDSEL_HENDELSE;
+            } else if (HendelseType.erPdlFamilierelasjonHendelseType(hendelseType)) {
+                this.navn = PDL_FAMILIERELASJON_HENDELSE;
+            } else {
+                this.navn = hendelseType.getKode();
+            }
         }
 
         @Override

@@ -24,13 +24,13 @@ public class HendelseTjenesteProvider {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends HendelsePayload> HendelseTjeneste<T> finnTjeneste(HendelseType hendelseType, Long sekvensnummer) {
+    public <T extends HendelsePayload> HendelseTjeneste<T> finnTjeneste(HendelseType hendelseType, String hendelseId) {
         Instance<HendelseTjeneste<? extends HendelsePayload>> selected = tjenester.select(new HendelseTypeRef.HendelseTypeRefLiteral(hendelseType));
 
         if (selected.isAmbiguous()) {
-            throw AbonnentHendelserFeil.FACTORY.merEnnEnHendelseTjenesteFunnet(hendelseType.getKode(), sekvensnummer).toException();
+            throw AbonnentHendelserFeil.FACTORY.merEnnEnHendelseTjenesteFunnet(hendelseType.getKode(), hendelseId).toException();
         } else if (selected.isUnsatisfied()) {
-            throw AbonnentHendelserFeil.FACTORY.ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(hendelseType.getKode(), sekvensnummer).toException();
+            throw AbonnentHendelserFeil.FACTORY.ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(hendelseType.getKode(), hendelseId).toException();
         }
         HendelseTjeneste<? extends HendelsePayload> minInstans = selected.get();
         if (minInstans.getClass().isAnnotationPresent(Dependent.class)) {

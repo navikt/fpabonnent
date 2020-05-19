@@ -50,7 +50,7 @@ public class FødselsmeldingOpprettetHendelseTjenesteTest {
 
         assertThat(payload).isNotNull();
         assertThat(payload.getType()).isEqualTo(FØDSELSMELDING);
-        assertThat(payload.getSekvensnummer()).isEqualTo(SEKVENSNUMMER);
+        assertThat(payload.getHendelseId()).isEqualTo("" + SEKVENSNUMMER);
         assertThat(payload.getAktørIdBarn().get()).contains(AKTØR_ID_BARN);
         assertThat(payload.getAktørIdMor().get()).contains(AKTØR_ID_MOR);
         assertThat(payload.getAktørIdFar().get()).contains(AKTØR_ID_FAR);
@@ -66,7 +66,7 @@ public class FødselsmeldingOpprettetHendelseTjenesteTest {
 
         assertThat(payload).isNotNull();
         assertThat(payload.getType()).isEqualTo(FØDSELSMELDING);
-        assertThat(payload.getSekvensnummer()).isEqualTo(SEKVENSNUMMER);
+        assertThat(payload.getHendelseId()).isEqualTo("" + SEKVENSNUMMER);
         assertThat(payload.getAktørIdBarn().get()).isEmpty();
         assertThat(payload.getAktørIdMor().get()).isEmpty();
         assertThat(payload.getAktørIdFar().get()).isEmpty();
@@ -84,7 +84,7 @@ public class FødselsmeldingOpprettetHendelseTjenesteTest {
 
         assertThat(payload).isNotNull();
         assertThat(payload.getType()).isEqualTo(FØDSELSMELDING);
-        assertThat(payload.getSekvensnummer()).isEqualTo(SEKVENSNUMMER);
+        assertThat(payload.getHendelseId()).isEqualTo("" + SEKVENSNUMMER);
         assertThat(payload.getAktørIdBarn()).isPresent();
         assertThat(payload.getAktørIdBarn().get()).hasSize(2).hasSameElementsAs(aktørIdBarn.stream().map(Ident::getIdent).collect(Collectors.toList()));
         assertThat(payload.getAktørIdMor()).isPresent();
@@ -104,7 +104,7 @@ public class FødselsmeldingOpprettetHendelseTjenesteTest {
 
         assertThat(payload).isNotNull();
         assertThat(payload.getType()).isEqualTo(FØDSELSMELDING);
-        assertThat(payload.getSekvensnummer()).isEqualTo(SEKVENSNUMMER);
+        assertThat(payload.getHendelseId()).isEqualTo("" + SEKVENSNUMMER);
         assertThat(payload.getAktørIdBarn()).isPresent();
         assertThat(payload.getAktørIdMor()).isPresent();
         assertThat(payload.getAktørIdFar()).isPresent();
@@ -119,7 +119,7 @@ public class FødselsmeldingOpprettetHendelseTjenesteTest {
 
         assertThat(payload).isNotNull();
         assertThat(payload.getType()).isEqualTo(FØDSELSMELDING);
-        assertThat(payload.getSekvensnummer()).isEqualTo(SEKVENSNUMMER);
+        assertThat(payload.getHendelseId()).isEqualTo("" + SEKVENSNUMMER);
         assertThat(payload.getAktørIdBarn()).isEmpty();
         assertThat(payload.getAktørIdMor()).isEmpty();
         assertThat(payload.getAktørIdFar()).isEmpty();

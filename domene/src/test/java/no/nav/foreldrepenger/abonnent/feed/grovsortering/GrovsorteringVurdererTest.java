@@ -39,12 +39,12 @@ public class GrovsorteringVurdererTest {
     public void skal_opprette_en_prosesstask_pr_uuid() {
         // Arrange
         List<InngåendeHendelse> hendelser = new ArrayList<>();
-        hendelser.add(opprettInngåendeHendelse(1L, "1"));
-        hendelser.add(opprettInngåendeHendelse(2L, "2"));
-        hendelser.add(opprettInngåendeHendelse(3L, "2"));
-        hendelser.add(opprettInngåendeHendelse(4L, "3"));
-        hendelser.add(opprettInngåendeHendelse(5L, "3"));
-        hendelser.add(opprettInngåendeHendelse(6L, "4"));
+        hendelser.add(opprettInngåendeHendelse("1", "1"));
+        hendelser.add(opprettInngåendeHendelse("2", "2"));
+        hendelser.add(opprettInngåendeHendelse("3", "2"));
+        hendelser.add(opprettInngåendeHendelse("4", "3"));
+        hendelser.add(opprettInngåendeHendelse("5", "3"));
+        hendelser.add(opprettInngåendeHendelse("6", "4"));
         when(hendelseRepository.finnHendelserSomErKlareTilGrovsortering()).thenReturn(hendelser);
 
         // Act
@@ -55,9 +55,9 @@ public class GrovsorteringVurdererTest {
         verify(prosessTaskRepository, times(4)).lagre(any(ProsessTaskData.class));
     }
 
-    private InngåendeHendelse opprettInngåendeHendelse(Long sekvensnr, String uuid) {
+    private InngåendeHendelse opprettInngåendeHendelse(String hendelseId, String uuid) {
         return InngåendeHendelse.builder()
-                .sekvensnummer(sekvensnr)
+                .hendelseId(hendelseId)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
