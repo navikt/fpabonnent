@@ -46,14 +46,14 @@ public class SendHendelseTask implements ProsessTaskHandler {
 
         hendelseConsumer.sendHendelse(hendelsePayload);
         inngåendeHendelseTjeneste.oppdaterHendelseSomSendtNå(hendelsePayload);
-        LOGGER.info("Sendt hendelse: [{}] til FPSAK.", hendelsePayload.getSekvensnummer());
+        LOGGER.info("Sendt hendelse: [{}] til FPSAK.", hendelsePayload.getHendelseId());
     }
 
     private HendelsePayload getHendelsePayload(HendelserDataWrapper dataWrapper) {
         String type = dataWrapper.getHendelseType()
                 .orElseThrow(() -> AbonnentHendelserFeil.FACTORY.ukjentHendelseType(null).toException());
         HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider
-                .finnTjeneste(HendelseType.fraKode(type), dataWrapper.getHendelseSekvensnummer().orElse(null));
+                .finnTjeneste(HendelseType.fraKode(type), dataWrapper.getHendelseId().orElse(null));
         return hendelseTjeneste.payloadFraWrapper(dataWrapper);
     }
 }

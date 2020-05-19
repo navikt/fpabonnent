@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.abonnent.task;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -48,7 +48,7 @@ public class SendHendelseTaskTest {
     public void setup() {
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         HendelseTjeneste fødselHendelseTjeneste = new FødselsmeldingOpprettetHendelseTjeneste();
-        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.FØDSELSMELDINGOPPRETTET), anyLong())).thenReturn(fødselHendelseTjeneste);
+        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.FØDSELSMELDINGOPPRETTET), anyString())).thenReturn(fødselHendelseTjeneste);
 
         mockHendelseConsumer = mock(HendelseConsumer.class);
         inngåendeHendelseTjeneste = mock(InngåendeHendelseTjeneste.class);
@@ -63,7 +63,7 @@ public class SendHendelseTaskTest {
         // Arrange
         HendelserDataWrapper hendelse = new HendelserDataWrapper(prosessTaskData);
         hendelse.setHendelseRequestUuid("req_uuid");
-        hendelse.setHendelseSekvensnummer(1L);
+        hendelse.setHendelseId("1");
         hendelse.setHendelseType(FØDSELSMELDINGSTYPE);
         hendelse.setFødselsdato(FØDSELSDATO);
         hendelse.setAktørIdBarn(new HashSet<>(singletonList("1")));
@@ -80,7 +80,7 @@ public class SendHendelseTaskTest {
         verify(inngåendeHendelseTjeneste, times(1)).oppdaterHendelseSomSendtNå(captor.capture());
         assertThat(captor.getAllValues()).hasSize(2);
         for (FødselHendelsePayload payload : captor.getAllValues()) {
-            assertThat(payload.getSekvensnummer()).isEqualTo(1L);
+            assertThat(payload.getHendelseId()).isEqualTo("1");
             assertThat(payload.getType()).isEqualTo(FØDSELSMELDINGSTYPE);
             assertThat(payload.getAktørIdMor()).isPresent();
             assertThat(payload.getAktørIdMor().get()).contains("2");
@@ -95,7 +95,7 @@ public class SendHendelseTaskTest {
         // Arrange
         HendelserDataWrapper hendelse = new HendelserDataWrapper(prosessTaskData);
         hendelse.setHendelseRequestUuid("req_uuid");
-        hendelse.setHendelseSekvensnummer(1L);
+        hendelse.setHendelseId("1");
         hendelse.setHendelseType(FØDSELSMELDINGSTYPE);
         hendelse.setFødselsdato(FØDSELSDATO);
         hendelse.setAktørIdBarn(new HashSet<>(asList("1","2")));
@@ -113,7 +113,7 @@ public class SendHendelseTaskTest {
         assertThat(hendelse.getProsessTaskData().getPropertyValue(HendelserDataWrapper.AKTØR_ID_FAR)).isEqualTo("6,7");
         verify(mockHendelseConsumer, times(1)).sendHendelse(captor.capture());
         FødselHendelsePayload payload = captor.getValue();
-        assertThat(payload.getSekvensnummer()).isEqualTo(1L);
+        assertThat(payload.getHendelseId()).isEqualTo("1");
         assertThat(payload.getType()).isEqualTo(FØDSELSMELDINGSTYPE);
         assertThat(payload.getAktørIdMor()).isPresent();
         assertThat(payload.getAktørIdMor().get()).containsExactly("3","4","5");
@@ -127,7 +127,7 @@ public class SendHendelseTaskTest {
         // Arrange
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
         dataWrapper.setHendelseRequestUuid("req_uuid");
-        dataWrapper.setHendelseSekvensnummer(1L);
+        dataWrapper.setHendelseId("1");
         dataWrapper.setHendelseType(null);
         dataWrapper.setAktørId("1");
 

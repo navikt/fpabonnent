@@ -127,7 +127,7 @@ public class HendelseRepositoryLockTest {
 
         private void lagHendelse(LocalDateTime now, String trådnavn) {
             InngåendeHendelse hendelse = InngåendeHendelse.builder()
-                    .sekvensnummer(sekvensnummer++)
+                    .hendelseId("" + sekvensnummer++)
                     .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                     .payload(trådnavn)
                     .feedKode(FeedKode.TPS)

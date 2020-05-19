@@ -65,25 +65,26 @@ public class SorterHendelserTask implements ProsessTaskHandler {
         List<String> filtrertAktørIdList = hendelseConsumer.grovsorterAktørIder(aktørIderForSortering);
         List<HendelsePayload> relevanteHendelser = filtrerUtRelevanteHendelser(payloadListe, filtrertAktørIdList);
 
-        Map<Long, InngåendeHendelse> inngåendeHendelserMap = inngåendeHendelserListe.stream()
-                .collect(Collectors.toMap(InngåendeHendelse::getSekvensnummer, ih -> ih));
+        Map<String, InngåendeHendelse> inngåendeHendelserMap = inngåendeHendelserListe.stream()
+                .collect(Collectors.toMap(InngåendeHendelse::getHendelseId, ih -> ih));
         inngåendeHendelseTjeneste.markerIkkeRelevanteHendelserSomHåndtert(inngåendeHendelserMap, relevanteHendelser);
 
         if (!relevanteHendelser.isEmpty()) {
             for (HendelsePayload payload : relevanteHendelser) {
                 HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(
-                        HendelseType.fraKodeDefaultUdefinert(payload.getType()), payload.getSekvensnummer());
+                        HendelseType.fraKodeDefaultUdefinert(payload.getType()), payload.getHendelseId());
 
                 if (payload.erAtomisk() || hendelseTjeneste.ikkeAtomiskHendelseSkalSendes(payload)) {
                     HendelserDataWrapper nesteSteg = dataWrapper.nesteSteg(SendHendelseTask.TASKNAME);
-                    nesteSteg.setHendelseSekvensnummer(payload.getSekvensnummer());
+                    nesteSteg.setHendelseId(payload.getHendelseId());
                     nesteSteg.setHendelseType(payload.getType());
+                    nesteSteg.setEndringstype(payload.getEndringstype());
                     hendelseTjeneste.populerDatawrapper(payload, nesteSteg);
 
                     prosessTaskRepository.lagre(nesteSteg.getProsessTaskData());
-                    inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelserMap.get(payload.getSekvensnummer()), HåndtertStatusType.GROVSORTERT);
+                    inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelserMap.get(payload.getHendelseId()), HåndtertStatusType.GROVSORTERT);
                 } else {
-                    inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelserMap.get(payload.getSekvensnummer()), HåndtertStatusType.HÅNDTERT);
+                    inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelserMap.get(payload.getHendelseId()), HåndtertStatusType.HÅNDTERT);
                 }
             }
 
@@ -108,8 +109,8 @@ public class SorterHendelserTask implements ProsessTaskHandler {
             if (finnRelevanteHendelser(aktørIdList, hendelsePayload)) {
                 listPayload.add(hendelsePayload);
             } else {
-                LOGGER.info("Ikke-relevant hendelse med sekvensummer {} og type {} blir ikke videresendt til FPSAK",
-                        hendelsePayload.getSekvensnummer(), hendelsePayload.getType());
+                LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK",
+                        hendelsePayload.getHendelseId(), hendelsePayload.getType());
             }
         }
         return listPayload;

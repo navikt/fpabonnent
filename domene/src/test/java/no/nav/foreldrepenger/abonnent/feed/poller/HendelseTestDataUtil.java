@@ -58,7 +58,7 @@ public class HendelseTestDataUtil {
     public static FødselHendelsePayload lagFødselsHendelsePayload() {
         FødselHendelsePayload.Builder builder = new FødselHendelsePayload.Builder();
         return builder
-                .sekvensnummer(SEKVENSNUMMER)
+                .hendelseId("" + SEKVENSNUMMER)
                 .type(MELDINGSTYPE.getKode())
                 .aktørIdBarn(new HashSet<>(singletonList(AKTØR_ID_BARN)))
                 .aktørIdMor(new HashSet<>(singletonList(AKTØR_ID_MOR)))
@@ -69,7 +69,7 @@ public class HendelseTestDataUtil {
 
     public static InngåendeHendelse lagInngåendeFødselsHendelse(long id, String uuid, HåndtertStatusType håndtertStatus) {
         return InngåendeHendelse.builder()
-                .sekvensnummer(id)
+                .hendelseId("" + id)
                 .type(MELDINGSTYPE)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)

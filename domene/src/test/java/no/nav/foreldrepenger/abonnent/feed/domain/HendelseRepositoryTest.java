@@ -30,7 +30,7 @@ public class HendelseRepositoryTest {
     @Test
     public void skal_hente_alle_hendelser_som_er_klare_til_grovsortering_og_sortere_på_opprettet_tid() {
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
-                .sekvensnummer(ID)
+                .hendelseId("" + ID)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
@@ -39,7 +39,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now().minusMinutes(2))
                 .build();
         InngåendeHendelse hendelse2 = InngåendeHendelse.builder()
-                .sekvensnummer(ID + 1)
+                .hendelseId("" + ID + 1)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
@@ -48,7 +48,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now().minusMinutes(1))
                 .build();
         InngåendeHendelse hendelse3 = InngåendeHendelse.builder()
-                .sekvensnummer(ID + 2)
+                .hendelseId("" + ID + 2)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
@@ -57,7 +57,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now().plusHours(2))
                 .build();
         InngåendeHendelse hendelse4 = InngåendeHendelse.builder()
-                .sekvensnummer(ID + 3)
+                .hendelseId("" + ID + 3)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
@@ -79,7 +79,7 @@ public class HendelseRepositoryTest {
     @Test
     public void skal_hente_alle_hendelser_som_ikke_er_håndterte_og_kommer_fra_tps_feed() {
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
-                .sekvensnummer(ID)
+                .hendelseId("" + ID)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
@@ -88,7 +88,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         InngåendeHendelse hendelse2 = InngåendeHendelse.builder()
-                .sekvensnummer(ID + 1)
+                .hendelseId("" + ID + 1)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
@@ -97,7 +97,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         InngåendeHendelse hendelse3 = InngåendeHendelse.builder()
-                .sekvensnummer(ID + 2)
+                .hendelseId("" + ID + 2)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
@@ -106,7 +106,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         InngåendeHendelse hendelse4 = InngåendeHendelse.builder()
-                .sekvensnummer(ID + 3)
+                .hendelseId("" + ID + 3)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload")
                 .feedKode(FeedKode.TPS)
@@ -158,7 +158,7 @@ public class HendelseRepositoryTest {
     @Test
     public void skal_returnere_hendelse_fra_tps_som_er_grovsortert() {
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
-                .sekvensnummer(ID)
+                .hendelseId("" + ID)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload1")
                 .feedKode(FeedKode.TPS)
@@ -167,7 +167,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         InngåendeHendelse hendelse2 = InngåendeHendelse.builder() // Feil feed
-                .sekvensnummer(ID)
+                .hendelseId("" + ID)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload2")
                 .feedKode(FeedKode.TPS)
@@ -176,7 +176,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         InngåendeHendelse hendelse3 = InngåendeHendelse.builder() // Feil sekvensnummer
-                .sekvensnummer(ID + 1)
+                .hendelseId("" + ID + 1)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload3")
                 .feedKode(FeedKode.TPS)
@@ -185,7 +185,7 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         InngåendeHendelse hendelse4 = InngåendeHendelse.builder() // Feil status
-                .sekvensnummer(ID)
+                .hendelseId("" + ID)
                 .type(HendelseType.FØDSELSMELDINGOPPRETTET)
                 .payload("payload4")
                 .feedKode(FeedKode.TPS)
@@ -199,9 +199,9 @@ public class HendelseRepositoryTest {
         hendelseRepository.lagreInngåendeHendelse(hendelse4);
         repoRule.getEntityManager().flush();
 
-        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(FeedKode.TPS, ID);
+        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(FeedKode.TPS, "" + ID);
         assertThat(hendelse).isPresent();
-        assertThat(hendelse.get().getSekvensnummer()).isEqualTo(ID);
+        assertThat(hendelse.get().getHendelseId()).isEqualTo("" + ID);
         assertThat(hendelse.get().getFeedKode()).isEqualTo(FeedKode.TPS);
         assertThat(hendelse.get().getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
         assertThat(hendelse.get().getPayload()).isEqualTo("payload1");

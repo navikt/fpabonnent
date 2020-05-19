@@ -7,18 +7,28 @@ import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
 
 public abstract class HendelsePayload {
 
-    protected Long sekvensnummer;
+    protected String hendelseId;
 
     protected String type;
+
+    protected String endringstype;
 
     public HendelsePayload() {
     }
 
+    public String getHendelseId() {
+        return hendelseId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getEndringstype() {
+        return endringstype;
+    }
+
     public abstract Set<String> getAktørIderForSortering();
-
-    public abstract Long getSekvensnummer();
-
-    public abstract String getType();
 
     public abstract HendelseWrapperDto mapPayloadTilDto();
 

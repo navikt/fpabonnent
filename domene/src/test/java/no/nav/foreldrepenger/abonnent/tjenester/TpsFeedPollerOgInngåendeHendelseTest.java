@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.abonnent.tjenester;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -74,11 +74,11 @@ public class TpsFeedPollerOgInngåendeHendelseTest {
         HendelseTjeneste fødselHendelseTjeneste = new FødselsmeldingOpprettetHendelseTjeneste();
         HendelseTjeneste dødHendelseTjeneste = new DødsmeldingOpprettetHendelseTjeneste();
         HendelseTjeneste dødfødselHendelseTjeneste = new DødfødselOpprettetHendelseTjeneste();
-        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.FØDSELSMELDINGOPPRETTET), anyLong()))
+        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.FØDSELSMELDINGOPPRETTET), anyString()))
                 .thenReturn(fødselHendelseTjeneste);
-        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.DØDSMELDINGOPPRETTET), anyLong()))
+        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.DØDSMELDINGOPPRETTET), anyString()))
                 .thenReturn(dødHendelseTjeneste);
-        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.DØDFØDSELOPPRETTET), anyLong()))
+        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.DØDFØDSELOPPRETTET), anyString()))
                 .thenReturn(dødfødselHendelseTjeneste);
 
         poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv");
@@ -102,9 +102,9 @@ public class TpsFeedPollerOgInngåendeHendelseTest {
 
         assertThat(inngåendeHendelser).hasSize(6); // Det er 1 FOEDSELSMELDINGOPPRETTET, 4 DOEDSMELDINGOPPRETTET og 1
                                                    // DOEDFOEDSELOPPRETTET i eksempel json.
-        assertThat(inngåendeHendelser).flatExtracting(InngåendeHendelse::getSekvensnummer).contains(41L);// 41 er hentet
-                                                                                                         // fra eksempel
-                                                                                                         // json.
+        assertThat(inngåendeHendelser).flatExtracting(InngåendeHendelse::getHendelseId).contains("41");// 41 er hentet
+                                                                                                       // fra eksempel
+                                                                                                       // json.
         assertThat(inngåendeHendelser).flatExtracting(InngåendeHendelse::getHåndtertStatus)
                 .containsOnly(HåndtertStatusType.MOTTATT);
         List<HendelsePayload> hendelsePayloadListe = inngåendeHendelseTjeneste
