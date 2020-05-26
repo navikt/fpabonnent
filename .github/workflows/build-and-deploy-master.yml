@@ -7,9 +7,6 @@ on:
 env:
   APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
   ORACLE_IMAGE: docker.pkg.github.com/navikt/vtp/foreldrepenger-oracle
-  CLUSTER: dev-fss
-  NAMESPACE: t4
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fpabonnent
 
 jobs:
@@ -79,17 +76,9 @@ jobs:
             Kommenter med <b>/promote env namespace</b>, hvor <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
             <table>
             <tr><th>Cluster</th><th>Namespace</th></tr>
-            <tr><td>dev-fss</td><td>t4, q1, q0</td></tr>
+            <tr><td>dev-fss</td><td>q1, q0</td></tr>
             <tr><td>prod-fss</td><td>default</td></tr>
             </table>
-
-      - name: Trigg deploy til T4
-        if: success()
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          token: ${{ secrets.NOTIFICATION }}
-          issue-number: ${{ steps.createdeployissue.outputs.number }}
-          body: /promote dev-fss t4
 
       - name: Trigg deploy til Q1
         if: success()
