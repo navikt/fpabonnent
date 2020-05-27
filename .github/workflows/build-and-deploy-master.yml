@@ -8,6 +8,7 @@ env:
   APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
   ORACLE_IMAGE: docker.pkg.github.com/navikt/vtp/foreldrepenger-oracle
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fpabonnent
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
