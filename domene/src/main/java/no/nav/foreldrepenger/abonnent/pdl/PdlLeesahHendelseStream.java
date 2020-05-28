@@ -13,7 +13,6 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.finn.unleash.Unleash;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 
@@ -22,11 +21,9 @@ public class PdlLeesahHendelseStream implements AppServiceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseStream.class);
 
-    private static final String FPABONNENT_KONSUMERE_PDL = "fpabonnent.konsumere.pdl";
-
     private KafkaStreams stream;
     private Topic<String, Personhendelse> topic;
-    private Unleash unleash;
+    private PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste;
 
     PdlLeesahHendelseStream() {
     }
@@ -34,15 +31,15 @@ public class PdlLeesahHendelseStream implements AppServiceHandler {
     @Inject
     public PdlLeesahHendelseStream(PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer,
                                    PdlLeesahHendelseProperties pdlLeesahHendelseProperties,
-                                   Unleash unleash) {
+                                   PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste) {
         this.topic = pdlLeesahHendelseProperties.getTopic();
-        if (unleash.isEnabled(FPABONNENT_KONSUMERE_PDL, false)) {
+        if (pdlFeatureToggleTjeneste.skalKonsumerePdl()) {
             LOG.info("Starter konsumering av PDL Kafka topic");
             this.stream = createKafkaStreams(topic, pdlLeesahHendelseHåndterer, pdlLeesahHendelseProperties);
         } else {
             LOG.info("Starter ikke konsumering av PDL Kafka topic");
         }
-        this.unleash = unleash;
+        this.pdlFeatureToggleTjeneste = pdlFeatureToggleTjeneste;
     }
 
     @SuppressWarnings("resource")
@@ -85,7 +82,7 @@ public class PdlLeesahHendelseStream implements AppServiceHandler {
 
     @Override
     public void start() {
-        if (unleash.isEnabled(FPABONNENT_KONSUMERE_PDL, false)) {
+        if (pdlFeatureToggleTjeneste.skalKonsumerePdl()) {
             addShutdownHooks();
             stream.start();
             LOG.info("Starter konsumering av topic={}, tilstand={}", getTopicName(), stream.state());

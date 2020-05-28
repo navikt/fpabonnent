@@ -11,7 +11,6 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
@@ -36,11 +35,9 @@ public class PdlLeesahHendelseHåndterer {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseHåndterer.class);
 
-    static final String FPABONNENT_GROVSORTERE_PDL = "fpabonnent.grovsortere.pdl";
-
     private PdlLeesahOversetter oversetter;
     private HendelseRepository hendelseRepository;
-    private Unleash unleash;
+    private PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste;
 
     PdlLeesahHendelseHåndterer() {
         // CDI
@@ -49,10 +46,10 @@ public class PdlLeesahHendelseHåndterer {
     @Inject
     public PdlLeesahHendelseHåndterer(HendelseRepository hendelseRepository,
                                       PdlLeesahOversetter pdlLeesahOversetter,
-                                      Unleash unleash) {
+                                      PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste) {
         this.hendelseRepository = hendelseRepository;
         this.oversetter = pdlLeesahOversetter;
-        this.unleash = unleash;
+        this.pdlFeatureToggleTjeneste = pdlFeatureToggleTjeneste;
     }
 
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
@@ -110,7 +107,7 @@ public class PdlLeesahHendelseHåndterer {
                     .feedKode(FeedKode.PDL)
                     .håndteresEtterTidspunkt(LocalDateTime.now()); //TODO(JEJ): Legge inn TPS-forsinkelse, må ta høyde for helger
 
-            if (unleash.isEnabled(FPABONNENT_GROVSORTERE_PDL, false)) {
+            if (pdlFeatureToggleTjeneste.skalGrovsorterePdl()) {
                 inngåendeHendelse.håndtertStatus(HåndtertStatusType.MOTTATT);
             } else {
                 inngåendeHendelse.håndtertStatus(HåndtertStatusType.HÅNDTERT);

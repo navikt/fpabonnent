@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import no.finn.unleash.FakeUnleash;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
@@ -35,10 +34,8 @@ public class PdlLeesahHendelseHåndtererTest {
     public void before() {
         hendelseRepository = mock(HendelseRepository.class);
         PdlLeesahOversetter oversetter = new PdlLeesahOversetter();
-        FakeUnleash fakeUnleash = new FakeUnleash();
-        fakeUnleash.enable(PdlLeesahHendelseHåndterer.FPABONNENT_GROVSORTERE_PDL);
 
-        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, oversetter, fakeUnleash);
+        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, oversetter, new PdlFeatureToggleTjeneste());
     }
 
     @Test
