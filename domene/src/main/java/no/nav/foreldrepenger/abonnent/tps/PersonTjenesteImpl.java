@@ -52,8 +52,11 @@ public class PersonTjenesteImpl implements PersonTjeneste {
                 .map(this::mapTilAktørId)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
-        } catch (Exception e) {
+        } catch (HentPersonPersonIkkeFunnet e) {
+            // Denne er ventet pga forsinkelse TPS vs PDL/aktør, ingen reaksjon
             return Collections.emptySet();
+        } catch (HentPersonSikkerhetsbegrensning e) {
+            throw PersonFeilmeldinger.FACTORY.tpsUtilgjengeligSikkerhetsbegrensning(e).toException();
         }
     }
 
@@ -65,8 +68,11 @@ public class PersonTjenesteImpl implements PersonTjeneste {
         try {
             HentPersonResponse response = personConsumer.hentPersonResponse(request);
             return response.getPerson() != null;
-        } catch (Exception e) {
+        } catch (HentPersonPersonIkkeFunnet e) {
+            // Denne er ventet pga forsinkelse TPS vs PDL/aktør, ingen reaksjon
             return false;
+        } catch (HentPersonSikkerhetsbegrensning e) {
+            throw PersonFeilmeldinger.FACTORY.tpsUtilgjengeligSikkerhetsbegrensning(e).toException();
         }
     }
 
