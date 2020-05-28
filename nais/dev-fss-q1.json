@@ -20,6 +20,8 @@
       "OIDC_STS_JWKS_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
       "OPENIDCONNECT_USERNAME": "fpabonnent-q1",
       "OPENIDCONNECT_ISSOHOST": "https://isso-q.adeo.no:443/isso/oauth2",
+      "AKTOER_V2_URL": "https://app-q1.adeo.no/aktoerregister/ws/Aktoer/v2",
+      "PERSON_V3_URL": "https://wasapp-q1.adeo.no/tpsws/ws/Person/v3",
       "PERSON_FEED_V2_URL": "https://person-feed-q1.nais.preprod.local/api/v2/personfeed/",
       "PERSONFEED_POLLING_AKTIVERT": "aktiv",
       "SECURITYTOKENSERVICE_URL": "https://sts-q1.test.local/SecurityTokenServiceProvider/"
