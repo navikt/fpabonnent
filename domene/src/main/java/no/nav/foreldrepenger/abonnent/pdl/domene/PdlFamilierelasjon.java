@@ -11,7 +11,7 @@ public class PdlFamilierelasjon extends PdlPersonhendelse {
     public boolean erRelevantForFpsak() {
         return (HendelseType.PDL_FAMILIERELASJON_OPPRETTET.equals(getHendelseType())
                 || HendelseType.PDL_FAMILIERELASJON_ANNULLERT.equals(getHendelseType()))
-                && "barn".contains(getRelatertPersonsRolle());
+                && "BARN".contains(getRelatertPersonsRolle());
     }
 
     public String getRelatertPersonsIdent() {
