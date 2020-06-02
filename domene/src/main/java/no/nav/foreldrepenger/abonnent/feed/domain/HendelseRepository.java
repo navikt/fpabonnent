@@ -119,6 +119,26 @@ public class HendelseRepository {
         return resultSendt;
     }
 
+    public InngåendeHendelse finnEksaktHendelse(Long inngåendeHendelseId) {
+        return entityManager.find(InngåendeHendelse.class, inngåendeHendelseId);
+    }
+
+    public Optional<InngåendeHendelse> finnHendelseFraIdHvisFinnes(String hendelseId, FeedKode feedKode) {
+        TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
+                "from InngåendeHendelse where feedKode = :feedKode " + //$NON-NLS-1$
+                        "and hendelseId = :hendelseId ", InngåendeHendelse.class); //$NON-NLS-1$
+        query.setParameter(FEED_KODE, feedKode);
+        query.setParameter(HENDELSE_ID, hendelseId);
+
+        List<InngåendeHendelse> resultater = query.getResultList();
+        if (resultater.size() > 1) {
+            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelse(feedKode.getKode(), hendelseId).getFeilmelding());
+        } else if (resultater.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(resultater.get(0));
+    }
+
     public void lagreInngåendeHendelse(InngåendeHendelse inngåendeHendelse) {
         entityManager.persist(inngåendeHendelse);
     }
@@ -147,7 +167,7 @@ public class HendelseRepository {
 
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelse(feedKode.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelseMedStatus(feedKode.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
         } else if (resultater.isEmpty()) {
             LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantIkkeHendelse(feedKode.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
             return Optional.empty();

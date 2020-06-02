@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.abonnent.feed.domain;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
         this.hendelseId = builder.hendelseId;
         this.type = builder.type;
         this.endringstype = builder.endringstype;
+        this.hendelseOpprettetTid = builder.hendelseOpprettetTid;
         this.aktørId = builder.aktørId;
         this.dødsdato = builder.dødsdato;
     }
@@ -80,6 +82,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
         if (type != null ? !type.equals(payload.type) : payload.type != null) return false;
         if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
+        if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) return false;
         if (aktørId != null ? !aktørId.equals(payload.aktørId) : payload.aktørId != null) return false;
         return dødsdato != null ? dødsdato.equals(payload.dødsdato) : payload.dødsdato == null;
     }
@@ -88,6 +91,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
     public int hashCode() {
         int result = type != null ? type.hashCode() : 0;
         result = 31 * result + (endringstype != null ? endringstype.hashCode() : 0);
+        result = 31 * result + (hendelseOpprettetTid != null ? hendelseOpprettetTid.hashCode() : 0);
         result = 31 * result + (aktørId != null ? aktørId.hashCode() : 0);
         result = 31 * result + (dødsdato != null ? dødsdato.hashCode() : 0);
         return result;
@@ -97,6 +101,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
         private String hendelseId;
         private String type;
         private String endringstype;
+        private LocalDateTime hendelseOpprettetTid;
         private Set<String> aktørId;
         private LocalDate dødsdato;
 
@@ -112,6 +117,11 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
         public Builder endringstype(String endringstype) {
             this.endringstype = endringstype;
+            return this;
+        }
+
+        public Builder hendelseOpprettetTid(LocalDateTime hendelseOpprettetTid) {
+            this.hendelseOpprettetTid = hendelseOpprettetTid;
             return this;
         }
 

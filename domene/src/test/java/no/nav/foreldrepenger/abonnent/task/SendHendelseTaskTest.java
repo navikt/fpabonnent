@@ -20,12 +20,14 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
+import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseConsumer;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
+import no.nav.foreldrepenger.abonnent.pdl.PdlFeatureToggleTjeneste;
 import no.nav.foreldrepenger.abonnent.tjenester.InngåendeHendelseTjeneste;
 import no.nav.tjenester.person.feed.v2.Meldingstype;
 import no.nav.vedtak.exception.TekniskException;
@@ -52,7 +54,7 @@ public class SendHendelseTaskTest {
 
         mockHendelseConsumer = mock(HendelseConsumer.class);
         inngåendeHendelseTjeneste = mock(InngåendeHendelseTjeneste.class);
-        sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste, hendelseTjenesteProvider);
+        sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste, hendelseTjenesteProvider, new PdlFeatureToggleTjeneste(), mock(HendelseRepository.class));
 
         prosessTaskData = new ProsessTaskData(SendHendelseTask.TASKNAME);
         prosessTaskData.setSekvens("1");

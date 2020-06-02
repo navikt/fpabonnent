@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonFormat(shape = Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
-public enum FeedKode implements Kodeverdi {
+public enum FeedKode implements Kodeverdi { //TODO(JEJ): Rename til noe mer generelt når person-feed saneres
 
     TPS("JF_TPS"),
     @Deprecated

@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.abonnent.pdl.domene;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 
@@ -11,6 +12,7 @@ public class PdlFødsel extends PdlPersonhendelse {
     private String fødeland;
     private String fødested;
     private String fødekommune;
+    private Set<String> aktørIdForeldre;
 
     public boolean erRelevantForFpsak() {
         return HendelseType.PDL_FØDSEL_OPPRETTET.equals(getHendelseType())
@@ -35,6 +37,14 @@ public class PdlFødsel extends PdlPersonhendelse {
 
     public String getFødekommune() {
         return fødekommune;
+    }
+
+    public Set<String> getAktørIdForeldre() {
+        return aktørIdForeldre;
+    }
+
+    public void setAktørIdForeldre(Set<String> aktørIdForeldre) {
+        this.aktørIdForeldre = aktørIdForeldre;
     }
 
     public static Builder builder() {

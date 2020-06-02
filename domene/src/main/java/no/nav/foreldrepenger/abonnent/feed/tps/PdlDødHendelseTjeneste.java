@@ -3,22 +3,32 @@ package no.nav.foreldrepenger.abonnent.feed.tps;
 import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.hentUtAktørIderFraString;
 import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.optionalStringTilLocalDate;
 
+import java.util.Optional;
+import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.PdlDødHendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTypeRef;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
+import no.nav.foreldrepenger.abonnent.felles.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlDød;
+import no.nav.foreldrepenger.abonnent.tps.AktørId;
+import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
 
 
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_DØD_HENDELSE)
 public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelsePayload> {
 
-    public PdlDødHendelseTjeneste() {
-        // CDI
+    private PersonTjeneste personTjeneste;
+
+    @Inject
+    public PdlDødHendelseTjeneste(PersonTjeneste personTjeneste) {
+        this.personTjeneste = personTjeneste;
     }
 
     @Override
@@ -29,6 +39,7 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
                 .hendelseId(pdlDød.getHendelseId())
                 .type(pdlDød.getHendelseType().getKode())
                 .endringstype(pdlDød.getEndringstype().name())
+                .hendelseOpprettetTid(pdlDød.getOpprettet())
                 .aktørId(hentUtAktørIderFraString(pdlDød.getPersonidenter(), pdlDød.getHendelseId()))
                 .dødsdato(pdlDød.getDødsdato())
                 .build();
@@ -54,5 +65,18 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
     @Override
     public boolean ikkeAtomiskHendelseSkalSendes(PdlDødHendelsePayload payload) {
         return true;
+    }
+
+    @Override
+    public KlarForSorteringResultat vurderOmKlarForSortering(PdlDødHendelsePayload payload) {
+        Optional<Set<String>> aktørIder = payload.getAktørId();
+        if (aktørIder.isPresent() && payload.getDødsdato().isPresent()) {
+            for (String aktørId : aktørIder.get()) {
+                if (personTjeneste.harRegistrertDødsdato(new AktørId(aktørId))) {
+                    return new KlarForSorteringResultat(true);
+                }
+            }
+        }
+        return new KlarForSorteringResultat(false);
     }
 }

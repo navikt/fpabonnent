@@ -9,8 +9,10 @@ import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTypeRef;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
+import no.nav.foreldrepenger.abonnent.felles.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFamilierelasjon;
 
+//TODO(JEJ): Slette koden som håndterer foreldrerelasjonshendelsen
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_FAMILIERELASJON_HENDELSE)
 public class PdlForeldrerelasjonHendelseTjeneste implements HendelseTjeneste<PdlForeldrerelasjonHendelsePayload> {
@@ -27,6 +29,7 @@ public class PdlForeldrerelasjonHendelseTjeneste implements HendelseTjeneste<Pdl
                 .hendelseId(pdlFamilierelasjon.getHendelseId())
                 .type(pdlFamilierelasjon.getHendelseType().getKode())
                 .endringstype(pdlFamilierelasjon.getEndringstype().name())
+                .hendelseOpprettetTid(pdlFamilierelasjon.getOpprettet())
                 .aktørId(hentUtAktørIderFraString(pdlFamilierelasjon.getPersonidenter(), pdlFamilierelasjon.getHendelseId()))
                 .build();
     }
@@ -49,5 +52,10 @@ public class PdlForeldrerelasjonHendelseTjeneste implements HendelseTjeneste<Pdl
     @Override
     public boolean ikkeAtomiskHendelseSkalSendes(PdlForeldrerelasjonHendelsePayload payload) {
         return true;
+    }
+
+    @Override
+    public KlarForSorteringResultat vurderOmKlarForSortering(PdlForeldrerelasjonHendelsePayload payload) {
+        return new KlarForSorteringResultat(true);
     }
 }

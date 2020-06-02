@@ -41,14 +41,14 @@
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
-        <logstash.version>6.3</logstash.version>
+        <logstash.version>6.4</logstash.version>
         <metrics.version>4.1.9</metrics.version>
         <prometheus.version>0.9.0</prometheus.version>
-        <resteasy-validator-provider.version>3.12.0.Final</resteasy-validator-provider.version>
+        <resteasy-validator-provider.version>3.12.1.Final</resteasy-validator-provider.version>
         <weld-web.version>3.1.4.Final</weld-web.version>
         <javax.el.version>3.0.1-b11</javax.el.version>
         <swagger.version>2.1.2</swagger.version>
-        <swagger-ui.version>3.25.4</swagger-ui.version>
+        <swagger-ui.version>3.25.5</swagger-ui.version>
         <kafka.version>2.5.0</kafka.version>
         <avro.version>1.9.2</avro.version>
         <confluent.version>5.5.0</confluent.version>
@@ -464,7 +464,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

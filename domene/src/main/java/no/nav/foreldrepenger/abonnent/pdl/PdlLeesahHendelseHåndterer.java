@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.abonnent.pdl;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
+import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
@@ -21,11 +23,14 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.PdlDødfødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFamilierelasjon;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlPersonhendelse;
+import no.nav.foreldrepenger.abonnent.task.VurderSorteringTask;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedfoedtbarn.DoedfoedtBarn;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
 import no.nav.person.pdl.leesah.familierelasjon.Familierelasjon;
 import no.nav.person.pdl.leesah.foedsel.Foedsel;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
 @Transactional
@@ -35,8 +40,10 @@ public class PdlLeesahHendelseHåndterer {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseHåndterer.class);
 
-    private PdlLeesahOversetter oversetter;
     private HendelseRepository hendelseRepository;
+    private PdlLeesahOversetter oversetter;
+    private ProsessTaskRepository prosessTaskRepository;
+    private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
     private PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste;
 
     PdlLeesahHendelseHåndterer() {
@@ -46,21 +53,32 @@ public class PdlLeesahHendelseHåndterer {
     @Inject
     public PdlLeesahHendelseHåndterer(HendelseRepository hendelseRepository,
                                       PdlLeesahOversetter pdlLeesahOversetter,
+                                      ProsessTaskRepository prosessTaskRepository,
+                                      TpsForsinkelseTjeneste tpsForsinkelseTjeneste,
                                       PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste) {
         this.hendelseRepository = hendelseRepository;
         this.oversetter = pdlLeesahOversetter;
+        this.prosessTaskRepository = prosessTaskRepository;
+        this.tpsForsinkelseTjeneste = tpsForsinkelseTjeneste;
         this.pdlFeatureToggleTjeneste = pdlFeatureToggleTjeneste;
     }
 
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
         setCallIdForHendelse(payload);
 
+        Optional<InngåendeHendelse> inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(), FeedKode.PDL);
+        if (inngåendeHendelse.isPresent()) {
+            LOG.warn("FPABONNENT mottok duplikat hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+            return;
+        }
+
         Foedsel foedsel = payload.getFoedsel();
         if (foedsel != null) {
             LOG.info("FPABONNENT mottok fødsel: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} fødselsdato={} fødselsår={} fødested={} fødeKommune={} fødeland={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), foedsel.getFoedselsdato(), foedsel.getFoedselsaar(), foedsel.getFoedested(), foedsel.getFoedekommune(), foedsel.getFoedeland());
             PdlFødsel pdlFødsel = oversetter.oversettFødsel(payload);
-            lagreInngåendeHendelseHvisRelevant(pdlFødsel);
+            prosesserHendelseVidereHvisRelevant(pdlFødsel);
         }
 
         Doedsfall doedsfall = payload.getDoedsfall();
@@ -68,7 +86,7 @@ public class PdlLeesahHendelseHåndterer {
             LOG.info("FPABONNENT mottok dødsfall: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dødsdato={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), doedsfall.getDoedsdato());
             PdlDød pdlDød = oversetter.oversettDød(payload);
-            lagreInngåendeHendelseHvisRelevant(pdlDød);
+            prosesserHendelseVidereHvisRelevant(pdlDød);
         }
 
         DoedfoedtBarn doedfoedtBarn = payload.getDoedfoedtBarn();
@@ -76,7 +94,7 @@ public class PdlLeesahHendelseHåndterer {
             LOG.info("FPABONNENT mottok dødfødtBarn: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dato={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), doedfoedtBarn.getDato());
             PdlDødfødsel pdlDødfødsel = oversetter.oversettDødfødsel(payload);
-            lagreInngåendeHendelseHvisRelevant(pdlDødfødsel);
+            prosesserHendelseVidereHvisRelevant(pdlDødfødsel);
         }
 
         Familierelasjon familierelasjon = payload.getFamilierelasjon();
@@ -84,7 +102,7 @@ public class PdlLeesahHendelseHåndterer {
             LOG.info("FPABONNENT mottok familierelasjon: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} relatertPersonsRolle={} minRolleForPerson={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), familierelasjon.getRelatertPersonsRolle(), familierelasjon.getMinRolleForPerson());
             PdlFamilierelasjon pdlFamilierelasjon = oversetter.oversettFamilierelasjon(payload);
-            lagreInngåendeHendelseHvisRelevant(pdlFamilierelasjon);
+            prosesserHendelseVidereHvisRelevant(pdlFamilierelasjon);
         }
     }
 
@@ -97,25 +115,44 @@ public class PdlLeesahHendelseHåndterer {
         }
     }
 
-    private void lagreInngåendeHendelseHvisRelevant(PdlPersonhendelse personhendelse) {
+    private void prosesserHendelseVidereHvisRelevant(PdlPersonhendelse personhendelse) {
         if (personhendelse.erRelevantForFpsak()) {
-            InngåendeHendelse.Builder inngåendeHendelse = InngåendeHendelse.builder()
-                    .type(personhendelse.getHendelseType())
-                    .hendelseId(personhendelse.getHendelseId())
-                    .requestUuid(personhendelse.getHendelseId()) //TODO(JEJ): Fjerne felt når person-feed saneres?
-                    .payload(JsonMapper.toJson(personhendelse))
-                    .feedKode(FeedKode.PDL)
-                    .håndteresEtterTidspunkt(LocalDateTime.now()); //TODO(JEJ): Legge inn TPS-forsinkelse, må ta høyde for helger
-
-            if (pdlFeatureToggleTjeneste.skalGrovsorterePdl()) {
-                inngåendeHendelse.håndtertStatus(HåndtertStatusType.MOTTATT);
+            if (pdlFeatureToggleTjeneste.skalLagrePdl()) {
+                if (pdlFeatureToggleTjeneste.skalGrovsorterePdl()) {
+                    InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
+                    opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId());
+                } else {
+                    LOG.info("Grovsortering av hendelseId={} er deaktivert i dette clusteret", personhendelse.getHendelseId());
+                    lagreInngåendeHendelse(personhendelse, HåndtertStatusType.HÅNDTERT);
+                }
             } else {
-                inngåendeHendelse.håndtertStatus(HåndtertStatusType.HÅNDTERT);
+                LOG.info("Lagring av hendelseId={} er deaktivert i dette clusteret", personhendelse.getHendelseId());
             }
-
-            hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse.build());
         } else {
             LOG.info("Ikke-relevant hendelseId={} filtrert bort", personhendelse.getHendelseId());
         }
+    }
+
+    private InngåendeHendelse lagreInngåendeHendelse(PdlPersonhendelse personhendelse, HåndtertStatusType håndtertStatusType) {
+        InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
+                .type(personhendelse.getHendelseType())
+                .hendelseId(personhendelse.getHendelseId())
+                .requestUuid(personhendelse.getHendelseId()) //TODO(JEJ): Fjerne felt når person-feed saneres?
+                .payload(JsonMapper.toJson(personhendelse))
+                .feedKode(FeedKode.PDL)
+                .håndtertStatus(håndtertStatusType)
+                .håndteresEtterTidspunkt(LocalDateTime.now().plusYears(50)) //TODO(JEJ): Håndteres av prosesstask - fjerne felt når person-feed saneres
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
+        return inngåendeHendelse;
+    }
+
+    private void opprettVurderSorteringTask(PdlPersonhendelse personhendelse, Long inngåendeHendelseId) {
+        HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelseId);
+        vurderSorteringTask.setHendelseId(personhendelse.getHendelseId());
+        vurderSorteringTask.setNesteKjøringEtter(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(personhendelse.getOpprettet()));
+        vurderSorteringTask.setHendelseType(personhendelse.getHendelseType().getKode());
+        prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
     }
 }

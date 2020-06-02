@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.abonnent.pdl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.time.LocalDate;
@@ -15,16 +16,23 @@ import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
+import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
+import no.nav.foreldrepenger.abonnent.task.VurderSorteringTask;
 import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 public class PdlLeesahHendelseHåndtererTest {
 
     private HendelseRepository hendelseRepository;
+    private ProsessTaskRepository prosessTaskRepository;
+    private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
+
     private PdlLeesahHendelseHåndterer hendelseHåndterer;
 
     private static final LocalDateTime OPPRETTET_TID = LocalDateTime.now();
@@ -33,13 +41,14 @@ public class PdlLeesahHendelseHåndtererTest {
     @Before
     public void before() {
         hendelseRepository = mock(HendelseRepository.class);
-        PdlLeesahOversetter oversetter = new PdlLeesahOversetter();
+        prosessTaskRepository = mock(ProsessTaskRepository.class);
+        tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste();
 
-        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, oversetter, new PdlFeatureToggleTjeneste());
+        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskRepository, tpsForsinkelseTjeneste, new PdlFeatureToggleTjeneste());
     }
 
     @Test
-    public void skal_oversette_og_lagre_dødshendelse() {
+    public void skal_lagre_oversatt_dødshendelse_og_opprette_vurder_sortering_task() {
         // Arrange
         Personhendelse payload = new Personhendelse();
         payload.setHendelseId("ABC");
@@ -53,6 +62,8 @@ public class PdlLeesahHendelseHåndtererTest {
         payload.setDoedsfall(doedsfall);
         ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
@@ -65,6 +76,13 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getFeedKode()).isEqualTo(FeedKode.PDL);
         assertThat(inngåendeHendelse.getType()).isEqualTo(HendelseType.PDL_DØD_OPPRETTET);
         assertThat(inngåendeHendelse.getHåndteresEtterTidspunkt()).isNotNull();
+
+        ProsessTaskData prosessTaskData = taskCaptor.getValue();
+        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
+        assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(OPPRETTET_TID).toLocalDate());
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_DØD_OPPRETTET.getKode());
     }
 
 }

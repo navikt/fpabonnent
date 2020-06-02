@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.abonnent.feed.domain;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
@@ -12,6 +13,8 @@ public abstract class HendelsePayload {
     protected String type;
 
     protected String endringstype;
+
+    protected LocalDateTime hendelseOpprettetTid;
 
     public HendelsePayload() {
     }
@@ -26,6 +29,10 @@ public abstract class HendelsePayload {
 
     public String getEndringstype() {
         return endringstype;
+    }
+
+    public LocalDateTime getHendelseOpprettetTid() {
+        return hendelseOpprettetTid;
     }
 
     public abstract Set<String> getAktørIderForSortering();
