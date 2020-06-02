@@ -117,7 +117,7 @@ public class InngåendeHendelse extends BaseEntitet {
         this.sendtTidspunkt = sendtTidspunkt;
     }
 
-    void setPayload(String payload) {
+    public void setPayload(String payload) {
         this.payload = payload;
     }
 

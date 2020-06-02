@@ -141,6 +141,10 @@ public enum HendelseType implements Kodeverdi {
                 || PDL_FAMILIERELASJON_OPPHØRT.equals(hendelseType);
     }
 
+    public boolean erPdlHendelse() {
+        return erPdlFødselHendelseType(this) || erPdlDødHendelseType(this) || erPdlDødfødselHendelseType(this);
+    }
+
     @Converter(autoApply = true)
     public static class KodeverdiConverter implements AttributeConverter<HendelseType, String> {
         @Override

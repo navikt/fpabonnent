@@ -11,6 +11,7 @@ import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTypeRef;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
+import no.nav.foreldrepenger.abonnent.felles.KlarForSorteringResultat;
 import no.nav.tjenester.person.feed.common.v1.FeedEntry;
 import no.nav.tjenester.person.feed.v2.doedfoedsel.DoedfoedselOpprettet;
 
@@ -58,5 +59,10 @@ public class DødfødselOpprettetHendelseTjeneste implements HendelseTjeneste<D�
     @Override
     public boolean ikkeAtomiskHendelseSkalSendes(DødfødselHendelsePayload payload) {
         return true;
+    }
+
+    @Override
+    public KlarForSorteringResultat vurderOmKlarForSortering(DødfødselHendelsePayload payload) {
+        return new KlarForSorteringResultat(true);
     }
 }

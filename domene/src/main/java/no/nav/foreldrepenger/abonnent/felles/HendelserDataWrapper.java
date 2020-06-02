@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 
 import java.sql.Clob;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Properties;
@@ -17,11 +18,13 @@ public class HendelserDataWrapper {
     public static final String DEFAULT_BESKRIVELSE = "Hendelseoppgave";
 
     public static final String HENDELSE_REQUEST_UUID = "hendelse.requestUuid";
-    private static final String HENDELSE_ID = "hendelse.sekvensnummer";
-    private static final String HENDELSE_TYPE = "hendelse.type";
+    public static final String HENDELSE_ID = "hendelse.sekvensnummer";
+    public static final String INNGÅENDE_HENDELSE_ID = "hendelse.ihId";
+    public static final String HENDELSE_TYPE = "hendelse.type";
     private static final String ENDRINGSTYPE = "hendelse.endringstype";
     public static final String AKTØR_ID_MOR = "hendelse.aktoerIdMor";
     public static final String AKTØR_ID_FAR = "hendelse.aktoerIdFar";
+    public static final String AKTØR_ID_FORELDRE = "hendelse.aktoerIdForeldre";
     public static final String AKTØR_ID_BARN = "hendelse.aktoerIdBarn";
     private static final String FØDSELSDATO = "hendelse.foedselsdato";
     private static final String DØDSDATO = "hendelse.doedsdato";
@@ -99,6 +102,19 @@ public class HendelserDataWrapper {
         prosessTaskData.setProperty(HENDELSE_ID, hendelseId);
     }
 
+    public Optional<Long> getInngåendeHendelseId() {
+        String propertyValue = prosessTaskData.getPropertyValue(INNGÅENDE_HENDELSE_ID);
+        try {
+            return Optional.of(Long.parseLong(propertyValue));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    public void setInngåendeHendelseId(Long inngåendeHendelseId) {
+        prosessTaskData.setProperty(INNGÅENDE_HENDELSE_ID, "" + inngåendeHendelseId);
+    }
+
     public Optional<String> getHendelseType() {
         return Optional.ofNullable(prosessTaskData.getPropertyValue(HENDELSE_TYPE));
     }
@@ -129,6 +145,14 @@ public class HendelserDataWrapper {
 
     public void setAktørIdFar(Set<String> aktørId) {
         setKommaseparertPropertyFraSet(AKTØR_ID_FAR, aktørId);
+    }
+
+    public Optional<Set<String>> getAktørIdForeldre() {
+        return getKommaseparertPropertySomSet(AKTØR_ID_FORELDRE);
+    }
+
+    public void setAktørIdForeldre(Set<String> aktørForeldre) {
+        setKommaseparertPropertyFraSet(AKTØR_ID_FORELDRE, aktørForeldre);
     }
 
     public Optional<Set<String>> getAktørIdBarn() {
@@ -224,5 +248,9 @@ public class HendelserDataWrapper {
         } else {
             return Optional.empty();
         }
+    }
+
+    public void setNesteKjøringEtter(LocalDateTime nesteKjøringEtter) {
+        prosessTaskData.setNesteKjøringEtter(nesteKjøringEtter);
     }
 }
