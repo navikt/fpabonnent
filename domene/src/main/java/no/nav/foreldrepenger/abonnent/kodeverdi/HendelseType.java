@@ -21,8 +21,9 @@ public enum HendelseType implements Kodeverdi {
     DØDSMELDINGOPPRETTET("DOEDSMELDINGOPPRETTET"),
     DØDFØDSELOPPRETTET("DOEDFOEDSELOPPRETTET"),
 
+    // Ikke lengre støttet, men beholdes så lenge det finnes data i tabeller:
     @Deprecated
-    OPPHØERT("OPPHOERT_v1"), // Beholdes så lende det finnes data i tabeller
+    OPPHØERT("OPPHOERT_v1"),
     @Deprecated
     INNVILGET("INNVILGET_v1"),
     @Deprecated
@@ -45,6 +46,7 @@ public enum HendelseType implements Kodeverdi {
     PDL_DØDFØDSEL_ANNULLERT("PDL_DOEDFOEDSEL_ANNULLERT"),
     PDL_DØDFØDSEL_OPPHØRT("PDL_DOEDFOEDSEL_OPPHOERT"),
 
+    // Prosesseres ikke pt:
     PDL_FAMILIERELASJON_OPPRETTET("PDL_FAMILIERELASJON_OPPRETTET"),
     PDL_FAMILIERELASJON_KORRIGERT("PDL_FAMILIERELASJON_KORRIGERT"),
     PDL_FAMILIERELASJON_ANNULLERT("PDL_FAMILIERELASJON_ANNULLERT"),
@@ -132,13 +134,6 @@ public enum HendelseType implements Kodeverdi {
                 || PDL_DØDFØDSEL_KORRIGERT.equals(hendelseType)
                 || PDL_DØDFØDSEL_ANNULLERT.equals(hendelseType)
                 || PDL_DØDFØDSEL_OPPHØRT.equals(hendelseType);
-    }
-
-    public static boolean erPdlFamilierelasjonHendelseType(HendelseType hendelseType) {
-        return PDL_FAMILIERELASJON_OPPRETTET.equals(hendelseType)
-                || PDL_FAMILIERELASJON_KORRIGERT.equals(hendelseType)
-                || PDL_FAMILIERELASJON_ANNULLERT.equals(hendelseType)
-                || PDL_FAMILIERELASJON_OPPHØRT.equals(hendelseType);
     }
 
     public boolean erPdlHendelse() {

@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlDødfødsel;
-import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFamilierelasjon;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlPersonhendelse;
 import no.nav.foreldrepenger.abonnent.task.VurderSorteringTask;
@@ -74,35 +73,31 @@ public class PdlLeesahHendelseHåndterer {
         }
 
         Foedsel foedsel = payload.getFoedsel();
+        Doedsfall doedsfall = payload.getDoedsfall();
+        DoedfoedtBarn doedfoedtBarn = payload.getDoedfoedtBarn();
+        Familierelasjon familierelasjon = payload.getFamilierelasjon();
+
         if (foedsel != null) {
             LOG.info("FPABONNENT mottok fødsel: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} fødselsdato={} fødselsår={} fødested={} fødeKommune={} fødeland={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), foedsel.getFoedselsdato(), foedsel.getFoedselsaar(), foedsel.getFoedested(), foedsel.getFoedekommune(), foedsel.getFoedeland());
             PdlFødsel pdlFødsel = oversetter.oversettFødsel(payload);
             prosesserHendelseVidereHvisRelevant(pdlFødsel);
-        }
-
-        Doedsfall doedsfall = payload.getDoedsfall();
-        if (doedsfall != null) {
+        } else if (doedsfall != null) {
             LOG.info("FPABONNENT mottok dødsfall: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dødsdato={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), doedsfall.getDoedsdato());
             PdlDød pdlDød = oversetter.oversettDød(payload);
             prosesserHendelseVidereHvisRelevant(pdlDød);
-        }
-
-        DoedfoedtBarn doedfoedtBarn = payload.getDoedfoedtBarn();
-        if (doedfoedtBarn != null) {
+        } else if (doedfoedtBarn != null) {
             LOG.info("FPABONNENT mottok dødfødtBarn: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dato={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), doedfoedtBarn.getDato());
             PdlDødfødsel pdlDødfødsel = oversetter.oversettDødfødsel(payload);
             prosesserHendelseVidereHvisRelevant(pdlDødfødsel);
-        }
-
-        Familierelasjon familierelasjon = payload.getFamilierelasjon();
-        if (familierelasjon != null) {
-            LOG.info("FPABONNENT mottok familierelasjon: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} relatertPersonsRolle={} minRolleForPerson={}",
+        } else if (familierelasjon != null) {
+            LOG.info("FPABONNENT mottok familierelasjon som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} relatertPersonsRolle={} minRolleForPerson={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), familierelasjon.getRelatertPersonsRolle(), familierelasjon.getMinRolleForPerson());
-            PdlFamilierelasjon pdlFamilierelasjon = oversetter.oversettFamilierelasjon(payload);
-            prosesserHendelseVidereHvisRelevant(pdlFamilierelasjon);
+        } else {
+            LOG.info("FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
         }
     }
 

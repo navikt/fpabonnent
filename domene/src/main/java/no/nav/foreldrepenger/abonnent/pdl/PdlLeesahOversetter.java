@@ -12,12 +12,10 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlDødfødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlEndringstype;
-import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFamilierelasjon;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlPersonhendelse;
 import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
-import no.nav.person.pdl.leesah.familierelasjon.Familierelasjon;
 import no.nav.person.pdl.leesah.foedsel.Foedsel;
 
 @ApplicationScoped
@@ -28,7 +26,6 @@ public class PdlLeesahOversetter {
     private static final String FØDSEL = "FOEDSEL_V1";
     private static final String DØD = "DOEDSFALL_V1";
     private static final String DØDFØDSEL = "DOEDFOEDT_BARN_V1";
-    private static final String FAMILIERELASJON = "FAMILIERELASJON_V1";
 
     public PdlLeesahOversetter() {
         // CDI
@@ -69,18 +66,6 @@ public class PdlLeesahOversetter {
         PdlDødfødsel.Builder builder = PdlDødfødsel.builder();
         oversettPersonhendelse(personhendelse, builder);
         builder.medDødfødselsdato(personhendelse.getDoedfoedtBarn().getDato());
-        return builder.build();
-    }
-
-    public PdlFamilierelasjon oversettFamilierelasjon(Personhendelse personhendelse) {
-        PdlFamilierelasjon.Builder builder = PdlFamilierelasjon.builder();
-        oversettPersonhendelse(personhendelse, builder);
-        Familierelasjon familierelasjon = personhendelse.getFamilierelasjon();
-        builder.medRelatertPersonsIdent(familierelasjon.getRelatertPersonsIdent().toString());
-        builder.medRelatertPersonsRolle(familierelasjon.getRelatertPersonsRolle().toString());
-        if (familierelasjon.getMinRolleForPerson() != null) {
-            builder.medMinRolleForPerson(familierelasjon.getMinRolleForPerson().toString());
-        }
         return builder.build();
     }
 
@@ -141,16 +126,6 @@ public class PdlLeesahOversetter {
                     return HendelseType.PDL_DØDFØDSEL_KORRIGERT;
                 } else if (Endringstype.OPPHOERT.equals(endringstype)) {
                     return HendelseType.PDL_DØDFØDSEL_OPPHØRT;
-                }
-            } else if (FAMILIERELASJON.equals(opplysningstype)) {
-                if (Endringstype.OPPRETTET.equals(endringstype)) {
-                    return HendelseType.PDL_FAMILIERELASJON_OPPRETTET;
-                } else if (Endringstype.ANNULLERT.equals(endringstype)) {
-                    return HendelseType.PDL_FAMILIERELASJON_ANNULLERT;
-                } else if (Endringstype.KORRIGERT.equals(endringstype)) {
-                    return HendelseType.PDL_FAMILIERELASJON_KORRIGERT;
-                } else if (Endringstype.OPPHOERT.equals(endringstype)) {
-                    return HendelseType.PDL_FAMILIERELASJON_OPPHØRT;
                 }
             }
         }
