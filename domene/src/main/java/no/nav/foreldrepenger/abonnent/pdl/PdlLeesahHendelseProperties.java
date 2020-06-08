@@ -53,6 +53,9 @@ public class PdlLeesahHendelseProperties {
         this.trustStorePath = trustStorePath;
         this.trustStorePassword = trustStorePassword;
         this.applicationId = System.getProperty("nais.app.name", "fpabonnent") + "-" + System.getProperty("nais.namespace", "default");
+        //TODO(JEJ) Fjerne når testet i Q:
+        LOG.info("nais.app.name={} nais_app_name={} NAIS_APP_NAME={}", System.getProperty("nais.app.name"), System.getProperty("nais_app_name"), System.getProperty("NAIS_APP_NAME"));
+        LOG.info("nais.namespace={} nais_namespace={} NAIS_NAMESPACE={}", System.getProperty("nais.namespace"), System.getProperty("nais_namespace"), System.getProperty("NAIS_NAMESPACE"));
     }
 
     public Topic<String, Personhendelse> getTopic() {
@@ -105,7 +108,9 @@ public class PdlLeesahHendelseProperties {
          * enn den man skal ha).
          */
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, getApplicationId() + "-" + personhendelseTopic.getConsumerClientId());
+        LOG.info("Stream APPLICATION_ID_CONFIG: {}", props.getProperty(StreamsConfig.APPLICATION_ID_CONFIG));
         props.put(StreamsConfig.CLIENT_ID_CONFIG, personhendelseTopic.getConsumerClientId());
+        LOG.info("Stream CLIENT_ID_CONFIG: {}", props.getProperty(StreamsConfig.CLIENT_ID_CONFIG));
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, getBootstrapServers());
 
         // Sikkerhet
