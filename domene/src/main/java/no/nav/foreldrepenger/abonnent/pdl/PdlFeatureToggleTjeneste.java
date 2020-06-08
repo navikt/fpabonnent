@@ -17,20 +17,21 @@ public class PdlFeatureToggleTjeneste {
     private static final Set<Cluster> SKAL_LAGRE_PDL_AKTIVERT = Set.of(Cluster.LOCAL, Cluster.DEV_FSS);
     private static final Set<Cluster> SKAL_GROVSORTERE_PDL_AKTIVERT = Set.of(Cluster.LOCAL, Cluster.DEV_FSS);
     private static final Set<Cluster> SKAL_SENDE_PDL_AKTIVERT = Set.of(Cluster.LOCAL);
+    private static final Cluster CLUSTER = Environment.current().getCluster();
 
     public boolean skalKonsumerePdl() {
-        return SKAL_KONSUMERE_PDL_AKTIVERT.contains(Environment.current().getCluster());
+        return SKAL_KONSUMERE_PDL_AKTIVERT.contains(CLUSTER);
     }
 
     public boolean skalLagrePdl() {
-        return SKAL_LAGRE_PDL_AKTIVERT.contains(Environment.current().getCluster());
+        return SKAL_LAGRE_PDL_AKTIVERT.contains(CLUSTER);
     }
 
     public boolean skalGrovsorterePdl() {
-        return SKAL_GROVSORTERE_PDL_AKTIVERT.contains(Environment.current().getCluster());
+        return SKAL_GROVSORTERE_PDL_AKTIVERT.contains(CLUSTER);
     }
 
     public boolean skalSendePdl() {
-        return SKAL_SENDE_PDL_AKTIVERT.contains(Environment.current().getCluster());
+        return SKAL_SENDE_PDL_AKTIVERT.contains(CLUSTER);
     }
 }
