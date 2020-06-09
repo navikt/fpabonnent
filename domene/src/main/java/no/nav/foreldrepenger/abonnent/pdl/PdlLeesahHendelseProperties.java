@@ -19,6 +19,7 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.util.env.Environment;
 
 @Dependent
 public class PdlLeesahHendelseProperties {
@@ -32,7 +33,7 @@ public class PdlLeesahHendelseProperties {
     private final Topic<String, Personhendelse> personhendelseTopic;
     private final String username;
     private final String password;
-    private String applicationId;
+    private final String applicationId;
     private final String trustStorePath;
     private final String trustStorePassword;
 
@@ -52,10 +53,13 @@ public class PdlLeesahHendelseProperties {
         this.password = password;
         this.trustStorePath = trustStorePath;
         this.trustStorePassword = trustStorePassword;
-        this.applicationId = getEnvVar("NAIS_APP_NAME", "fpabonnent") + "-" + getEnvVar("NAIS_NAMESPACE", "default");
-        //TODO(JEJ) Fjerne når testet i Q:
-        LOG.info("nais.app.name={} nais_app_name={} NAIS_APP_NAME={}", System.getenv("nais.app.name"), System.getenv("nais_app_name"), System.getenv("NAIS_APP_NAME"));
-        LOG.info("nais.namespace={} nais_namespace={} NAIS_NAMESPACE={}", System.getenv("nais.namespace"), System.getenv("nais_namespace"), System.getenv("NAIS_NAMESPACE"));
+
+        String namespace = Environment.current().getNamespace().getNamespace();
+        LOG.info("Namespace fra Environment: {}", namespace); //TODO(JEJ) Fjerne når testet i Q
+        if (namespace == null || namespace.isBlank()) {
+            namespace = getEnvVar("NAIS_NAMESPACE", "default");
+        }
+        this.applicationId = getEnvVar("NAIS_APP_NAME", "fpabonnent") + "-" + namespace;
     }
 
     public Topic<String, Personhendelse> getTopic() {
