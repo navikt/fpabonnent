@@ -52,10 +52,10 @@ public class PdlLeesahHendelseProperties {
         this.password = password;
         this.trustStorePath = trustStorePath;
         this.trustStorePassword = trustStorePassword;
-        this.applicationId = System.getProperty("nais.app.name", "fpabonnent") + "-" + System.getProperty("nais.namespace", "default");
+        this.applicationId = getEnvVar("NAIS_APP_NAME", "fpabonnent") + "-" + getEnvVar("NAIS_NAMESPACE", "default");
         //TODO(JEJ) Fjerne når testet i Q:
-        LOG.info("nais.app.name={} nais_app_name={} NAIS_APP_NAME={}", System.getProperty("nais.app.name"), System.getProperty("nais_app_name"), System.getProperty("NAIS_APP_NAME"));
-        LOG.info("nais.namespace={} nais_namespace={} NAIS_NAMESPACE={}", System.getProperty("nais.namespace"), System.getProperty("nais_namespace"), System.getProperty("NAIS_NAMESPACE"));
+        LOG.info("nais.app.name={} nais_app_name={} NAIS_APP_NAME={}", System.getenv("nais.app.name"), System.getenv("nais_app_name"), System.getenv("NAIS_APP_NAME"));
+        LOG.info("nais.namespace={} nais_namespace={} NAIS_NAMESPACE={}", System.getenv("nais.namespace"), System.getenv("nais_namespace"), System.getenv("NAIS_NAMESPACE"));
     }
 
     public Topic<String, Personhendelse> getTopic() {
@@ -150,5 +150,10 @@ public class PdlLeesahHendelseProperties {
             }
         }
         return serde;
+    }
+
+    private String getEnvVar(String key, String defaultValue) {
+        String val = System.getenv(key);
+        return (val == null) ? defaultValue : val;
     }
 }
