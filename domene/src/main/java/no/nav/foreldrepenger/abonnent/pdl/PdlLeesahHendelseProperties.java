@@ -53,13 +53,12 @@ public class PdlLeesahHendelseProperties {
         this.password = password;
         this.trustStorePath = trustStorePath;
         this.trustStorePassword = trustStorePassword;
-
-        String namespace = Environment.current().getNamespace().getNamespace();
-        LOG.info("Namespace fra Environment: {}", namespace); //TODO(JEJ) Fjerne når testet i Q
-        if (namespace == null || namespace.isBlank()) {
-            namespace = getEnvVar("NAIS_NAMESPACE", "default");
+        String naisAppName = Environment.current().getProperty("NAIS_APP_NAME");
+        if (naisAppName == null || naisAppName.isBlank()) {
+            LOG.info("Funker ikke å hente NAIS_APP_NAME fra environment - bør endres tilbake til System.getenv()"); //TODO(JEJ): Fjerne når testet på miljø
+            naisAppName = "fpabonnent";
         }
-        this.applicationId = getEnvVar("NAIS_APP_NAME", "fpabonnent") + "-" + namespace;
+        this.applicationId = naisAppName + "-" + Environment.current().getNamespace().getNamespace();
     }
 
     public Topic<String, Personhendelse> getTopic() {
@@ -154,10 +153,5 @@ public class PdlLeesahHendelseProperties {
             }
         }
         return serde;
-    }
-
-    private String getEnvVar(String key, String defaultValue) {
-        String val = System.getenv(key);
-        return (val == null) ? defaultValue : val;
     }
 }

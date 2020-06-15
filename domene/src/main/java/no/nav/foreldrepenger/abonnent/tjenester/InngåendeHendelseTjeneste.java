@@ -56,7 +56,8 @@ public class InngåendeHendelseTjeneste {
             if (!relevanteHendelseIder.contains(entry.getKey())) {
                 InngåendeHendelse inngåendeHendelse = entry.getValue();
                 hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.HÅNDTERT);
-                hendelseRepository.fjernPayload(inngåendeHendelse);
+                //TODO(JEJ): Kommentere inn slik at vi fjerner payload når vi har sett at det fungerer (+ bestille patch til null på gamle):
+                //hendelseRepository.fjernPayload(inngåendeHendelse);
             }
         }
     }

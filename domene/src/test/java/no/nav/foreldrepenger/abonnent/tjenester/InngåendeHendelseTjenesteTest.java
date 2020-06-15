@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -75,6 +76,8 @@ public class InngåendeHendelseTjenesteTest {
         assertThat(resultat).isEmpty();
     }
 
+    //TODO(JEJ): Kommentere inn når payload fjernes igjen:
+    @Ignore
     @Test
     public void skal_markere_ikke_relevante_hendelser_som_håndterte_og_fjerne_payload() {
         // Arrange

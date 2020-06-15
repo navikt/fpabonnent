@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.konfig.KonfigVerdier;
+import no.nav.foreldrepenger.abonnent.pdl.PdlFeatureToggleTjeneste;
 import no.nav.tjenester.person.feed.common.v1.Feed;
 import no.nav.tjenester.person.feed.common.v1.FeedEntry;
 import no.nav.tjenester.person.feed.v2.Meldingstype;
@@ -56,13 +57,17 @@ public class TpsFeedPoller implements FeedPoller {
     private OidcRestClient oidcRestClient;
     private String pageSize;
     private boolean pollingErAktivert;
+    private PdlLanseringTjeneste pdlLanseringTjeneste;
+    private PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste;
 
     @Inject
     public TpsFeedPoller(@KonfigVerdi(ENDPOINT_KEY) URI endpoint,
-            HendelseRepository hendelseRepository,
-            OidcRestClient oidcRestClient,
-            @KonfigVerdi(value = PAGE_SIZE_VALUE_KEY, defaultVerdi = KonfigVerdier.PAGE_SIZE_VALUE_DEFAULT) String pageSize,
-            @KonfigVerdi(value = POLLING_AKTIVERT_KEY, defaultVerdi = POLLING_AKTIVERT_DEFAULT) String pollingErAktivert) {
+                         HendelseRepository hendelseRepository,
+                         OidcRestClient oidcRestClient,
+                         @KonfigVerdi(value = PAGE_SIZE_VALUE_KEY, defaultVerdi = KonfigVerdier.PAGE_SIZE_VALUE_DEFAULT) String pageSize,
+                         @KonfigVerdi(value = POLLING_AKTIVERT_KEY, defaultVerdi = POLLING_AKTIVERT_DEFAULT) String pollingErAktivert,
+                         PdlLanseringTjeneste pdlLanseringTjeneste,
+                         PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste) {
         this.endpoint = endpoint;
         this.hendelseRepository = hendelseRepository;
         this.oidcRestClient = oidcRestClient;
@@ -73,6 +78,8 @@ public class TpsFeedPoller implements FeedPoller {
         } else {
             log.info(DEAKTIVERT_LOG);
         }
+        this.pdlLanseringTjeneste = pdlLanseringTjeneste;
+        this.pdlFeatureToggleTjeneste = pdlFeatureToggleTjeneste;
     }
 
     @Override
@@ -102,7 +109,18 @@ public class TpsFeedPoller implements FeedPoller {
             Optional<Long> lastSequenceId = Optional.empty();
             for (FeedEntry entry : personFeed.getItems()) {
                 if (AKSEPTERTE_MELDINGSTYPER.contains(entry.getType())) {
-                    lagreInngåendeHendelse(entry, pollId);
+                    Optional<String> pdlHendelseId;
+                    if (pdlFeatureToggleTjeneste.skalSendePdlOgDuplikatsjekkePf()) {
+                        pdlHendelseId = pdlLanseringTjeneste.sjekkOmTpsHendelseErMottattFraPdlAllerede(entry);
+                    } else {
+                        pdlHendelseId = Optional.empty();
+                    }
+                    if (pdlHendelseId.isPresent()) {
+                        log.info("Hendelse med sekvensnummer {} av type {} er allerede mottatt fra PDL som ID {} og vil ikke bli sortert", entry.getSequence(), entry.getType(), pdlHendelseId.get());
+                        lagreInngåendeHendelse(entry, pollId, HåndtertStatusType.HÅNDTERT);
+                    } else {
+                        lagreInngåendeHendelse(entry, pollId, HåndtertStatusType.MOTTATT);
+                    }
                 }
                 lastSequenceId = Optional.of(entry.getSequence());
             }
@@ -133,14 +151,14 @@ public class TpsFeedPoller implements FeedPoller {
         }
     }
 
-    private void lagreInngåendeHendelse(FeedEntry entry, String pollId) {
+    private void lagreInngåendeHendelse(FeedEntry entry, String pollId, HåndtertStatusType håndtertStatus) {
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
                 .hendelseId("" + entry.getSequence())
                 .type(HendelseType.fraKodeDefaultUdefinert(entry.getType()))
                 .payload(JsonMapper.toJson(entry))
                 .feedKode(FeedKode.TPS)
                 .requestUuid(pollId)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .håndtertStatus(håndtertStatus)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);

@@ -25,6 +25,10 @@ public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødf
 
     private PersonTjeneste personTjeneste;
 
+    public PdlDødfødselHendelseTjeneste() {
+        // CDI
+    }
+
     @Inject
     public PdlDødfødselHendelseTjeneste(PersonTjeneste personTjeneste) {
         this.personTjeneste = personTjeneste;

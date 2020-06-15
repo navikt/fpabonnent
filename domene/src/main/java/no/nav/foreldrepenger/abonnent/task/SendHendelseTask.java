@@ -56,7 +56,7 @@ public class SendHendelseTask implements ProsessTaskHandler {
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
         HendelsePayload hendelsePayload = getHendelsePayload(dataWrapper);
 
-        if (!HendelseType.fraKode(hendelsePayload.getType()).erPdlHendelse() || pdlFeatureToggleTjeneste.skalSendePdl()) {
+        if (!HendelseType.fraKode(hendelsePayload.getType()).erPdlHendelse() || pdlFeatureToggleTjeneste.skalSendePdlOgDuplikatsjekkePf()) {
             hendelseConsumer.sendHendelse(hendelsePayload);
             inngåendeHendelseTjeneste.oppdaterHendelseSomSendtNå(hendelsePayload);
             LOGGER.info("Sendt hendelse: [{}] til FPSAK.", hendelsePayload.getHendelseId());

@@ -35,12 +35,14 @@ import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
 import no.nav.foreldrepenger.abonnent.feed.tps.DødfødselOpprettetHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.feed.tps.DødsmeldingOpprettetHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
+import no.nav.foreldrepenger.abonnent.feed.tps.PdlLanseringTjeneste;
 import no.nav.foreldrepenger.abonnent.feed.tps.TpsFeedPoller;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
+import no.nav.foreldrepenger.abonnent.pdl.PdlFeatureToggleTjeneste;
 import no.nav.tjenester.person.feed.common.v1.Feed;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
@@ -68,6 +70,9 @@ public class TpsFeedPollerOgInngåendeHendelseTest {
 
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
+    @Mock
+    private PdlLanseringTjeneste pdlLanseringTjeneste;
+
     @Before
     public void setUp() {
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
@@ -81,7 +86,7 @@ public class TpsFeedPollerOgInngåendeHendelseTest {
         when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.DØDFØDSELOPPRETTET), anyString()))
                 .thenReturn(dødfødselHendelseTjeneste);
 
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv");
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv", pdlLanseringTjeneste, new PdlFeatureToggleTjeneste());
         inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, hendelseTjenesteProvider);
         Mockito.clearInvocations(oidcRestClient);
     }
