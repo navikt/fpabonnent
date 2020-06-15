@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
@@ -173,5 +174,18 @@ public class HendelseRepository {
             return Optional.empty();
         }
         return Optional.of(resultater.get(0));
+    }
+
+    public List<InngåendeHendelse> finnAlleHendelserFraSisteUkeAvType(HendelseType hendelseType, FeedKode feedKode) {
+        TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
+                "from InngåendeHendelse where feedKode = :feedKode " + //$NON-NLS-1$
+                        "and opprettetTidspunkt >= :opprettetTidspunkt " + //$NON-NLS-1$
+                        "and payload != null " + //$NON-NLS-1$
+                        "and type = :type ", InngåendeHendelse.class); //$NON-NLS-1$
+        query.setParameter(FEED_KODE, feedKode);
+        query.setParameter("opprettetTidspunkt", LocalDateTime.now().minusDays(7));
+        query.setParameter("type", hendelseType);
+
+        return query.getResultList();
     }
 }

@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.pdl.PdlFeatureToggleTjeneste;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
@@ -35,7 +36,7 @@ public class FeedPollerManagerTest {
         when(feedPollers.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true, false);
         when(iterator.next()).thenReturn(new TestFeedPoller());
-        manager = new FeedPollerManager(feedPollerRepositoryImpl, feedPollers);
+        manager = new FeedPollerManager(feedPollerRepositoryImpl, feedPollers, new PdlFeatureToggleTjeneste());
     }
 
     @Test

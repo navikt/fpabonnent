@@ -24,8 +24,10 @@ import org.mockito.junit.MockitoRule;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
+import no.nav.foreldrepenger.abonnent.feed.tps.PdlLanseringTjeneste;
 import no.nav.foreldrepenger.abonnent.feed.tps.TpsFeedPoller;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
+import no.nav.foreldrepenger.abonnent.pdl.PdlFeatureToggleTjeneste;
 import no.nav.tjenester.person.feed.common.v1.Feed;
 import no.nav.tjenester.person.feed.common.v1.FeedEntry;
 import no.nav.tjenester.person.feed.v2.Meldingstype;
@@ -46,13 +48,15 @@ public class TpsFeedPollerTest {
     private TpsFeedPoller poller;
     @Mock
     private InputFeed inputFeed;
+    @Mock
+    private PdlLanseringTjeneste pdlLanseringTjeneste;
 
     private URI startUri = URI.create(BASE_URL_FEED + "?sequenceId=1&pageSize=5");
     private URI endpoint = URI.create(BASE_URL_FEED);
 
     @Before
     public void setUp() {
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv");
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "aktiv", pdlLanseringTjeneste, new PdlFeatureToggleTjeneste());
         Mockito.clearInvocations(oidcRestClient);
     }
 
@@ -110,7 +114,7 @@ public class TpsFeedPollerTest {
     @Test
     public void skal_ikke_polle_feed_når_deaktivert() {
         // Arrange
-        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "falsk");
+        poller = new TpsFeedPoller(endpoint, hendelseRepository, oidcRestClient, "5", "false", pdlLanseringTjeneste, new PdlFeatureToggleTjeneste());
 
         // Act
         poller.poll(inputFeed);

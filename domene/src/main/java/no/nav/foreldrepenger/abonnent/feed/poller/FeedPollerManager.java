@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.felles.NamedThreadFactory;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.pdl.PdlFeatureToggleTjeneste;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.util.Tuple;
 
@@ -32,6 +33,8 @@ public class FeedPollerManager implements AppServiceHandler {
     private static final Logger log = LoggerFactory.getLogger(FeedPollerManager.class);
 
     private FeedPollerRepositoryImpl feedPollerRepository;
+
+    private PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste;
 
     /**
      * Prefix every thread in pool with given name.
@@ -59,16 +62,21 @@ public class FeedPollerManager implements AppServiceHandler {
     }
 
     @Inject
-    public FeedPollerManager(FeedPollerRepositoryImpl feedPollerRepository, @Any Instance<FeedPoller> feedPollers) {
+    public FeedPollerManager(FeedPollerRepositoryImpl feedPollerRepository, @Any Instance<FeedPoller> feedPollers, PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste) {
         Objects.requireNonNull(feedPollerRepository, "feedPollerRepository"); //$NON-NLS-1$
         Objects.requireNonNull(feedPollers, "feedPollers"); //$NON-NLS-1$
         this.feedPollerRepository = feedPollerRepository;
         this.feedPollers = feedPollers;
+        this.pdlFeatureToggleTjeneste = pdlFeatureToggleTjeneste;
     }
 
     @Override
     public synchronized void start() {
-        startPollerThread();
+        if (pdlFeatureToggleTjeneste.skalKonsumerePf()) {
+            startPollerThread();
+        } else {
+            log.info("Person-feed er deaktivert i dette clusteret");
+        }
     }
 
     @Override

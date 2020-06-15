@@ -82,17 +82,22 @@ public class VurderSorteringTask implements ProsessTaskHandler {
 
     private void opprettVurderSorteringTaskHvisIkkeHendelsenErForGammel(HendelsePayload hendelsePayload, InngåendeHendelse inngåendeHendelse) {
         if (hendelsenErUnderEnUkeGammel(hendelsePayload.getHendelseOpprettetTid())) {
+            LocalDateTime nesteKjøringEtter = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now());
+            LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}",
+                    hendelsePayload.getHendelseId(), inngåendeHendelse.getType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
             HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
             vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
             vurderSorteringTask.setHendelseId(hendelsePayload.getHendelseId());
-            vurderSorteringTask.setNesteKjøringEtter(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now()));
+            vurderSorteringTask.setNesteKjøringEtter(nesteKjøringEtter);
             vurderSorteringTask.setHendelseType(inngåendeHendelse.getType().getKode());
             prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
         } else {
             //TODO(JEJ): Kalle "erRegistrert()" for å kunne spisse feilmeldingen (se JOL kommentar på PR)
-            LOGGER.warn("HendelseId {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre",
-                    hendelsePayload.getHendelseId(), hendelsePayload.getHendelseOpprettetTid());
+            LOGGER.warn("Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre",
+                    hendelsePayload.getHendelseId(), inngåendeHendelse.getType().getKode(), hendelsePayload.getHendelseOpprettetTid());
             hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.HÅNDTERT);
+            //TODO(JEJ): Kommentere inn slik at vi fjerner payload når vi har sett at det fungerer (+ bestille patch til null på gamle):
+            //hendelseRepository.fjernPayload(inngåendeHendelse);
         }
     }
 
