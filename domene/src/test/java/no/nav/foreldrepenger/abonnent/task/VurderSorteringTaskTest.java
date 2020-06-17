@@ -74,6 +74,7 @@ public class VurderSorteringTaskTest {
     @Test
     public void skal_berike_og_grovsortere_fødselshendelse_som_er_klar() {
         // Arrange
+        when(personTjeneste.erRegistrert(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(true);
         when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
 
         InngåendeHendelse inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now());
@@ -106,7 +107,9 @@ public class VurderSorteringTaskTest {
     @Test
     public void skal_opprette_ny_vurder_sortering_task_for_fødselshendelse_som_ikke_er_klar() {
         // Arrange
-        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of()); // Foreldre finnes ikke i TPS
+        // Barn og relasjon til foreldre finnes ikke i TPS:
+        when(personTjeneste.erRegistrert(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(false);
+        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of());
 
         InngåendeHendelse inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now());
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
@@ -136,7 +139,9 @@ public class VurderSorteringTaskTest {
     @Test
     public void skal_ikke_opprette_ny_vurder_sortering_task_for_fødselshendelse_som_ikke_er_klar_når_hendelsen_er_gammel() {
         // Arrange
-        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of()); // Foreldre finnes ikke i TPS
+        // Barn og relasjon til foreldre finnes ikke i TPS:
+        when(personTjeneste.erRegistrert(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(false);
+        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of());
 
         InngåendeHendelse inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now().minusDays(8));
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
