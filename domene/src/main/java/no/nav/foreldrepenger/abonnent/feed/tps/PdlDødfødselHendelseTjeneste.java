@@ -3,11 +3,15 @@ package no.nav.foreldrepenger.abonnent.feed.tps;
 import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.hentUtAktørIderFraString;
 import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.optionalStringTilLocalDate;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.PdlDødfødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
@@ -22,6 +26,8 @@ import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_DØDFØDSEL_HENDELSE)
 public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødfødselHendelsePayload> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdlDødfødselHendelseTjeneste.class);
 
     private PersonTjeneste personTjeneste;
 
@@ -74,12 +80,45 @@ public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødf
     public KlarForSorteringResultat vurderOmKlarForSortering(PdlDødfødselHendelsePayload payload) {
         Optional<Set<String>> aktørIder = payload.getAktørId();
         if (aktørIder.isPresent() && payload.getDødfødselsdato().isPresent()) {
-            for (String aktørId : aktørIder.get()) {
-                if (personTjeneste.harRegistrertDødfødsel(new AktørId(aktørId), payload.getDødfødselsdato().get())) {
-                    return new KlarForSorteringResultat(true);
-                }
+            if (harRegistrertDødfødsel(aktørIder, payload.getDødfødselsdato().get())) {
+                return new KlarForSorteringResultat(true);
             }
         }
         return new KlarForSorteringResultat(false);
+    }
+
+    @Override
+    public void loggFeiletHendelse(PdlDødfødselHendelsePayload payload) {
+        String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
+        String årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
+        Optional<LocalDate> dødfødselsdato = payload.getDødfødselsdato();
+        Optional<Set<String>> aktørIder = payload.getAktørId();
+        if (dødfødselsdato.isEmpty()) {
+            årsak = "Årsaken er at dødfødselsdato mangler på hendelsen.";
+        } else if (aktørIder.isEmpty()) {
+            årsak = "Årsaken er at aktørId mangler på hendelsen.";
+        } else {
+            boolean aktørIkkeFunnetITPS = true;
+            for (String aktørId : aktørIder.get()) {
+                if (personTjeneste.erRegistrert(new AktørId(aktørId))) {
+                    aktørIkkeFunnetITPS = false;
+                }
+            }
+            if (aktørIkkeFunnetITPS) {
+                årsak = "Årsaken er at aktørId fortsatt ikke finnes i TPS.";
+            } else if (!harRegistrertDødfødsel(aktørIder, dødfødselsdato.get())) {
+                årsak = "Årsaken er at dødfødselen fortsatt ikke er registrert i TPS.";
+            }
+        }
+        LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
+    }
+
+    private boolean harRegistrertDødfødsel(Optional<Set<String>> aktørIder, LocalDate dødfødselsdato) {
+        for (String aktørId : aktørIder.get()) {
+            if (personTjeneste.harRegistrertDødfødsel(new AktørId(aktørId), dødfødselsdato)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

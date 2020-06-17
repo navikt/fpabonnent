@@ -100,6 +100,45 @@ public class TpsForsinkelseTjenesteTest {
     }
 
     @Test
+    public void skal_utlede_at_hendelse_fra_onsdag_kan_prosesseres_mandag_etter_06_30_pga_17_mai_fredag() {
+        // Arrange
+        LocalDateTime input = LocalDateTime.of(2019, 5, 15, 14, 2);
+
+        // Act
+        LocalDateTime resultat = new TpsForsinkelseTjeneste().finnNesteTidspunktForVurderSortering(input);
+
+        // Assert
+        assertThat(resultat).isBetween(LocalDateTime.of(2019, 5, 20, 6, 30),
+                LocalDateTime.of(2019, 5, 20, 6, 59));
+    }
+
+    @Test
+    public void skal_utlede_at_hendelse_fra_torsdag_kan_prosesseres_tirsdag_etter_06_30_pga_17_mai_mandag() {
+        // Arrange
+        LocalDateTime input = LocalDateTime.of(2021, 5, 13, 13, 6);
+
+        // Act
+        LocalDateTime resultat = new TpsForsinkelseTjeneste().finnNesteTidspunktForVurderSortering(input);
+
+        // Assert
+        assertThat(resultat).isBetween(LocalDateTime.of(2021, 5, 18, 6, 30),
+                LocalDateTime.of(2021, 5, 18, 6, 59));
+    }
+
+    @Test
+    public void skal_utlede_at_hendelse_fra_fredag_kan_prosesseres_torsdag_etter_06_30_pga_juledager_tirsdag_og_onsdag() {
+        // Arrange
+        LocalDateTime input = LocalDateTime.of(2018, 12, 21, 9, 3);
+
+        // Act
+        LocalDateTime resultat = new TpsForsinkelseTjeneste().finnNesteTidspunktForVurderSortering(input);
+
+        // Assert
+        assertThat(resultat).isBetween(LocalDateTime.of(2018, 12, 27, 6, 30),
+                LocalDateTime.of(2018, 12, 27, 6, 59));
+    }
+
+    @Test
     public void skal_utlede_at_neste_forsøk_på_prosessesering_er_tirsdag_etter_06_30_gitt_sist_kjøring_på_mandag() {
         // Arrange
         LocalDateTime input = LocalDateTime.of(2020, 1, 6, 6, 34);
@@ -136,6 +175,32 @@ public class TpsForsinkelseTjenesteTest {
         // Assert
         assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30),
                 LocalDateTime.of(2020, 1, 13, 6, 59));
+    }
+
+    @Test
+    public void skal_utlede_at_neste_forsøk_på_prosessesering_er_mandag_etter_06_30_gitt_sist_kjøring_på_torsdag_og_fredag_er_første_januar() {
+        // Arrange
+        LocalDateTime input = LocalDateTime.of(2020, 12, 31, 6, 34);
+
+        // Act
+        LocalDateTime resultat = new TpsForsinkelseTjeneste().finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input);
+
+        // Assert
+        assertThat(resultat).isBetween(LocalDateTime.of(2021, 1, 4, 6, 30),
+                LocalDateTime.of(2021, 1, 4, 6, 59));
+    }
+
+    @Test
+    public void skal_utlede_at_neste_forsøk_på_prosessesering_er_tirsdag_etter_06_30_gitt_sist_kjøring_på_fredag_og_mandag_er_første_mai() {
+        // Arrange
+        LocalDateTime input = LocalDateTime.of(2023, 4, 28, 6, 43);
+
+        // Act
+        LocalDateTime resultat = new TpsForsinkelseTjeneste().finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input);
+
+        // Assert
+        assertThat(resultat).isBetween(LocalDateTime.of(2023, 5, 2, 6, 30),
+                LocalDateTime.of(2023, 5, 2, 6, 59));
     }
 
 }
