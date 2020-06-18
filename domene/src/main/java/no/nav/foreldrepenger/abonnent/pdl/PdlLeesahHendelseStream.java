@@ -17,7 +17,7 @@ import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 
 @ApplicationScoped
-public class PdlLeesahHendelseStream implements AppServiceHandler {
+public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegration {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseStream.class);
 
@@ -104,5 +104,10 @@ public class PdlLeesahHendelseStream implements AppServiceHandler {
             stream.close(Duration.ofSeconds(10));
             LOG.info("Shutdown av topic={}, tilstand={} med 10 sekunder timeout", getTopicName(), stream.state());
         }
+    }
+
+    @Override
+    public boolean isAlive() {
+        return stream != null && stream.state().isRunningOrRebalancing();
     }
 }

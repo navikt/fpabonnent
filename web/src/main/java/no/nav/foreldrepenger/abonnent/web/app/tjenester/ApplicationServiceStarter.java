@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.hotspot.DefaultExports;
 import no.nav.foreldrepenger.abonnent.felles.RequestContextHandler;
+import no.nav.foreldrepenger.abonnent.pdl.KafkaIntegration;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 
 /**
@@ -75,4 +76,10 @@ public class ApplicationServiceStarter {
         }
     }
 
+    public boolean isKafkaAlive() {
+        return serviceMap.entrySet()
+                .stream()
+                .filter(it -> it.getKey() instanceof KafkaIntegration)
+                .allMatch(it -> ((KafkaIntegration) it.getKey()).isAlive());
+    }
 }
