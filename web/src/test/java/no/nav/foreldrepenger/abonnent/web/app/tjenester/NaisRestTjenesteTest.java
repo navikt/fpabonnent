@@ -25,14 +25,26 @@ public class NaisRestTjenesteTest {
     }
 
     @Test
-    public void test_isAlive_skal_returnere_status_200() {
+    public void isAlive_skal_returnere_status_200() {
+        when(serviceStarterMock.isKafkaAlive()).thenReturn(true);
+
         Response response = restTjeneste.isAlive();
 
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
     @Test
-    public void test_isReady_skal_returnere_service_unavailable_når_kritiske_selftester_feiler() {
+    public void isAlive_skal_returnere_server_error_når_kafka_feiler() {
+        when(serviceStarterMock.isKafkaAlive()).thenReturn(false);
+
+        Response response = restTjeneste.isAlive();
+
+        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    }
+
+    @Test
+    public void isReady_skal_returnere_service_unavailable_når_kritiske_selftester_feiler() {
+        when(serviceStarterMock.isKafkaAlive()).thenReturn(true);
         when(selftestServiceMock.kritiskTjenesteFeilet()).thenReturn(true);
 
         Response response = restTjeneste.isReady();
@@ -41,7 +53,18 @@ public class NaisRestTjenesteTest {
     }
 
     @Test
-    public void test_isReady_skal_returnere_status_ok_når_selftester_er_ok() {
+    public void isReady_skal_returnere_server_error_når_kafka_feiler() {
+        when(serviceStarterMock.isKafkaAlive()).thenReturn(false);
+        when(selftestServiceMock.kritiskTjenesteFeilet()).thenReturn(false);
+
+        Response response = restTjeneste.isReady();
+
+        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    }
+
+    @Test
+    public void isReady_skal_returnere_status_ok_når_selftester_er_ok() {
+        when(serviceStarterMock.isKafkaAlive()).thenReturn(true);
         when(selftestServiceMock.kritiskTjenesteFeilet()).thenReturn(false);
 
         Response response = restTjeneste.isReady();
@@ -50,7 +73,7 @@ public class NaisRestTjenesteTest {
     }
 
     @Test
-    public void test_preStop_skal_kalle_stopServices_og_returnere_status_ok() {
+    public void preStop_skal_kalle_stopServices_og_returnere_status_ok() {
         Response response = restTjeneste.preStop();
 
         verify(serviceStarterMock).stopServices();
