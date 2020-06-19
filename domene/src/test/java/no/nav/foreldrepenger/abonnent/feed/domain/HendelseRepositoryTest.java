@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -205,5 +206,51 @@ public class HendelseRepositoryTest {
         assertThat(hendelse.get().getFeedKode()).isEqualTo(FeedKode.TPS);
         assertThat(hendelse.get().getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
         assertThat(hendelse.get().getPayload()).isEqualTo("payload1");
+    }
+
+    @Test
+    public void skal_ikke_returnere_hendelser_som_er_HÅNDTERT_uten_å_være_sendt_til_FPSAK() {
+        // Arrange
+        InngåendeHendelse hendelse1 = InngåendeHendelse.builder() // Er ikke HÅNDTERT - OK
+                .hendelseId("A")
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .payload("payload1")
+                .feedKode(FeedKode.PDL)
+                .requestUuid("req_uuid")
+                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
+                .håndteresEtterTidspunkt(LocalDateTime.now())
+                .build();
+        InngåendeHendelse hendelse2 = InngåendeHendelse.builder() // Er HÅNDTERT uten SENDT - ikke OK
+                .hendelseId("B")
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .payload("payload1")
+                .feedKode(FeedKode.PDL)
+                .requestUuid("req_uuid")
+                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+                .sendtTidspunkt(null)
+                .håndteresEtterTidspunkt(LocalDateTime.now())
+                .build();
+        InngåendeHendelse hendelse3 = InngåendeHendelse.builder() // Er HÅNDTERT med SENDT - OK
+                .hendelseId("C")
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .payload("payload1")
+                .feedKode(FeedKode.PDL)
+                .requestUuid("req_uuid")
+                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+                .sendtTidspunkt(LocalDateTime.now())
+                .håndteresEtterTidspunkt(LocalDateTime.now())
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelse1);
+        hendelseRepository.lagreInngåendeHendelse(hendelse2);
+        hendelseRepository.lagreInngåendeHendelse(hendelse3);
+        repoRule.getEntityManager().flush();
+
+        // Act
+        List<InngåendeHendelse> resultat = hendelseRepository.finnAlleHendelserFraSisteUkeAvType(HendelseType.PDL_FØDSEL_OPPRETTET, FeedKode.PDL);
+
+        // Assert
+        assertThat(resultat.size()).isEqualTo(2);
+        List<String> ider = resultat.stream().map(InngåendeHendelse::getHendelseId).collect(Collectors.toList());
+        assertThat(ider).containsExactly("A", "C");
     }
 }
