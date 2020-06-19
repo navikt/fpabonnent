@@ -181,9 +181,11 @@ public class HendelseRepository {
                 "from InngåendeHendelse where feedKode = :feedKode " + //$NON-NLS-1$
                         "and opprettetTidspunkt >= :opprettetTidspunkt " + //$NON-NLS-1$
                         "and payload != null " + //$NON-NLS-1$
+                        "and ((håndtertStatus = :håndtertStatus and sendtTidspunkt is not null) or (håndtertStatus != :håndtertStatus)) " + //$NON-NLS-1$
                         "and type = :type ", InngåendeHendelse.class); //$NON-NLS-1$
         query.setParameter(FEED_KODE, feedKode);
         query.setParameter("opprettetTidspunkt", LocalDateTime.now().minusDays(7));
+        query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.HÅNDTERT);
         query.setParameter("type", hendelseType);
 
         return query.getResultList();
