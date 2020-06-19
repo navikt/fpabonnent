@@ -25,7 +25,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <felles.version>1.6-20200312141659-2c32ef0</felles.version>
-        <prosesstask.version>2.2-20200312141536-b3be707</prosesstask.version>
+        <prosesstask.version>2.4.2-20200618061704-7acf57f</prosesstask.version>
         <fp-kontrakter.version>5.1-20200312090022-51b4f7d</fp-kontrakter.version>
 
         <!-- Eksterne tjenestekontrakter -->
