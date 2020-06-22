@@ -113,7 +113,7 @@ public class PdlLeesahHendelseHåndterer {
     private void prosesserHendelseVidereHvisRelevant(PdlPersonhendelse personhendelse) {
         if (personhendelse.erRelevantForFpsak()) {
             if (pdlFeatureToggleTjeneste.skalLagrePdl()) {
-                if (pdlFeatureToggleTjeneste.skalGrovsorterePdl()) {
+                if (pdlFeatureToggleTjeneste.skalGrovsorterePdl() && pdlFeatureToggleTjeneste.endringstypenErAktivert(personhendelse.getEndringstype())) {
                     InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
                     opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId());
                 } else {
