@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
 
 public abstract class HendelsePayload {
 

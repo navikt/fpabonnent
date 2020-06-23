@@ -16,7 +16,8 @@ public class PdlFødsel extends PdlPersonhendelse {
 
     public boolean erRelevantForFpsak() {
         return HendelseType.PDL_FØDSEL_OPPRETTET.equals(getHendelseType())
-                || HendelseType.PDL_FØDSEL_ANNULLERT.equals(getHendelseType());
+                || HendelseType.PDL_FØDSEL_ANNULLERT.equals(getHendelseType())
+                || HendelseType.PDL_FØDSEL_KORRIGERT.equals(getHendelseType());
     }
 
     public Integer getFødselsår() {

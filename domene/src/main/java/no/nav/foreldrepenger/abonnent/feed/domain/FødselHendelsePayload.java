@@ -6,11 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.tps.FødselHendelseDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.FødselHendelseDto;
 
 public class FødselHendelsePayload extends HendelsePayload {
 
@@ -39,15 +42,20 @@ public class FødselHendelsePayload extends HendelsePayload {
     public HendelseWrapperDto mapPayloadTilDto() {
         FødselHendelseDto dto = new FødselHendelseDto();
         dto.setId(HendelseMapper.FØDSEL_HENDELSE_TYPE + this.getHendelseId());
+        dto.setEndringstype(Endringstype.valueOf(endringstype));
         dto.setAktørIdForeldre(finnAktørIdForeldre(this));
         this.getFødselsdato().ifPresent(dto::setFødselsdato);
-        return HendelseWrapperDto.lagDto(dto);
+        return new HendelseWrapperDto(dto);
     }
 
-    private List<String> finnAktørIdForeldre(FødselHendelsePayload payload) {
-        List<String> aktørIder = new LinkedList<>();
-        payload.getAktørIdFar().ifPresent(aktørIder::addAll);
-        payload.getAktørIdMor().ifPresent(aktørIder::addAll);
+    private List<AktørIdDto> finnAktørIdForeldre(FødselHendelsePayload payload) {
+        List<AktørIdDto> aktørIder = new LinkedList<>();
+        if (payload.getAktørIdFar().isPresent()) {
+            aktørIder.addAll(payload.getAktørIdFar().get().stream().map(AktørIdDto::new).collect(Collectors.toList()));
+        }
+        if (payload.getAktørIdMor().isPresent()) {
+            aktørIder.addAll(payload.getAktørIdMor().get().stream().map(AktørIdDto::new).collect(Collectors.toList()));
+        }
         return aktørIder;
     }
 

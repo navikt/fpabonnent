@@ -1,12 +1,9 @@
 package no.nav.foreldrepenger.abonnent.pdl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -88,29 +85,38 @@ public class PdlLeesahHendelseHåndtererTest {
     }
 
     @Test
-    public void skal_lagre_annullert_dødshendelse_uten_detaljer_uten_videre_håndtering() {
+    public void skal_lagre_annullert_fødselshendelse_og_opprette_vurder_sortering_task() {
         // Arrange
         Personhendelse payload = new Personhendelse();
         payload.setHendelseId("ABC");
         payload.setPersonidenter(List.of("1111111111111", "22222222222"));
         payload.setMaster("Freg");
         payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
-        payload.setOpplysningstype("DOEDSFALL_V1");
+        payload.setOpplysningstype("FOEDSEL_V1");
         payload.setEndringstype(Endringstype.ANNULLERT);
         ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
 
         // Assert
         InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
-        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"DOEDSFALL_V1\"", "\"endringstype\":\"ANNULLERT\"", "\"hendelseType\":{\"kode\":\"PDL_DOED_ANNULLERT\"", "\"kodeverk\":\"HENDELSE_TYPE\"}");
+        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"", "\"hendelseType\":{\"kode\":\"PDL_FOEDSEL_ANNULLERT\"", "\"kodeverk\":\"HENDELSE_TYPE\"}");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
-        assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+        assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
         assertThat(inngåendeHendelse.getFeedKode()).isEqualTo(FeedKode.PDL);
-        assertThat(inngåendeHendelse.getType()).isEqualTo(HendelseType.PDL_DØD_ANNULLERT);
-        verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+        assertThat(inngåendeHendelse.getType()).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT);
+
+        ProsessTaskData prosessTaskData = taskCaptor.getValue();
+        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
+        assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
+                tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(OPPRETTET_TID, inngåendeHendelse).toLocalDate());
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT.getKode());
     }
 
 }
