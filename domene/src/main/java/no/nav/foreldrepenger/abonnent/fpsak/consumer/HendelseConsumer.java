@@ -10,8 +10,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
-import no.nav.foreldrepenger.kontrakter.abonnent.AktørIdDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
@@ -19,7 +19,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 public class HendelseConsumer {
     private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
     // URI append paths
-    private static final String SEND_HENDELSE_PATH = "hendelse";
+    private static final String SEND_HENDELSE_PATH = "motta";
     private static final String GROVSORTER_HENDELSE_PATH = "grovsorter";
 
     private OidcRestClient oidcRestClient;

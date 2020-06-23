@@ -84,6 +84,8 @@ public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødf
             if (harRegistrertDødfødsel(aktørIder, payload.getDødfødselsdato().get())) {
                 return new KlarForSorteringResultat(true);
             }
+        } else if (aktørIder.isPresent() && payload.getDødfødselsdato().isEmpty() && PdlEndringstype.ANNULLERT.name().equals(payload.getEndringstype())) {
+            return new KlarForSorteringResultat(true);
         }
         return new KlarForSorteringResultat(false);
     }

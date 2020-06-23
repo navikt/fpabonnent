@@ -2,16 +2,19 @@ package no.nav.foreldrepenger.abonnent.feed.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.tps.DødfødselHendelseDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.DødfødselHendelseDto;
 
 public class PdlDødfødselHendelsePayload extends HendelsePayload {
 
@@ -36,15 +39,17 @@ public class PdlDødfødselHendelsePayload extends HendelsePayload {
     public HendelseWrapperDto mapPayloadTilDto() {
         DødfødselHendelseDto dto = new DødfødselHendelseDto();
         dto.setId(HendelseMapper.DØDFØDSEL_HENDELSE_TYPE + "_" + getHendelseId());
+        dto.setEndringstype(Endringstype.valueOf(endringstype));
         dto.setAktørId(finnAktørId(this));
         this.getDødfødselsdato().ifPresent(dto::setDødfødselsdato);
-        return HendelseWrapperDto.lagDto(dto);
+        return new HendelseWrapperDto(dto);
     }
 
-    private List<String> finnAktørId(PdlDødfødselHendelsePayload payload) {
-        List<String> aktørIder = new LinkedList<>();
-        payload.getAktørId().ifPresent(aktørIder::addAll);
-        return aktørIder;
+    private List<AktørIdDto> finnAktørId(PdlDødfødselHendelsePayload payload) {
+        if (payload.getAktørId().isPresent()) {
+            return payload.getAktørId().get().stream().map(AktørIdDto::new).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     public Optional<Set<String>> getAktørId() {

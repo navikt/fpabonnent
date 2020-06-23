@@ -14,7 +14,7 @@ import javax.validation.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.kontrakter.abonnent.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 
 public class AktørIdTjeneste {
 

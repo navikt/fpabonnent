@@ -9,9 +9,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.abonnent.feed.poller.HendelseTestDataUtil;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.tps.FødselHendelseDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.FødselHendelseDto;
 
 public class HendelseMapperTest {
 
@@ -30,7 +31,7 @@ public class HendelseMapperTest {
         assertThat(hendelseDto.getHendelsetype()).isEqualTo(HendelseMapper.FØDSEL_HENDELSE_TYPE);
         FødselHendelseDto fødselHendelseDto = (FødselHendelseDto) hendelseDto;
         assertThat(fødselHendelseDto.getFødselsdato()).isEqualTo(FØDSELSDATO);
-        assertThat(fødselHendelseDto.getAktørIdForeldre()).containsExactly(AKTØR_ID_FAR, AKTØR_ID_MOR);
+        assertThat(fødselHendelseDto.getAktørIdForeldre()).containsExactly(new AktørIdDto(AKTØR_ID_FAR), new AktørIdDto(AKTØR_ID_MOR));
     }
 
 }

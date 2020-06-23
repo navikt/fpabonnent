@@ -2,15 +2,17 @@ package no.nav.foreldrepenger.abonnent.feed.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.tps.FødselHendelseDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.FødselHendelseDto;
 
 public class PdlFødselHendelsePayload extends HendelsePayload {
 
@@ -38,9 +40,10 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
     public HendelseWrapperDto mapPayloadTilDto() {
         FødselHendelseDto dto = new FødselHendelseDto();
         dto.setId(HendelseMapper.FØDSEL_HENDELSE_TYPE + "_" + getHendelseId());
+        dto.setEndringstype(Endringstype.valueOf(endringstype));
         this.getFødselsdato().ifPresent(dto::setFødselsdato);
-        this.getAktørIdForeldre().ifPresent(foreldre -> dto.setAktørIdForeldre(new ArrayList<>(foreldre)));
-        return HendelseWrapperDto.lagDto(dto);
+        this.getAktørIdForeldre().ifPresent(foreldre -> dto.setAktørIdForeldre(foreldre.stream().map(AktørIdDto::new).collect(Collectors.toList())));
+        return new HendelseWrapperDto(dto);
     }
 
     public Optional<Set<String>> getAktørIdBarn() {

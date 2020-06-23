@@ -4,7 +4,6 @@ import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import no.nav.foreldrepenger.abonnent.pdl.domene.PdlEndringstype;
 import no.nav.vedtak.util.env.Cluster;
 import no.nav.vedtak.util.env.Environment;
 
@@ -39,9 +38,5 @@ public class PdlFeatureToggleTjeneste {
 
     public boolean skalKonsumerePf() {
         return SKAL_KONSUMERE_PF_AKTIVERT.contains(CLUSTER);
-    }
-
-    public boolean endringstypenErAktivert(PdlEndringstype endringstype) {
-        return PdlEndringstype.OPPRETTET.equals(endringstype);
     }
 }

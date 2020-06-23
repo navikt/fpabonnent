@@ -22,9 +22,10 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import no.nav.foreldrepenger.abonnent.feed.poller.HendelseTestDataUtil;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.HendelseWrapperDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.tps.FødselHendelseDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.FødselHendelseDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
 public class HendelseConsumerTest {
@@ -47,7 +48,7 @@ public class HendelseConsumerTest {
     @Before
     public void setUp() throws Exception {
         baseEndpoint = new URI("/test");
-        hendelseEndpoint = baseEndpoint.resolve("hendelse");
+        hendelseEndpoint = baseEndpoint.resolve("motta");
         grovsorterEndpoint = baseEndpoint.resolve("grovsorter");
         consumer = new HendelseConsumer(oidcRestClient, baseEndpoint, new HendelseMapper());
     }
@@ -66,7 +67,7 @@ public class HendelseConsumerTest {
             FødselHendelseDto fødselHendelseDto = (FødselHendelseDto) hendelseDto;
             assertThat(fødselHendelseDto.getFødselsdato()).isEqualTo(FØDSELSDATO);
             assertThat(fødselHendelseDto.getHendelsetype()).isEqualTo(HendelseMapper.FØDSEL_HENDELSE_TYPE);
-            assertThat(fødselHendelseDto.getAktørIdForeldre()).containsExactly(AKTØR_ID_FAR, AKTØR_ID_MOR);
+            assertThat(fødselHendelseDto.getAktørIdForeldre()).containsExactly(new AktørIdDto(AKTØR_ID_FAR), new AktørIdDto(AKTØR_ID_MOR));
         }
     }
 
