@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Familierelasjon;
@@ -19,11 +22,14 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Personidenter;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumerMedCache;
 import no.nav.vedtak.felles.integrasjon.person.PersonConsumer;
 
 @ApplicationScoped
 public class PersonTjenesteImpl implements PersonTjeneste {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersonTjenesteImpl.class);
 
     private AktørConsumerMedCache aktørConsumer;
     private PersonConsumer personConsumer;
@@ -40,7 +46,15 @@ public class PersonTjenesteImpl implements PersonTjeneste {
 
     @Override
     public Set<AktørId> registrerteForeldre(AktørId aktørId) {
-        PersonIdent personIdent = hentIdentForAktørId(aktørId);
+        PersonIdent personIdent;
+        try {
+            personIdent = hentIdentForAktørId(aktørId);
+        } catch (TekniskException e) {
+            // Denne er ventet pga forsinkelse TPS vs PDL/aktør, ingen reaksjon
+            LOGGER.info("Feilet ved kall til aktør-registeret: {}", e.getMessage());
+            return Collections.emptySet();
+        }
+
         HentPersonRequest request = new HentPersonRequest();
         request.setAktoer(lagPersonIdent(personIdent.getIdent()));
         request.getInformasjonsbehov().add(Informasjonsbehov.FAMILIERELASJONER);
@@ -62,7 +76,15 @@ public class PersonTjenesteImpl implements PersonTjeneste {
 
     @Override
     public boolean erRegistrert(AktørId aktørId) {
-        PersonIdent personIdent = hentIdentForAktørId(aktørId);
+        PersonIdent personIdent;
+        try {
+            personIdent = hentIdentForAktørId(aktørId);
+        } catch (TekniskException e) {
+            // Denne er ventet pga forsinkelse TPS vs PDL/aktør, ingen reaksjon
+            LOGGER.info("Feilet ved kall til aktør-registeret: {}", e.getMessage());
+            return false;
+        }
+
         HentPersonRequest request = new HentPersonRequest();
         request.setAktoer(lagPersonIdent(personIdent.getIdent()));
         try {
@@ -78,7 +100,15 @@ public class PersonTjenesteImpl implements PersonTjeneste {
 
     @Override
     public boolean harRegistrertDødsdato(AktørId aktørId) {
-        PersonIdent personIdent = hentIdentForAktørId(aktørId);
+        PersonIdent personIdent;
+        try {
+            personIdent = hentIdentForAktørId(aktørId);
+        } catch (TekniskException e) {
+            // Denne er ventet pga forsinkelse TPS vs PDL/aktør, ingen reaksjon
+            LOGGER.info("Feilet ved kall til aktør-registeret: {}", e.getMessage());
+            return false;
+        }
+
         HentPersonRequest request = new HentPersonRequest();
         request.setAktoer(lagPersonIdent(personIdent.getIdent()));
         try {
@@ -94,7 +124,15 @@ public class PersonTjenesteImpl implements PersonTjeneste {
 
     @Override
     public boolean harRegistrertDødfødsel(AktørId aktørId, LocalDate hendelseDato) {
-        PersonIdent personIdent = hentIdentForAktørId(aktørId);
+        PersonIdent personIdent;
+        try {
+            personIdent = hentIdentForAktørId(aktørId);
+        } catch (TekniskException e) {
+            // Denne er ventet pga forsinkelse TPS vs PDL/aktør, ingen reaksjon
+            LOGGER.info("Feilet ved kall til aktør-registeret: {}", e.getMessage());
+            return false;
+        }
+
         HentPersonRequest request = new HentPersonRequest();
         request.setAktoer(lagPersonIdent(personIdent.getIdent()));
         request.getInformasjonsbehov().add(Informasjonsbehov.FAMILIERELASJONER);
@@ -113,7 +151,7 @@ public class PersonTjenesteImpl implements PersonTjeneste {
 
     private PersonIdent hentIdentForAktørId(AktørId aktørId) {
         return aktørConsumer.hentPersonIdentForAktørId(aktørId.getId()).map(PersonIdent::new)
-            .orElseThrow(() -> PersonFeilmeldinger.FACTORY.fantIkkePersonForAktørId().toException());
+                .orElseThrow(() -> PersonFeilmeldinger.FACTORY.fantIkkePersonForAktørId().toException());
     }
 
     private Optional<AktørId> mapTilAktørId(Familierelasjon familierelasjon) {
@@ -125,6 +163,7 @@ public class PersonTjenesteImpl implements PersonTjeneste {
         try {
             return aktørConsumer.hentAktørIdForPersonIdent(ident.getIdent()).map(AktørId::new);
         } catch (Exception e) { // NOSONAR
+            LOGGER.info("Feilet ved kall til aktør-registeret: {}", e.getMessage());
             return Optional.empty();
         }
     }

@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.abonnent.tps;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -121,6 +122,21 @@ public class PersonTjenesteImplTest {
         boolean svar = tjeneste.harRegistrertDødfødsel(AKTØR_ID_SØKER, FDAT_DATO);
 
         assertThat(svar).isTrue();
+    }
+
+    @Test
+    public void skal_svare_nei_og_tomt_når_aktør_register_gir_tomt_svar() {
+        when(aktørConsumerMock.hentPersonIdentForAktørId(anyString())).thenReturn(Optional.empty());
+
+        Set<AktørId> svar1 = tjeneste.registrerteForeldre(AKTØR_ID_BARN);
+        boolean svar2 = tjeneste.erRegistrert(AKTØR_ID_BARN);
+        boolean svar3 = tjeneste.harRegistrertDødsdato(AKTØR_ID_SØKER);
+        boolean svar4 = tjeneste.harRegistrertDødfødsel(AKTØR_ID_SØKER, FDAT_DATO);
+
+        assertThat(svar1).isEmpty();
+        assertThat(svar2).isFalse();
+        assertThat(svar3).isFalse();
+        assertThat(svar4).isFalse();
     }
 
     private HentPersonResponse responseMedDødsdato(String ident, LocalDate dødsdato) {
