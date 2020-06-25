@@ -89,7 +89,6 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 FødselKlarForSorteringResultat resultat = new FødselKlarForSorteringResultat(true);
                 resultat.setForeldre(foreldre.stream().map(AktørId::getId).collect(Collectors.toSet()));
                 return resultat;
-
             }
         } else {
             LOGGER.warn("Hendelse {} med type {} har ikke barns aktørId", payload.getHendelseId(), payload.getType());
