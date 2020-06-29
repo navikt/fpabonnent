@@ -125,6 +125,14 @@ public class InngåendeHendelse extends BaseEntitet {
         this.payload = payload;
     }
 
+    public boolean erSendtTilFpsak() {
+        return HåndtertStatusType.HÅNDTERT.equals(håndtertStatus) && sendtTidspunkt != null;
+    }
+
+    public boolean erFerdigbehandletMenIkkeSendtTilFpsak() {
+        return HåndtertStatusType.HÅNDTERT.equals(håndtertStatus) && sendtTidspunkt == null;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

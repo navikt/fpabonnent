@@ -155,7 +155,7 @@ public class PdlLeesahHendelseHåndterer {
             if (pdlFeatureToggleTjeneste.skalLagrePdl()) {
                 if (pdlFeatureToggleTjeneste.skalGrovsorterePdl()) {
                     InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
-                    LocalDateTime håndteresEtterTidspunkt = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(personhendelse.getOpprettet());
+                    LocalDateTime håndteresEtterTidspunkt = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(personhendelse.getOpprettet(), inngåendeHendelse);
                     hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, håndteresEtterTidspunkt);
                     opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId(), håndteresEtterTidspunkt);
                 } else {

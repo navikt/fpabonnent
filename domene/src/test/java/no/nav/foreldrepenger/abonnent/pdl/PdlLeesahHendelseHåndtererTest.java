@@ -80,7 +80,8 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
-        assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(OPPRETTET_TID).toLocalDate());
+        assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
+                tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(OPPRETTET_TID, inngåendeHendelse).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_DØD_OPPRETTET.getKode());
     }
 

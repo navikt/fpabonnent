@@ -5,12 +5,35 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
+import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
+import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
+
+/**
+ * Tjenesten forsinker hendelser mens man venter på at de skal bli tilgjengelige i batch-oppdaterte TPS,
+ * typisk 1-2 arbeidsdager etter PDL. Den sørger også for å ivareta rekkefølgen når hendelser er koblet, slik
+ * at historikkinnslagene i FPSAK får riktig rekkefølge.
+ *
+ * Når FPSAK har byttet til PDL kan man i utgangspunktet sende hendelsene mye tidligere, men det er trolig
+ * at det fremdeles må beholdes en viss forsinkelse, feks pga oppførsel der DSF bruker ANNULLERT+OPPRETTET
+ * når de skal gjøre korrigeringer. Det er da ikke ønsket at ANNULLERT-hendelsen skal slippes før grunnlaget
+ * er klart med den korrigerte informasjonen. Det kan også være aktuelt å fremdeles unngå hendelser på natten
+ * når Oppdrag er stengt. Disse behovene må utredes nærmere når det blir aktuelt å erstatte denne tjenestens
+ * nåværende logikk med kortere ventetid.
+ */
 @ApplicationScoped
 public class TpsForsinkelseTjeneste {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TpsForsinkelseTjeneste.class);
 
     // Velger et tidspunkt litt etter at Oppdrag har åpnet for business kl 06:00.
     private static final LocalTime OPPDRAG_VÅKNER = LocalTime.of(6, 30);
@@ -26,11 +49,41 @@ public class TpsForsinkelseTjeneste {
             MonthDay.of(12, 31)
     );
 
+    private HendelseRepository hendelseRepository;
+
     public TpsForsinkelseTjeneste() {
         // CDI
     }
 
-    public LocalDateTime finnNesteTidspunktForVurderSortering(LocalDateTime opprettetTid) {
+    @Inject
+    public TpsForsinkelseTjeneste(HendelseRepository hendelseRepository) {
+        this.hendelseRepository = hendelseRepository;
+    }
+
+    public LocalDateTime finnNesteTidspunktForVurderSortering(LocalDateTime opprettetTid, InngåendeHendelse inngåendeHendelse) {
+        Optional<LocalDateTime> tidspunktBasertPåTidligereHendelse = sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse);
+        return tidspunktBasertPåTidligereHendelse.orElseGet(() -> doFinnNesteTidspunktForVurderSortering(opprettetTid));
+    }
+
+    public LocalDateTime finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime sistKjøringTid, InngåendeHendelse inngåendeHendelse) {
+        Optional<LocalDateTime> tidspunktBasertPåTidligereHendelse = sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse);
+        return tidspunktBasertPåTidligereHendelse.orElseGet(() -> finnNesteÅpningsdag(sistKjøringTid.plusDays(1)));
+    }
+
+    private Optional<LocalDateTime> sjekkOmHendelsenMåKjøreEtterTidligereHendelse(InngåendeHendelse inngåendeHendelse) {
+        if (inngåendeHendelse.getTidligereHendelseId() != null) {
+            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(), inngåendeHendelse.getFeedKode());
+            if (tidligereHendelse.isPresent() && !HåndtertStatusType.HÅNDTERT.equals(tidligereHendelse.get().getHåndtertStatus())) {
+                LocalDateTime tidspunktBasertPåTidligereHendelse = tidligereHendelse.get().getHåndteresEtterTidspunkt().plusMinutes(2);
+                LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert {} og vil derfor bli behandlet {}",
+                        inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(), tidligereHendelse.get().getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
+                return Optional.of(tidspunktBasertPåTidligereHendelse);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private LocalDateTime doFinnNesteTidspunktForVurderSortering(LocalDateTime opprettetTid) {
         if (DayOfWeek.FRIDAY.equals(opprettetTid.getDayOfWeek())) {
             return finnNesteÅpningsdag(opprettetTid.plusDays(4));
         } else if (DayOfWeek.SATURDAY.equals(opprettetTid.getDayOfWeek())) {
@@ -38,10 +91,6 @@ public class TpsForsinkelseTjeneste {
         } else {
             return finnNesteÅpningsdag(opprettetTid.plusDays(2));
         }
-    }
-
-    public LocalDateTime finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime sistKjøringTid) {
-        return finnNesteÅpningsdag(sistKjøringTid.plusDays(1));
     }
 
     private LocalDateTime finnNesteÅpningsdag(LocalDateTime utgangspunkt) {
