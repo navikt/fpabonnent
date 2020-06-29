@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.feed.domain.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
@@ -22,6 +23,8 @@ import no.nav.foreldrepenger.abonnent.felles.HendelseTypeRef;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
 import no.nav.foreldrepenger.abonnent.felles.KlarForSorteringResultat;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.tps.AktørId;
 import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
@@ -34,13 +37,16 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
     private PersonTjeneste personTjeneste;
 
+    private HendelseRepository hendelseRepository;
+
     public PdlFødselHendelseTjeneste() {
         // CDI
     }
 
     @Inject
-    public PdlFødselHendelseTjeneste(PersonTjeneste personTjeneste) {
+    public PdlFødselHendelseTjeneste(PersonTjeneste personTjeneste, HendelseRepository hendelseRepository) {
         this.personTjeneste = personTjeneste;
+        this.hendelseRepository = hendelseRepository;
     }
 
     @Override
@@ -89,6 +95,24 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
             LOGGER.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet",
                     payload.getHendelseId(), payload.getFødselsdato().get());
             return true;
+        } else if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && payload.getTidligereHendelseId() != null) {
+            return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, payload.getTidligereHendelseId());
+        }
+        return false;
+    }
+
+    private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(PdlFødselHendelsePayload payload, String tidligereHendelseId) {
+        Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, FeedKode.PDL);
+        if (tidligereHendelse.isPresent() && tidligereHendelse.get().erSendtTilFpsak()) {
+            boolean harSammeDato = payload.getFødselsdato().isPresent() && payload.getFødselsdato().equals(payloadFraString(tidligereHendelse.get().getPayload()).getFødselsdato());
+            if (harSammeDato) {
+                LOGGER.info("Hendelse {} vil bli forkastet da endringstypen er KORRIGERT, uten at fødselsdatoen {} er endret siden hendelse {}, som er forrige hendelse som ble sendt til FPSAK",
+                        payload.getHendelseId(), payload.getFødselsdato(), tidligereHendelseId);
+            }
+            return harSammeDato;
+        } else if (tidligereHendelse.isPresent() && tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() != null) {
+            // Gjøre sammenlikningen mot neste tidligere hendelse i stedet, i tilfelle den er sendt til Fpsak
+            return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, tidligereHendelse.get().getTidligereHendelseId());
         }
         return false;
     }

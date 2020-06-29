@@ -66,7 +66,7 @@ public class VurderSorteringTaskTest {
 
     @Before
     public void before() {
-        HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(personTjeneste);
+        HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(personTjeneste, hendelseRepository);
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         when(hendelseTjenesteProvider.finnTjeneste(any(HendelseType.class), anyString())).thenReturn(hendelseTjeneste);
         vurderSorteringTask = new VurderSorteringTask(prosessTaskRepository, tpsForsinkelseTjeneste, hendelseTjenesteProvider, hendelseRepository);
@@ -131,7 +131,7 @@ public class VurderSorteringTaskTest {
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
-        assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now()).toLocalDate());
+        assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse).toLocalDate());
 
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelse.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
@@ -197,6 +197,167 @@ public class VurderSorteringTaskTest {
         verify(personTjeneste, times(0)).erRegistrert(any());
         verify(personTjeneste, times(0)).registrerteForeldre(any());
         verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
+    @Test
+    public void skal_grovsortere_korrigering_da_en_tidligere_sendt_fødselshendelse_hadde_forskjellig_fødselsdato() {
+        // Arrange
+        when(personTjeneste.erRegistrert(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(true);
+        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
+
+        InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
+                .hendelseId("A")
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+                .feedKode(FeedKode.PDL)
+                .sendtTidspunkt(LocalDateTime.now())
+                .requestUuid("1")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
+        InngåendeHendelse hendelseKorrigert1 = InngåendeHendelse.builder()
+                .hendelseId("B")
+                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+                .feedKode(FeedKode.PDL)
+                .sendtTidspunkt(null)
+                .requestUuid("2")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+                .tidligereHendelseId("A")
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert1);
+        InngåendeHendelse hendelseKorrigert2 = InngåendeHendelse.builder()
+                .hendelseId("C")
+                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .feedKode(FeedKode.PDL)
+                .requestUuid("3")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.KORRIGERT, "C", "B").build()))
+                .tidligereHendelseId("B")
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert2);
+        repoRule.getEntityManager().flush();
+
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert2.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+        hendelserDataWrapper.setHendelseId("C");
+
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        InngåendeHendelse beriketHendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert2.getId());
+        assertThat(beriketHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.SENDT_TIL_SORTERING);
+        PdlFødsel beriketFødsel = JsonMapper.fromJson(beriketHendelse.getPayload(), PdlFødsel.class);
+        assertThat(beriketFødsel.getAktørIdForeldre()).containsExactly(AKTØR_ID_MOR, AKTØR_ID_FAR);
+
+        ProsessTaskData prosessTaskData = taskCaptor.getValue();
+        assertThat(prosessTaskData.getTaskType()).isEqualTo(SorterHendelserTask.TASKNAME);
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("C");
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+    }
+
+    @Test
+    public void skal_ikke_grovsortere_korrigering_da_en_tidligere_sendt_fødselshendelse_har_samme_fødselsdato() {
+        // Arrange
+        InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
+                .hendelseId("A")
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+                .feedKode(FeedKode.PDL)
+                .sendtTidspunkt(LocalDateTime.now())
+                .requestUuid("1")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
+        InngåendeHendelse hendelseKorrigert1 = InngåendeHendelse.builder()
+                .hendelseId("B")
+                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .feedKode(FeedKode.PDL)
+                .sendtTidspunkt(null)
+                .requestUuid("2")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+                .tidligereHendelseId("A")
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert1);
+        repoRule.getEntityManager().flush();
+
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert1.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+        hendelserDataWrapper.setHendelseId("B");
+
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert1.getId());
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+
+        verify(personTjeneste, times(0)).erRegistrert(any());
+        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
+    @Test
+    public void skal_utsette_grovsortering_av_hendelser_som_har_en_tidligere_hendelse_som_ikke_er_håndtert_enda() {
+        // Arrange
+        LocalDateTime håndteresTidspunktA = LocalDateTime.now();
+        InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
+                .hendelseId("A")
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .feedKode(FeedKode.PDL)
+                .requestUuid("1")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
+                .håndteresEtterTidspunkt(håndteresTidspunktA)
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
+        InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
+                .hendelseId("B")
+                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .feedKode(FeedKode.PDL)
+                .requestUuid("2")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+                .tidligereHendelseId("A")
+                .håndteresEtterTidspunkt(håndteresTidspunktA.minusMinutes(2))
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert);
+        repoRule.getEntityManager().flush();
+
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+        hendelserDataWrapper.setHendelseId("B");
+
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert.getId());
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
+        assertThat(hendelse.getHåndteresEtterTidspunkt()).isEqualTo(håndteresTidspunktA.plusMinutes(2));
+
+        ProsessTaskData prosessTaskData = taskCaptor.getValue();
+        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("B");
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+        assertThat(prosessTaskData.getNesteKjøringEtter()).isEqualTo(håndteresTidspunktA.plusMinutes(2));
+
+        verify(personTjeneste, times(0)).erRegistrert(any());
+        verify(personTjeneste, times(0)).registrerteForeldre(any());
     }
 
     private InngåendeHendelse opprettInngåendeHendelse(LocalDateTime opprettetTid) {

@@ -66,6 +66,11 @@ public class VurderSorteringTask implements ProsessTaskHandler {
             return;
         }
 
+        if (enTidligereHendelseLiggerUbehandlet(inngåendeHendelse)) {
+            opprettVurderSorteringTaskHvisIkkeHendelsenErForGammel(hendelsePayload, inngåendeHendelse, hendelseTjeneste);
+            return;
+        }
+
         KlarForSorteringResultat klarForSorteringResultat = hendelseTjeneste.vurderOmKlarForSortering(hendelsePayload);
         if (klarForSorteringResultat.hendelseKlarForSortering()) {
             hendelseTjeneste.berikHendelseHvisNødvendig(inngåendeHendelse, klarForSorteringResultat);
@@ -73,6 +78,19 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         } else {
             opprettVurderSorteringTaskHvisIkkeHendelsenErForGammel(hendelsePayload, inngåendeHendelse, hendelseTjeneste);
         }
+    }
+
+    private boolean enTidligereHendelseLiggerUbehandlet(InngåendeHendelse inngåendeHendelse) {
+        // Scenario som kanskje kan oppstå hvis hendelsene kommer samtidig på Kafka, og blir plukket av forskjellige noder samtidig
+        if (inngåendeHendelse.getTidligereHendelseId() != null) {
+            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(), inngåendeHendelse.getFeedKode());
+            if (tidligereHendelse.isPresent() && !HåndtertStatusType.HÅNDTERT.equals(tidligereHendelse.get().getHåndtertStatus())) {
+                LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert enda, og vil derfor vente til den er ferdig",
+                        inngåendeHendelse.getHendelseId(), tidligereHendelse.get().getHendelseId());
+                return true;
+            }
+        }
+        return false;
     }
 
     private void opprettSorteringTask(String hendelseId, InngåendeHendelse inngåendeHendelse) {
@@ -87,7 +105,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
 
     private void opprettVurderSorteringTaskHvisIkkeHendelsenErForGammel(HendelsePayload hendelsePayload, InngåendeHendelse inngåendeHendelse, HendelseTjeneste<HendelsePayload> hendelseTjeneste) {
         if (hendelsenErUnderEnUkeGammel(hendelsePayload.getHendelseOpprettetTid())) {
-            LocalDateTime nesteKjøringEtter = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now());
+            LocalDateTime nesteKjøringEtter = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse);
             LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}",
                     hendelsePayload.getHendelseId(), inngåendeHendelse.getType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
             hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, nesteKjøringEtter);
