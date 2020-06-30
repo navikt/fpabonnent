@@ -18,7 +18,7 @@ public class PdlFeatureToggleTjeneste {
     private static final Set<Cluster> SKAL_LAGRE_PDL_AKTIVERT = Set.of(Cluster.LOCAL, Cluster.DEV_FSS, Cluster.PROD_FSS);
     private static final Set<Cluster> SKAL_GROVSORTERE_PDL_AKTIVERT = Set.of(Cluster.LOCAL, Cluster.DEV_FSS, Cluster.PROD_FSS);
     private static final Set<Cluster> SKAL_SENDE_PDL_OG_DUPLIKATSJEKKE_PF_AKTIVERT = Set.of(Cluster.LOCAL, Cluster.DEV_FSS, Cluster.PROD_FSS);
-    private static final Set<Cluster> SKAL_KONSUMERE_PF_AKTIVERT = Set.of(Cluster.LOCAL, Cluster.DEV_FSS, Cluster.PROD_FSS);
+    private static final Set<Cluster> SKAL_KONSUMERE_PF_AKTIVERT = Set.of();
     private static final Cluster CLUSTER = Environment.current().getCluster();
 
     public boolean skalKonsumerePdl() {
