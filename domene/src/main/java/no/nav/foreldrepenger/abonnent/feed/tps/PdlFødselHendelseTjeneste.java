@@ -107,6 +107,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     public void loggFeiletHendelse(PdlFødselHendelsePayload payload) {
         String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
         String årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
+        boolean info = false;
         Optional<Set<String>> aktørIdBarn = payload.getAktørIdBarn();
         if (aktørIdBarn.isEmpty()) {
             årsak = "Årsaken er at barnets aktørId mangler på hendelsen.";
@@ -121,9 +122,14 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 årsak = "Årsaken er at barnet fortsatt ikke finnes i TPS.";
             } else if (getForeldre(payload).isEmpty()) {
                 årsak = "Årsaken er at barnet fortsatt ikke har registrerte foreldre i TPS.";
+                info = true; // Innvandring blir varslet som fødsel OPPRETTET, men mangler ofte foreldreopplysninger (gjelder primært voksne)
             }
         }
-        LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
+        if (info) {
+            LOGGER.info(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
+        } else {
+            LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
+        }
     }
 
     private Set<AktørId> getForeldre(PdlFødselHendelsePayload payload) {
