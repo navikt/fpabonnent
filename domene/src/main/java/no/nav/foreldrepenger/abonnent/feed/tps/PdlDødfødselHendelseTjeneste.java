@@ -46,6 +46,7 @@ public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødf
 
         return new PdlDødfødselHendelsePayload.Builder()
                 .hendelseId(pdlDødfødsel.getHendelseId())
+                .tidligereHendelseId(pdlDødfødsel.getTidligereHendelseId())
                 .type(pdlDødfødsel.getHendelseType().getKode())
                 .endringstype(pdlDødfødsel.getEndringstype().name())
                 .hendelseOpprettetTid(pdlDødfødsel.getOpprettet())

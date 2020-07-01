@@ -13,6 +13,10 @@ public interface HendelseTjeneste<T extends HendelsePayload> {
 
     boolean ikkeAtomiskHendelseSkalSendes(T payload);
 
+    default boolean vurderOmHendelseKanForkastes(T payload) {
+        return false;
+    }
+
     KlarForSorteringResultat vurderOmKlarForSortering(T payload);
 
     default void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {}

@@ -60,9 +60,11 @@ public class HendelseRepository {
             TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
                     "from InngåendeHendelse where håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
                             "and håndteresEtterTidspunkt <= :håndteresEtterTidspunkt " + //$NON-NLS-1$
+                            "and feedKode = :feedKode " + //$NON-NLS-1$
                             SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
             query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.MOTTATT);
             query.setParameter(HÅNDTERES_ETTER_TIDSPUNKT, LocalDateTime.now());
+            query.setParameter(FEED_KODE, FeedKode.TPS);
             hendelseLock.get().oppdaterSistLåstTidspunkt();
             return query.getResultList();
         }
@@ -146,6 +148,10 @@ public class HendelseRepository {
 
     public void oppdaterHåndtertStatus(InngåendeHendelse inngåendeHendelse, HåndtertStatusType håndtertStatus) {
         inngåendeHendelse.setHåndtertStatus(håndtertStatus);
+    }
+
+    public void oppdaterHåndteresEtterTidspunkt(InngåendeHendelse inngåendeHendelse, LocalDateTime håndteresEtterTidspunkt) {
+        inngåendeHendelse.setHåndteresEtterTidspunkt(håndteresEtterTidspunkt);
     }
 
     public void fjernPayload(InngåendeHendelse inngåendeHendelse) {

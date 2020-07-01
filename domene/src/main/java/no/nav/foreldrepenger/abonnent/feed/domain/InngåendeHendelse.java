@@ -28,8 +28,8 @@ public class InngåendeHendelse extends BaseEntitet {
     @Column(name = "hendelse_id")
     private String hendelseId;
 
-    @Column(name = "kobling_id")
-    private Long koblingId;
+    @Column(name = "tidligere_hendelse_id")
+    private String tidligereHendelseId;
 
     @Convert(converter = FeedKode.KodeverdiConverter.class)
     @Column(name="feed_kode", nullable = false)
@@ -63,7 +63,7 @@ public class InngåendeHendelse extends BaseEntitet {
     private InngåendeHendelse(Builder builder) {
         this.id = builder.id;
         this.hendelseId = builder.hendelseId;
-        this.koblingId = builder.koblingId;
+        this.tidligereHendelseId = builder.tidligereHendelseId;
         this.feedKode = builder.feedKode;
         this.type = builder.type;
         this.payload = builder.payload;
@@ -81,8 +81,8 @@ public class InngåendeHendelse extends BaseEntitet {
         return hendelseId;
     }
 
-    public Long getKoblingId() {
-        return koblingId;
+    public String getTidligereHendelseId() {
+        return tidligereHendelseId;
     }
 
     public FeedKode getFeedKode() {
@@ -103,6 +103,10 @@ public class InngåendeHendelse extends BaseEntitet {
 
     public LocalDateTime getHåndteresEtterTidspunkt() {
         return håndteresEtterTidspunkt;
+    }
+
+    public void setHåndteresEtterTidspunkt(LocalDateTime håndteresEtterTidspunkt) {
+        this.håndteresEtterTidspunkt = håndteresEtterTidspunkt;
     }
 
     public HåndtertStatusType getHåndtertStatus() {
@@ -128,7 +132,7 @@ public class InngåendeHendelse extends BaseEntitet {
     public static class Builder {
         private Long id;
         private String hendelseId;
-        private Long koblingId;
+        private String tidligereHendelseId;
         private FeedKode feedKode;
         private HendelseType type;
         private String payload;
@@ -147,8 +151,8 @@ public class InngåendeHendelse extends BaseEntitet {
             return this;
         }
 
-        public Builder koblingId(Long koblingId) {
-            this.koblingId = koblingId;
+        public Builder tidligereHendelseId(String tidligereHendelseId) {
+            this.tidligereHendelseId = tidligereHendelseId;
             return this;
         }
 
