@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.abonnent.feed.tps;
 import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.hentUtAktørIderFraString;
 import static no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper.optionalStringTilLocalDate;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +49,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
         return new PdlFødselHendelsePayload.Builder()
                 .hendelseId(pdlFødsel.getHendelseId())
+                .tidligereHendelseId(pdlFødsel.getTidligereHendelseId())
                 .type(pdlFødsel.getHendelseType().getKode())
                 .endringstype(pdlFødsel.getEndringstype().name())
                 .hendelseOpprettetTid(pdlFødsel.getOpprettet())
@@ -79,6 +81,16 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     @Override
     public boolean ikkeAtomiskHendelseSkalSendes(PdlFødselHendelsePayload payload) {
         return true;
+    }
+
+    @Override
+    public boolean vurderOmHendelseKanForkastes(PdlFødselHendelsePayload payload) {
+        if (payload.getFødselsdato().isPresent() && payload.getFødselsdato().get().isBefore(LocalDate.now().minusYears(2))) {
+            LOGGER.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet",
+                    payload.getHendelseId(), payload.getFødselsdato().get());
+            return true;
+        }
+        return false;
     }
 
     @Override

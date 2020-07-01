@@ -75,7 +75,6 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
         assertThat(inngåendeHendelse.getFeedKode()).isEqualTo(FeedKode.PDL);
         assertThat(inngåendeHendelse.getType()).isEqualTo(HendelseType.PDL_DØD_OPPRETTET);
-        assertThat(inngåendeHendelse.getHåndteresEtterTidspunkt()).isNotNull();
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);

@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
+import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.pdl.TpsForsinkelseTjeneste;
@@ -163,18 +164,59 @@ public class VurderSorteringTaskTest {
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
     }
 
+    @Test
+    public void skal_ikke_grovsortere_fødselshendelse_med_fødselsdato_over_to_år_tilbake_i_tid() {
+        // Arrange
+        InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
+                .hendelseId("A")
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .feedKode(FeedKode.PDL)
+                .sendtTidspunkt(LocalDateTime.now())
+                .requestUuid("1")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusYears(10), PdlEndringstype.OPPRETTET, "A", null).build()))
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
+        repoRule.getEntityManager().flush();
+
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
+        hendelserDataWrapper.setHendelseId("A");
+
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseOpprettet.getId());
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+
+        verify(personTjeneste, times(0)).erRegistrert(any());
+        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
     private InngåendeHendelse opprettInngåendeHendelse(LocalDateTime opprettetTid) {
-        PdlFødsel.Builder pdlFødsel = PdlFødsel.builder();
-        pdlFødsel.medHendelseId(HENDELSE_ID);
-        pdlFødsel.medHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET);
-        pdlFødsel.medEndringstype(PdlEndringstype.OPPRETTET);
-        pdlFødsel.leggTilPersonident(AKTØR_ID_BARN);
-        pdlFødsel.medFødselsdato(LocalDate.now());
-        pdlFødsel.medOpprettet(opprettetTid);
+        PdlFødsel.Builder pdlFødsel = opprettFødsel(opprettetTid, LocalDate.now(), PdlEndringstype.OPPRETTET, HENDELSE_ID, null);
         return InngåendeHendelse.builder()
                 .type(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
                 .payload(JsonMapper.toJson(pdlFødsel.build()))
                 .build();
+    }
+
+    private PdlFødsel.Builder opprettFødsel(LocalDateTime opprettetTid, LocalDate fødselsdato, PdlEndringstype endringstype, String hendelseId, String tidligereHendelseID) {
+        PdlFødsel.Builder pdlFødsel = PdlFødsel.builder();
+        pdlFødsel.medHendelseId(hendelseId);
+        pdlFødsel.medHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET);
+        pdlFødsel.medEndringstype(endringstype);
+        pdlFødsel.leggTilPersonident(AKTØR_ID_BARN);
+        pdlFødsel.medFødselsdato(fødselsdato);
+        pdlFødsel.medOpprettet(opprettetTid);
+        pdlFødsel.medTidligereHendelseId(tidligereHendelseID);
+        return pdlFødsel;
     }
 }

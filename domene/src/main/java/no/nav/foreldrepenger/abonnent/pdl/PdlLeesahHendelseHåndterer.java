@@ -115,7 +115,9 @@ public class PdlLeesahHendelseHåndterer {
             if (pdlFeatureToggleTjeneste.skalLagrePdl()) {
                 if (pdlFeatureToggleTjeneste.skalGrovsorterePdl() && pdlFeatureToggleTjeneste.endringstypenErAktivert(personhendelse.getEndringstype())) {
                     InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
-                    opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId());
+                    LocalDateTime håndteresEtterTidspunkt = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(personhendelse.getOpprettet());
+                    hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, håndteresEtterTidspunkt);
+                    opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId(), håndteresEtterTidspunkt);
                 } else {
                     LOG.info("Grovsortering av hendelseId={} er deaktivert i dette clusteret", personhendelse.getHendelseId());
                     lagreInngåendeHendelse(personhendelse, HåndtertStatusType.HÅNDTERT);
@@ -132,21 +134,21 @@ public class PdlLeesahHendelseHåndterer {
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
                 .type(personhendelse.getHendelseType())
                 .hendelseId(personhendelse.getHendelseId())
+                .tidligereHendelseId(personhendelse.getTidligereHendelseId())
                 .requestUuid(personhendelse.getHendelseId()) //TODO(JEJ): Fjerne felt når person-feed saneres?
                 .payload(JsonMapper.toJson(personhendelse))
                 .feedKode(FeedKode.PDL)
                 .håndtertStatus(håndtertStatusType)
-                .håndteresEtterTidspunkt(LocalDateTime.now().plusYears(50)) //TODO(JEJ): Håndteres av prosesstask - fjerne felt når person-feed saneres
                 .build();
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
         return inngåendeHendelse;
     }
 
-    private void opprettVurderSorteringTask(PdlPersonhendelse personhendelse, Long inngåendeHendelseId) {
+    private void opprettVurderSorteringTask(PdlPersonhendelse personhendelse, Long inngåendeHendelseId, LocalDateTime håndteresEtterTidspunkt) {
         HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
         vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelseId);
         vurderSorteringTask.setHendelseId(personhendelse.getHendelseId());
-        vurderSorteringTask.setNesteKjøringEtter(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(personhendelse.getOpprettet()));
+        vurderSorteringTask.setNesteKjøringEtter(håndteresEtterTidspunkt);
         vurderSorteringTask.setHendelseType(personhendelse.getHendelseType().getKode());
         prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
     }

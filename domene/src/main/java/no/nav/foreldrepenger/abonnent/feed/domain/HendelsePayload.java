@@ -10,6 +10,8 @@ public abstract class HendelsePayload {
 
     protected String hendelseId;
 
+    protected String tidligereHendelseId;
+
     protected String type;
 
     protected String endringstype;
@@ -21,6 +23,10 @@ public abstract class HendelsePayload {
 
     public String getHendelseId() {
         return hendelseId;
+    }
+
+    public String getTidligereHendelseId() {
+        return tidligereHendelseId;
     }
 
     public String getType() {

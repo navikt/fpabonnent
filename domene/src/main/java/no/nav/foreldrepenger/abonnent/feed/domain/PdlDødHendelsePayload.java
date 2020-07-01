@@ -24,6 +24,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
     private PdlDødHendelsePayload(PdlDødHendelsePayload.Builder builder) {
         this.hendelseId = builder.hendelseId;
+        this.tidligereHendelseId = builder.tidligereHendelseId;
         this.type = builder.type;
         this.endringstype = builder.endringstype;
         this.hendelseOpprettetTid = builder.hendelseOpprettetTid;
@@ -80,6 +81,8 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
         PdlDødHendelsePayload payload = (PdlDødHendelsePayload) o;
 
+        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) return false;
+        if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) return false;
         if (type != null ? !type.equals(payload.type) : payload.type != null) return false;
         if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
         if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) return false;
@@ -89,7 +92,9 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
     @Override
     public int hashCode() {
-        int result = type != null ? type.hashCode() : 0;
+        int result = hendelseId != null ? hendelseId.hashCode() : 0;
+        result = 31 * result + (tidligereHendelseId != null ? tidligereHendelseId.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (endringstype != null ? endringstype.hashCode() : 0);
         result = 31 * result + (hendelseOpprettetTid != null ? hendelseOpprettetTid.hashCode() : 0);
         result = 31 * result + (aktørId != null ? aktørId.hashCode() : 0);
@@ -99,6 +104,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
     public static class Builder {
         private String hendelseId;
+        private String tidligereHendelseId;
         private String type;
         private String endringstype;
         private LocalDateTime hendelseOpprettetTid;
@@ -107,6 +113,11 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
         public Builder hendelseId(String hendelseId) {
             this.hendelseId = hendelseId;
+            return this;
+        }
+
+        public Builder tidligereHendelseId(String tidligereHendelseId) {
+            this.tidligereHendelseId = tidligereHendelseId;
             return this;
         }
 

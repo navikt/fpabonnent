@@ -61,6 +61,11 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         InngåendeHendelse inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId.get());
         HendelsePayload hendelsePayload = hendelseTjeneste.payloadFraString(inngåendeHendelse.getPayload());
 
+        if (hendelseTjeneste.vurderOmHendelseKanForkastes(hendelsePayload)) {
+            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse);
+            return;
+        }
+
         KlarForSorteringResultat klarForSorteringResultat = hendelseTjeneste.vurderOmKlarForSortering(hendelsePayload);
         if (klarForSorteringResultat.hendelseKlarForSortering()) {
             hendelseTjeneste.berikHendelseHvisNødvendig(inngåendeHendelse, klarForSorteringResultat);
@@ -85,6 +90,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
             LocalDateTime nesteKjøringEtter = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now());
             LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}",
                     hendelsePayload.getHendelseId(), inngåendeHendelse.getType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
+            hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, nesteKjøringEtter);
             HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
             vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
             vurderSorteringTask.setHendelseId(hendelsePayload.getHendelseId());
@@ -93,14 +99,18 @@ public class VurderSorteringTask implements ProsessTaskHandler {
             prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
         } else {
             hendelseTjeneste.loggFeiletHendelse(hendelsePayload);
-            hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.HÅNDTERT);
-            //TODO(JEJ): Kommentere inn slik at vi fjerner payload når vi har sett at det fungerer (+ bestille patch til null på gamle):
-            //hendelseRepository.fjernPayload(inngåendeHendelse);
+            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse);
         }
     }
 
     private boolean hendelsenErUnderEnUkeGammel(LocalDateTime hendelseOpprettetTid) {
         return hendelseOpprettetTid.plusDays(7).isAfter(LocalDateTime.now());
+    }
+
+    private void ferdigstillHendelseUtenVidereHåndtering(InngåendeHendelse inngåendeHendelse) {
+        hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.HÅNDTERT);
+        //TODO(JEJ): Kommentere inn slik at vi fjerner payload når vi har sett at det fungerer (+ bestille patch til null på gamle):
+        //hendelseRepository.fjernPayload(inngåendeHendelse);
     }
 
     private HendelseTjeneste<HendelsePayload> getHendelseTjeneste(HendelserDataWrapper dataWrapper, String hendelseType) {
