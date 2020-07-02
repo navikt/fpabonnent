@@ -24,6 +24,6 @@
       "PERSON_V3_URL": "https://wasapp-q1.adeo.no/tpsws/ws/Person/v3",
       "PERSON_FEED_V2_URL": "https://person-feed-q1.nais.preprod.local/api/v2/personfeed/",
       "PERSONFEED_POLLING_AKTIVERT": "aktiv",
-      "SECURITYTOKENSERVICE_URL": "https://sts-q1.test.local/SecurityTokenServiceProvider/"
+      "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/"
     }
 }
