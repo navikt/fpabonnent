@@ -1,0 +1,1 @@
+update PROSESS_TASK_TYPE set cron_expression = '0 20 7 * * *' where kode = 'retry.feiledeTasks';
