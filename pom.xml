@@ -24,8 +24,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <felles.version>1.6-20200312141659-2c32ef0</felles.version>
-        <prosesstask.version>2.2-20200312141536-b3be707</prosesstask.version>
+        <felles.version>2.0.0-20200702160706-bb063e2</felles.version>
+        <prosesstask.version>2.4.2-20200703105213-95d753a</prosesstask.version>
         <fp-kontrakter.version>5.1-20200312090022-51b4f7d</fp-kontrakter.version>
 
         <!-- Eksterne tjenestekontrakter -->
@@ -37,21 +37,22 @@
         <flyway.version>4.2.0</flyway.version>
         <hamcrest.version>1.3</hamcrest.version>
         <junit.version>5.5.2</junit.version>
-        <mockito.version>3.3.3</mockito.version>
+        <mockito.version>3.4.4</mockito.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
         <logstash.version>6.4</logstash.version>
-        <metrics.version>4.1.9</metrics.version>
+        <metrics.version>4.1.11</metrics.version>
         <prometheus.version>0.9.0</prometheus.version>
-        <resteasy-validator-provider.version>3.12.1.Final</resteasy-validator-provider.version>
+        <resteasy-validator-provider.version>3.13.0.Final</resteasy-validator-provider.version>
         <weld-web.version>3.1.4.Final</weld-web.version>
         <javax.el.version>3.0.1-b11</javax.el.version>
-        <swagger.version>2.1.2</swagger.version>
-        <swagger-ui.version>3.26.1</swagger-ui.version>
+        <swagger.version>2.1.4</swagger.version>
+        <swagger-ui.version>3.30.0</swagger-ui.version>
         <kafka.version>2.5.0</kafka.version>
-        <avro.version>1.9.2</avro.version>
+        <avro.version>1.10.0</avro.version>
         <confluent.version>5.5.0</confluent.version>
+        <woodstox.version>6.2.1</woodstox.version>
 
         <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
         <joda-time.version>2.10.6</joda-time.version>
@@ -143,6 +144,20 @@
                 <version>${felles.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.woodstox</groupId>
+                        <artifactId>woodstox-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.woodstox</groupId>
+                        <artifactId>woodstox-core-asl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>no.nav.foreldrepenger.felles</groupId>
+                        <artifactId>felles-sikkerhet-testutilities</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -230,6 +245,12 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
+            </dependency>
+            <dependency>
+                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
+                <groupId>com.fasterxml.woodstox</groupId>
+                <artifactId>woodstox-core</artifactId>
+                <version>${woodstox.version}</version>
             </dependency>
             <dependency>
                 <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
@@ -382,6 +403,10 @@
                     <exclusion>
                         <groupId>org.hibernate.validator</groupId>
                         <artifactId>hibernate-validator</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

@@ -6,7 +6,7 @@ on:
       - master
 env:
   APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-  ORACLE_IMAGE: docker.pkg.github.com/navikt/vtp/foreldrepenger-oracle
+  ORACLE_IMAGE: docker.pkg.github.com/navikt/fpsak-autotest/oracle-flattened
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fpabonnent
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -35,6 +35,8 @@ jobs:
         run: echo "::set-env name=TAG::$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7)"
 
       - name: Hent og start Oracle image
+        env:
+          GITHUB_TOKEN: ${{ secrets.NOTIFICATION }}
         id: oracle
         shell: bash
         run: |

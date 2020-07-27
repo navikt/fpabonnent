@@ -8,6 +8,7 @@
 	"ingresses": [ "https://fpabonnent.nais.adeo.no" ],
 	"env": {
 		"ABAC_PDP_ENDPOINT_URL": "https://wasapp.adeo.no/asm-pdp/authorize",
+		"ABAC_ATTRIBUTT_DRIFT": "no.nav.abac.attributter.foreldrepenger.drift",
 		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
 		"KAFKA_BOOTSTRAP_SERVERS": "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
 		"KAFKA_SCHEMA_REGISTRY_URL": "http://kafka-schema-registry.tpa:8081",

@@ -11,7 +11,6 @@ import javax.persistence.Query;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.InputFeed;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class FeedPollerRepositoryImpl {
@@ -22,7 +21,7 @@ public class FeedPollerRepositoryImpl {
     }
 
     @Inject
-    public FeedPollerRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public FeedPollerRepositoryImpl(EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
     }

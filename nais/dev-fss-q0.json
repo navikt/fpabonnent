@@ -9,6 +9,7 @@
 	],
 	"env": {
       "ABAC_PDP_ENDPOINT_URL": "https://wasapp-q0.adeo.no/asm-pdp/authorize",
+      "ABAC_ATTRIBUTT_DRIFT": "no.nav.abac.attributter.foreldrepenger.drift",
       "FPSAKHENDELSER_V1_URL": "https://fpsak-q0.nais.preprod.local/fpsak/api/hendelser/",
       "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
       "KAFKA_SCHEMA_REGISTRY_URL": "https://kafka-schema-registry.nais.preprod.local",

@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 /**
  * Repository for InngåendeHendelse.
@@ -49,7 +48,7 @@ public class HendelseRepository {
     }
 
     @Inject
-    public HendelseRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public HendelseRepository(EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
     }
