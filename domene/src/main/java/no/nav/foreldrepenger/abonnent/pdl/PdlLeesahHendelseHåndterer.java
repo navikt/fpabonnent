@@ -78,29 +78,65 @@ public class PdlLeesahHendelseHåndterer {
         }
 
         if (FØDSEL.contentEquals(payload.getOpplysningstype())) {
-            Foedsel foedsel = payload.getFoedsel();
+            håndterFødsel(payload);
+        } else if (DØD.contentEquals(payload.getOpplysningstype())) {
+            håndterDødsfall(payload);
+        } else if (DØDFØDSEL.contentEquals(payload.getOpplysningstype())) {
+            håndterDødfødtBarn(payload);
+        } else if (FAMILIERELASJON.contentEquals(payload.getOpplysningstype())) {
+            håndterFamilierelasjon(payload);
+        } else {
+            LOG.info("FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+        }
+    }
+
+    private void håndterFødsel(Personhendelse payload) {
+        Foedsel foedsel = payload.getFoedsel();
+        if (foedsel != null) {
             LOG.info("FPABONNENT mottok fødsel: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} fødselsdato={} fødselsår={} fødested={} fødeKommune={} fødeland={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), foedsel.getFoedselsdato(), foedsel.getFoedselsaar(), foedsel.getFoedested(), foedsel.getFoedekommune(), foedsel.getFoedeland());
-            PdlFødsel pdlFødsel = oversetter.oversettFødsel(payload);
-            prosesserHendelseVidereHvisRelevant(pdlFødsel);
-        } else if (DØD.contentEquals(payload.getOpplysningstype())) {
-            Doedsfall doedsfall = payload.getDoedsfall();
+        } else {
+            LOG.info("FPABONNENT mottok fødsel: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+        }
+        PdlFødsel pdlFødsel = oversetter.oversettFødsel(payload);
+        prosesserHendelseVidereHvisRelevant(pdlFødsel);
+    }
+
+    private void håndterDødsfall(Personhendelse payload) {
+        Doedsfall doedsfall = payload.getDoedsfall();
+        if (doedsfall != null) {
             LOG.info("FPABONNENT mottok dødsfall: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dødsdato={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), doedsfall.getDoedsdato());
-            PdlDød pdlDød = oversetter.oversettDød(payload);
-            prosesserHendelseVidereHvisRelevant(pdlDød);
-        } else if (DØDFØDSEL.contentEquals(payload.getOpplysningstype())) {
-            DoedfoedtBarn doedfoedtBarn = payload.getDoedfoedtBarn();
+        } else {
+            LOG.info("FPABONNENT mottok dødsfall: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+        }
+        PdlDød pdlDød = oversetter.oversettDød(payload);
+        prosesserHendelseVidereHvisRelevant(pdlDød);
+    }
+
+    private void håndterDødfødtBarn(Personhendelse payload) {
+        DoedfoedtBarn doedfoedtBarn = payload.getDoedfoedtBarn();
+        if (doedfoedtBarn != null) {
             LOG.info("FPABONNENT mottok dødfødtBarn: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dato={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), doedfoedtBarn.getDato());
-            PdlDødfødsel pdlDødfødsel = oversetter.oversettDødfødsel(payload);
-            prosesserHendelseVidereHvisRelevant(pdlDødfødsel);
-        } else if (FAMILIERELASJON.contentEquals(payload.getOpplysningstype())) {
-            Familierelasjon familierelasjon = payload.getFamilierelasjon();
+        } else {
+            LOG.info("FPABONNENT mottok dødfødtBarn: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+        }
+        PdlDødfødsel pdlDødfødsel = oversetter.oversettDødfødsel(payload);
+        prosesserHendelseVidereHvisRelevant(pdlDødfødsel);
+    }
+
+    private void håndterFamilierelasjon(Personhendelse payload) {
+        Familierelasjon familierelasjon = payload.getFamilierelasjon();
+        if (familierelasjon != null) {
             LOG.info("FPABONNENT mottok familierelasjon som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} relatertPersonsRolle={} minRolleForPerson={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), familierelasjon.getRelatertPersonsRolle(), familierelasjon.getMinRolleForPerson());
         } else {
-            LOG.info("FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+            LOG.info("FPABONNENT mottok familierelasjon som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
         }
     }

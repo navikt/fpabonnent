@@ -1,9 +1,12 @@
 package no.nav.foreldrepenger.abonnent.pdl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -82,6 +85,32 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(OPPRETTET_TID).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_DØD_OPPRETTET.getKode());
+    }
+
+    @Test
+    public void skal_lagre_annullert_dødshendelse_uten_detaljer_uten_videre_håndtering() {
+        // Arrange
+        Personhendelse payload = new Personhendelse();
+        payload.setHendelseId("ABC");
+        payload.setPersonidenter(List.of("1111111111111", "22222222222"));
+        payload.setMaster("Freg");
+        payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
+        payload.setOpplysningstype("DOEDSFALL_V1");
+        payload.setEndringstype(Endringstype.ANNULLERT);
+        ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
+        doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
+
+        // Act
+        hendelseHåndterer.handleMessage("", payload);
+
+        // Assert
+        InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
+        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"DOEDSFALL_V1\"", "\"endringstype\":\"ANNULLERT\"", "\"hendelseType\":{\"kode\":\"PDL_DOED_ANNULLERT\"", "\"kodeverk\":\"HENDELSE_TYPE\"}");
+        assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
+        assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+        assertThat(inngåendeHendelse.getFeedKode()).isEqualTo(FeedKode.PDL);
+        assertThat(inngåendeHendelse.getType()).isEqualTo(HendelseType.PDL_DØD_ANNULLERT);
+        verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
     }
 
 }
