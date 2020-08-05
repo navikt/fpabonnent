@@ -37,20 +37,22 @@ public class PdlLeesahOversetter {
         oversettPersonhendelse(personhendelse, builder);
         Foedsel foedsel = personhendelse.getFoedsel();
 
-        if (foedsel.getFoedselsaar() != null) {
-            builder.medFødselsår(foedsel.getFoedselsaar());
-        }
-        if (foedsel.getFoedselsdato() != null) {
-            builder.medFødselsdato(foedsel.getFoedselsdato());
-        }
-        if (foedsel.getFoedeland() != null) {
-            builder.medFødeland(foedsel.getFoedeland().toString());
-        }
-        if (foedsel.getFoedested() != null) {
-            builder.medFødested(foedsel.getFoedested().toString());
-        }
-        if (foedsel.getFoedekommune() != null) {
-            builder.medFødekommune(foedsel.getFoedekommune().toString());
+        if (foedsel != null) {
+            if (foedsel.getFoedselsaar() != null) {
+                builder.medFødselsår(foedsel.getFoedselsaar());
+            }
+            if (foedsel.getFoedselsdato() != null) {
+                builder.medFødselsdato(foedsel.getFoedselsdato());
+            }
+            if (foedsel.getFoedeland() != null) {
+                builder.medFødeland(foedsel.getFoedeland().toString());
+            }
+            if (foedsel.getFoedested() != null) {
+                builder.medFødested(foedsel.getFoedested().toString());
+            }
+            if (foedsel.getFoedekommune() != null) {
+                builder.medFødekommune(foedsel.getFoedekommune().toString());
+            }
         }
 
         return builder.build();
@@ -59,14 +61,18 @@ public class PdlLeesahOversetter {
     public PdlDød oversettDød(Personhendelse personhendelse) {
         PdlDød.Builder builder = PdlDød.builder();
         oversettPersonhendelse(personhendelse, builder);
-        builder.medDødsdato(personhendelse.getDoedsfall().getDoedsdato());
+        if (personhendelse.getDoedsfall() != null) {
+            builder.medDødsdato(personhendelse.getDoedsfall().getDoedsdato());
+        }
         return builder.build();
     }
 
     public PdlDødfødsel oversettDødfødsel(Personhendelse personhendelse) {
         PdlDødfødsel.Builder builder = PdlDødfødsel.builder();
         oversettPersonhendelse(personhendelse, builder);
-        builder.medDødfødselsdato(personhendelse.getDoedfoedtBarn().getDato());
+        if (personhendelse.getDoedfoedtBarn() != null) {
+            builder.medDødfødselsdato(personhendelse.getDoedfoedtBarn().getDato());
+        }
         return builder.build();
     }
 

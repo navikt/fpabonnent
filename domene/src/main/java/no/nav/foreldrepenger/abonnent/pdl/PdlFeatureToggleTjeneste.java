@@ -42,9 +42,6 @@ public class PdlFeatureToggleTjeneste {
     }
 
     public boolean endringstypenErAktivert(PdlEndringstype endringstype) {
-        if (CLUSTER.equals(Cluster.PROD_FSS)) {
-            return PdlEndringstype.OPPRETTET.equals(endringstype);
-        }
-        return true;
+        return PdlEndringstype.OPPRETTET.equals(endringstype);
     }
 }
