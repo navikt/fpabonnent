@@ -23,9 +23,10 @@ public class PdlLeesahOversetter {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahOversetter.class);
 
-    private static final String FØDSEL = "FOEDSEL_V1";
-    private static final String DØD = "DOEDSFALL_V1";
-    private static final String DØDFØDSEL = "DOEDFOEDT_BARN_V1";
+    public static final String FØDSEL = "FOEDSEL_V1";
+    public static final String DØD = "DOEDSFALL_V1";
+    public static final String DØDFØDSEL = "DOEDFOEDT_BARN_V1";
+    public static final String FAMILIERELASJON = "FAMILIERELASJON_V1";
 
     public PdlLeesahOversetter() {
         // CDI
