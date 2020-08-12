@@ -1,10 +1,9 @@
 package no.nav.foreldrepenger.abonnent.felles;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +27,6 @@ public class HendelserDataWrapperTest {
 
     @Test
     public void test_kan_opprette_og_kopiere_wrapper_uten_eksisterende_properties() throws Exception {
-
         wrapper = new HendelserDataWrapper(eksisterendeData);
         assertThat(wrapper.hentAlleProsessTaskVerdier()).as("Forventer at wrapper i utgangspunktet blir opprettet uten properties").isEmpty();
 
@@ -64,23 +62,16 @@ public class HendelserDataWrapperTest {
     }
 
     @Test
-    public void skal_hente_aktøridMor_fra_properties() {
+    public void skal_hente_aktøridForeldre_fra_properties() {
         HendelserDataWrapper wrapper = new HendelserDataWrapper(eksisterendeData);
-        wrapper.setAktørIdMor(new HashSet<>(singletonList("1234567891238")));
-        assertThat(wrapper.getAktørIdMor().get()).contains("1234567891238");
-    }
-
-    @Test
-    public void skal_hente_aktøridFar_fra_properties() {
-        HendelserDataWrapper wrapper = new HendelserDataWrapper(eksisterendeData);
-        wrapper.setAktørIdFar(new HashSet<>(singletonList("1234567891235")));
-        assertThat(wrapper.getAktørIdFar().get()).contains("1234567891235");
+        wrapper.setAktørIdForeldre(Set.of("1234567891238", "1234567891235"));
+        assertThat(wrapper.getAktørIdForeldre().get()).contains("1234567891238", "1234567891235");
     }
 
     @Test
     public void skal_hente_aktøridBarn_fra_properties() {
         HendelserDataWrapper wrapper = new HendelserDataWrapper(eksisterendeData);
-        wrapper.setAktørIdBarn(new HashSet<>(singletonList("2131234567891")));
+        wrapper.setAktørIdBarn(Set.of("2131234567891"));
         assertThat(wrapper.getAktørIdBarn().get()).contains("2131234567891");
     }
 
@@ -90,6 +81,5 @@ public class HendelserDataWrapperTest {
         wrapper.setFødselsdato(LocalDate.of(2018, 1,10));
         assertThat(wrapper.getFødselsdato()).hasValue("2018-01-10");
     }
-
 
 }

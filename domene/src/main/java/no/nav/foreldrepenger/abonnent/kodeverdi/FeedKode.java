@@ -17,9 +17,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum FeedKode implements Kodeverdi { //TODO(JEJ): Rename til noe mer generelt når person-feed saneres
 
+    // Ligger igjen til evt databaseopprydding:
+    @Deprecated
     TPS("JF_TPS"),
     @Deprecated
-    INFOTRYGD("JF_INFOTRYGD"), // Ligger igjen til evt databaseopprydding
+    INFOTRYGD("JF_INFOTRYGD"),
+
     PDL("KAFKA_PDL"),
 
     /**

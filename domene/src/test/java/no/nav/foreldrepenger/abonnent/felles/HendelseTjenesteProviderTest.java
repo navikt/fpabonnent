@@ -10,7 +10,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
+import no.nav.foreldrepenger.abonnent.feed.tps.PdlFødselHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
@@ -27,11 +27,11 @@ public class HendelseTjenesteProviderTest {
     @Test
     public void skal_finne_hendelsetjeneste() {
         // Act
-        HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(HendelseType.FØDSELSMELDINGOPPRETTET, "1");
+        HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(HendelseType.PDL_FØDSEL_OPPRETTET, "1");
 
         // Assert
         assertThat(hendelseTjeneste).isNotNull();
-        assertThat(hendelseTjeneste).isInstanceOf(FødselsmeldingOpprettetHendelseTjeneste.class);
+        assertThat(hendelseTjeneste).isInstanceOf(PdlFødselHendelseTjeneste.class);
     }
 
     @Test

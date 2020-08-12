@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.felles.AbonnentHendelserFeil;
-import no.nav.tjenester.person.feed.v2.Ident;
 
 public class TpsHendelseHjelper {
 
@@ -21,30 +20,6 @@ public class TpsHendelseHjelper {
 
     private TpsHendelseHjelper() {
         // Skal ikke konstrueres
-    }
-
-    /**
-     * Identer inneholder flere identer for en person. fnr/dnr, aktørid osv.
-     * Vi må hente ut det som er aktørId fra dette settet.
-     *
-     * En person kan ha flere aktørIder, gjerne der en av dem er knyttet til et D-nummer.
-     *
-     * @param identer liste av forskjellige identer for en person(fnr, dnr, aktørid).
-     * @return Liste av AktørId, normalt bare en
-     */
-    public static Set<String> hentUtAktørIderFraIdent(Set<Ident> identer, Long sekvensnummer) {
-        if (Objects.isNull(identer)) {
-            return null; // NOSONAR - ønsker ikke å returnere tomt Set, for da må man sjekke !isEmpty() i tillegg til isPresent()
-        }
-
-        Set<String> aktørIder = identer.stream()
-                .filter(TpsHendelseHjelper::erAktørId)
-                .map(Ident::getIdent)
-                .collect(Collectors.toSet());
-
-        validerResultat("" + sekvensnummer, aktørIder);
-
-        return aktørIder;
     }
 
     /**
@@ -68,10 +43,6 @@ public class TpsHendelseHjelper {
         validerResultat(hendelseId, aktørIder);
 
         return aktørIder;
-    }
-
-    private static boolean erAktørId(Ident ident) {
-        return ident != null && AKTØR_ID_IDENT_TYPE.equals(ident.getType());
     }
 
     private static boolean erAktørId(String string) {

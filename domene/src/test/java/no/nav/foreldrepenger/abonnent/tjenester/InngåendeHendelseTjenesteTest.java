@@ -22,19 +22,19 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
+import no.nav.foreldrepenger.abonnent.feed.domain.PdlFødselHendelsePayload;
+import no.nav.foreldrepenger.abonnent.feed.tps.PdlFødselHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.JsonMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
-import no.nav.tjenester.person.feed.common.v1.FeedEntry;
-import no.nav.tjenester.person.feed.v2.foedselsmelding.FoedselsmeldingOpprettet;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PdlEndringstype;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFødsel;
 
 public class InngåendeHendelseTjenesteTest {
 
@@ -48,7 +48,7 @@ public class InngåendeHendelseTjenesteTest {
     public void setup() {
         hendelseRepository = mock(HendelseRepository.class);
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
-        HendelseTjeneste hendelseTjeneste = new FødselsmeldingOpprettetHendelseTjeneste();
+        HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste();
         when(hendelseTjenesteProvider.finnTjeneste(any(HendelseType.class), anyString())).thenReturn(hendelseTjeneste);
         inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, hendelseTjenesteProvider);
     }
@@ -56,7 +56,7 @@ public class InngåendeHendelseTjenesteTest {
     @Test
     public void skal_returnere_liste_med_FødselHendelsePayload() {
         // Arrange
-        List<InngåendeHendelse> inngåendeHendelser = singletonList(lagInngåendeHendelse(1L));
+        List<InngåendeHendelse> inngåendeHendelser = singletonList(lagInngåendeHendelse("1"));
 
         // Act
         List<HendelsePayload> resultat = inngåendeHendelseTjeneste.getPayloadsForInngåendeHendelser(inngåendeHendelser);
@@ -81,11 +81,11 @@ public class InngåendeHendelseTjenesteTest {
     @Test
     public void skal_markere_ikke_relevante_hendelser_som_håndterte_og_fjerne_payload() {
         // Arrange
-        InngåendeHendelse hendelse1 = lagInngåendeHendelse(1L);
-        InngåendeHendelse hendelse2 = lagInngåendeHendelse(2L);
-        InngåendeHendelse hendelse3 = lagInngåendeHendelse(3L);
-        InngåendeHendelse hendelse4 = lagInngåendeHendelse(4L);
-        InngåendeHendelse hendelse5 = lagInngåendeHendelse(5L);
+        InngåendeHendelse hendelse1 = lagInngåendeHendelse("1");
+        InngåendeHendelse hendelse2 = lagInngåendeHendelse("2");
+        InngåendeHendelse hendelse3 = lagInngåendeHendelse("3");
+        InngåendeHendelse hendelse4 = lagInngåendeHendelse("4");
+        InngåendeHendelse hendelse5 = lagInngåendeHendelse("5");
         List<InngåendeHendelse> alleHendelser = asList(hendelse1, hendelse2, hendelse3, hendelse4, hendelse5);
         List<InngåendeHendelse> relevanteHendelser = asList(hendelse1, hendelse3, hendelse5);
         List<HendelsePayload> payloadRelevanteHendelser = inngåendeHendelseTjeneste.getPayloadsForInngåendeHendelser(relevanteHendelser);
@@ -108,11 +108,11 @@ public class InngåendeHendelseTjenesteTest {
     @Test
     public void skal_markere_hendelse_som_sendt_nå_og_håndtert() {
         // Arrange
-        InngåendeHendelse hendelse = lagInngåendeHendelse(1L);
+        InngåendeHendelse hendelse = lagInngåendeHendelse("1");
         when(hendelseRepository.finnGrovsortertHendelse(any(FeedKode.class), anyString())).thenReturn(Optional.of(hendelse));
 
         // Act
-        var payload = new FødselHendelsePayload.Builder().hendelseId("1").build();
+        var payload = new PdlFødselHendelsePayload.Builder().hendelseId("1").build();
         inngåendeHendelseTjeneste.oppdaterHendelseSomSendtNå(payload);
 
         // Assert
@@ -120,15 +120,20 @@ public class InngåendeHendelseTjenesteTest {
         verify(hendelseRepository).oppdaterHåndtertStatus(eq(hendelse), eq(HåndtertStatusType.HÅNDTERT));
     }
 
-    private InngåendeHendelse lagInngåendeHendelse(Long sekvensnummer) {
-        FoedselsmeldingOpprettet foedselsmelding = new FoedselsmeldingOpprettet();
-        String inngåendeHendelsePayload = JsonMapper.toJson(FeedEntry.builder().sequence(sekvensnummer).content(foedselsmelding).build());
+    private InngåendeHendelse lagInngåendeHendelse(String hendelseId) {
+        PdlFødsel.Builder fødselsmelding = new PdlFødsel.Builder();
+        fødselsmelding.medHendelseId(hendelseId);
+        fødselsmelding.medHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET);
+        fødselsmelding.medEndringstype(PdlEndringstype.OPPRETTET);
+        fødselsmelding.leggTilPersonident("1111111111111");
+
+        String inngåendeHendelsePayload = JsonMapper.toJson(fødselsmelding.build());
 
         return new InngåendeHendelse.Builder()
-                .hendelseId("" + sekvensnummer)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
+                .hendelseId(hendelseId)
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .payload(inngåendeHendelsePayload)
-                .feedKode(FeedKode.TPS)
+                .feedKode(FeedKode.PDL)
                 .requestUuid(REQ_UUID)
                 .build();
     }

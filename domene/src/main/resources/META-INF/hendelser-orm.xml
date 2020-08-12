@@ -7,8 +7,6 @@
 
     <sequence-generator name="SEQ_INNGAAENDE_HENDELSE" allocation-size="50" sequence-name="SEQ_INNGAAENDE_HENDELSE"/>
 
-    <entity class="no.nav.foreldrepenger.abonnent.feed.domain.InputFeed"/>
     <entity class="no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse"/>
-    <entity class="no.nav.foreldrepenger.abonnent.feed.domain.HendelseLock"/>
 
 </entity-mappings>

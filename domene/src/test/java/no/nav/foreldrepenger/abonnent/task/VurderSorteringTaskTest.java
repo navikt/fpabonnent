@@ -95,7 +95,7 @@ public class VurderSorteringTaskTest {
         InngåendeHendelse beriketHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelse.getId());
         assertThat(beriketHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.SENDT_TIL_SORTERING);
         PdlFødsel beriketFødsel = JsonMapper.fromJson(beriketHendelse.getPayload(), PdlFødsel.class);
-        assertThat(beriketFødsel.getAktørIdForeldre()).containsExactly(AKTØR_ID_MOR, AKTØR_ID_FAR);
+        assertThat(beriketFødsel.getAktørIdForeldre()).containsExactlyInAnyOrder(AKTØR_ID_MOR, AKTØR_ID_FAR);
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.getTaskType()).isEqualTo(SorterHendelserTask.TASKNAME);
@@ -253,7 +253,7 @@ public class VurderSorteringTaskTest {
         InngåendeHendelse beriketHendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert2.getId());
         assertThat(beriketHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.SENDT_TIL_SORTERING);
         PdlFødsel beriketFødsel = JsonMapper.fromJson(beriketHendelse.getPayload(), PdlFødsel.class);
-        assertThat(beriketFødsel.getAktørIdForeldre()).containsExactly(AKTØR_ID_MOR, AKTØR_ID_FAR);
+        assertThat(beriketFødsel.getAktørIdForeldre()).containsExactlyInAnyOrder(AKTØR_ID_MOR, AKTØR_ID_FAR);
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.getTaskType()).isEqualTo(SorterHendelserTask.TASKNAME);

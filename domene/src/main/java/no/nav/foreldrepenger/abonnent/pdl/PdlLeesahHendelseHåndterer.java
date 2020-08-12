@@ -48,7 +48,6 @@ public class PdlLeesahHendelseHåndterer {
     private PdlLeesahOversetter oversetter;
     private ProsessTaskRepository prosessTaskRepository;
     private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
-    private PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste;
 
     PdlLeesahHendelseHåndterer() {
         // CDI
@@ -58,13 +57,11 @@ public class PdlLeesahHendelseHåndterer {
     public PdlLeesahHendelseHåndterer(HendelseRepository hendelseRepository,
                                       PdlLeesahOversetter pdlLeesahOversetter,
                                       ProsessTaskRepository prosessTaskRepository,
-                                      TpsForsinkelseTjeneste tpsForsinkelseTjeneste,
-                                      PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste) {
+                                      TpsForsinkelseTjeneste tpsForsinkelseTjeneste) {
         this.hendelseRepository = hendelseRepository;
         this.oversetter = pdlLeesahOversetter;
         this.prosessTaskRepository = prosessTaskRepository;
         this.tpsForsinkelseTjeneste = tpsForsinkelseTjeneste;
-        this.pdlFeatureToggleTjeneste = pdlFeatureToggleTjeneste;
     }
 
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
@@ -152,19 +149,10 @@ public class PdlLeesahHendelseHåndterer {
 
     private void prosesserHendelseVidereHvisRelevant(PdlPersonhendelse personhendelse) {
         if (personhendelse.erRelevantForFpsak()) {
-            if (pdlFeatureToggleTjeneste.skalLagrePdl()) {
-                if (pdlFeatureToggleTjeneste.skalGrovsorterePdl()) {
-                    InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
-                    LocalDateTime håndteresEtterTidspunkt = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(personhendelse.getOpprettet(), inngåendeHendelse);
-                    hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, håndteresEtterTidspunkt);
-                    opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId(), håndteresEtterTidspunkt);
-                } else {
-                    LOG.info("Grovsortering av hendelseId={} er deaktivert i dette clusteret", personhendelse.getHendelseId());
-                    lagreInngåendeHendelse(personhendelse, HåndtertStatusType.HÅNDTERT);
-                }
-            } else {
-                LOG.info("Lagring av hendelseId={} er deaktivert i dette clusteret", personhendelse.getHendelseId());
-            }
+            InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
+            LocalDateTime håndteresEtterTidspunkt = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(personhendelse.getOpprettet(), inngåendeHendelse);
+            hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, håndteresEtterTidspunkt);
+            opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId(), håndteresEtterTidspunkt);
         } else {
             LOG.info("Ikke-relevant hendelseId={} filtrert bort", personhendelse.getHendelseId());
         }

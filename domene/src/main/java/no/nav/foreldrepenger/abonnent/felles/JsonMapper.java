@@ -51,7 +51,7 @@ public class JsonMapper {
 
     interface JsonMapperFeil extends DeklarerteFeil {
 
-        public static final JsonMapperFeil FACTORY = FeilFactory.create(JsonMapperFeil.class);
+        JsonMapperFeil FACTORY = FeilFactory.create(JsonMapperFeil.class);
 
         @TekniskFeil(feilkode = "F-528313", feilmelding = "Kunne ikke serialisere objekt til JSON", logLevel = LogLevel.WARN)
         Feil kunneIkkeSerialisereJson(JsonProcessingException cause);

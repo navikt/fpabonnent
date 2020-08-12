@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,7 +20,7 @@ public class HendelseRepositoryTest {
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"));
     }
-    private static final Long ID = 1000L;
+    private static final String HENDELSE_ID = "1000";
 
     @Rule
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
@@ -29,115 +28,17 @@ public class HendelseRepositoryTest {
     private HendelseRepository hendelseRepository = new HendelseRepository(repoRule.getEntityManager());
 
     @Test
-    public void skal_hente_alle_hendelser_som_er_klare_til_grovsortering_og_sortere_på_opprettet_tid() {
-        InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
-                .hendelseId("" + ID)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
-                .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .håndteresEtterTidspunkt(LocalDateTime.now().minusMinutes(2))
-                .build();
-        InngåendeHendelse hendelse2 = InngåendeHendelse.builder()
-                .hendelseId("" + ID + 1)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
-                .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(LocalDateTime.now().minusMinutes(1))
-                .build();
-        InngåendeHendelse hendelse3 = InngåendeHendelse.builder()
-                .hendelseId("" + ID + 2)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
-                .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(LocalDateTime.now().plusHours(2))
-                .build();
-        InngåendeHendelse hendelse4 = InngåendeHendelse.builder()
-                .hendelseId("" + ID + 3)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
-                .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(LocalDateTime.now().minusMinutes(2))
-                .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelse4);
-        hendelseRepository.lagreInngåendeHendelse(hendelse1);
-        hendelseRepository.lagreInngåendeHendelse(hendelse3);
-        hendelseRepository.lagreInngåendeHendelse(hendelse2);
-        repoRule.getEntityManager().flush();
-
-        List<InngåendeHendelse> hendelser = hendelseRepository.finnHendelserSomErKlareTilGrovsortering();
-        assertThat(hendelser).hasSize(2);
-        assertThat(hendelser).containsExactly(hendelse4, hendelse2);
-    }
-
-    @Test
-    public void skal_hente_alle_hendelser_som_ikke_er_håndterte_og_kommer_fra_tps_feed() {
-        InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
-                .hendelseId("" + ID)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
-                .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
-        InngåendeHendelse hendelse2 = InngåendeHendelse.builder()
-                .hendelseId("" + ID + 1)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
-                .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
-        InngåendeHendelse hendelse3 = InngåendeHendelse.builder()
-                .hendelseId("" + ID + 2)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
-                .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.SENDT_TIL_SORTERING)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
-        InngåendeHendelse hendelse4 = InngåendeHendelse.builder()
-                .hendelseId("" + ID + 3)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
-                .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelse1);
-        hendelseRepository.lagreInngåendeHendelse(hendelse2);
-        hendelseRepository.lagreInngåendeHendelse(hendelse3);
-        hendelseRepository.lagreInngåendeHendelse(hendelse4);
-        repoRule.getEntityManager().flush();
-
-        List<InngåendeHendelse> hendelser = hendelseRepository.finnAlleIkkeSorterteHendelserFraFeed(FeedKode.TPS);
-        assertThat(hendelser).hasSize(3);
-        assertThat(hendelser).containsExactly(hendelse3, hendelse2, hendelse4);
-    }
-
-    @Test
     public void skal_hente_payload_for_alle_hendelser_med_request_uuid_som_er_sendt_til_sortering() {
         // Arrange
-        InngåendeHendelse hendelse1 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(ID, "req_uuid",
+        InngåendeHendelse hendelse1 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID + "0", "req_uuid",
                 HåndtertStatusType.SENDT_TIL_SORTERING);
-        InngåendeHendelse hendelse2 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(ID + 1, "req_uuid",
+        InngåendeHendelse hendelse2 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID + "1", "req_uuid",
                 HåndtertStatusType.SENDT_TIL_SORTERING);
-        InngåendeHendelse hendelse3 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(ID + 2, "req_annen_uuid",
+        InngåendeHendelse hendelse3 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID + "2", "req_annen_uuid",
                 HåndtertStatusType.SENDT_TIL_SORTERING);
-        InngåendeHendelse hendelse4 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(ID + 3, "req_uuid",
+        InngåendeHendelse hendelse4 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID + "3", "req_uuid",
                 HåndtertStatusType.MOTTATT);
-        InngåendeHendelse hendelse5 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(ID + 4, "req_uuid",
+        InngåendeHendelse hendelse5 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID + "4", "req_uuid",
                 HåndtertStatusType.HÅNDTERT);
 
         hendelseRepository.lagreInngåendeHendelse(hendelse1);
@@ -157,39 +58,40 @@ public class HendelseRepositoryTest {
     }
 
     @Test
-    public void skal_returnere_hendelse_fra_tps_som_er_grovsortert() {
+    public void skal_returnere_hendelse_fra_PDL_som_er_grovsortert() {
+        // Arrange
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
-                .hendelseId("" + ID)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
+                .hendelseId(HENDELSE_ID)
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .payload("payload1")
-                .feedKode(FeedKode.TPS)
+                .feedKode(FeedKode.PDL)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.GROVSORTERT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         InngåendeHendelse hendelse2 = InngåendeHendelse.builder() // Feil feed
-                .hendelseId("" + ID)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
+                .hendelseId(HENDELSE_ID)
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .payload("payload2")
                 .feedKode(FeedKode.TPS)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.GROVSORTERT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
-        InngåendeHendelse hendelse3 = InngåendeHendelse.builder() // Feil sekvensnummer
-                .hendelseId("" + ID + 1)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
+        InngåendeHendelse hendelse3 = InngåendeHendelse.builder() // Feil hendelseId
+                .hendelseId(HENDELSE_ID + 1)
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .payload("payload3")
-                .feedKode(FeedKode.TPS)
+                .feedKode(FeedKode.PDL)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.GROVSORTERT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
-        InngåendeHendelse hendelse4 = InngåendeHendelse.builder() // Feil status
-                .hendelseId("" + ID)
-                .type(HendelseType.FØDSELSMELDINGOPPRETTET)
+        InngåendeHendelse hendelse4 = InngåendeHendelse.builder() // Feil håndtertStatus
+                .hendelseId(HENDELSE_ID)
+                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .payload("payload4")
-                .feedKode(FeedKode.TPS)
+                .feedKode(FeedKode.PDL)
                 .requestUuid("req_uuid")
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
@@ -200,57 +102,14 @@ public class HendelseRepositoryTest {
         hendelseRepository.lagreInngåendeHendelse(hendelse4);
         repoRule.getEntityManager().flush();
 
-        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(FeedKode.TPS, "" + ID);
-        assertThat(hendelse).isPresent();
-        assertThat(hendelse.get().getHendelseId()).isEqualTo("" + ID);
-        assertThat(hendelse.get().getFeedKode()).isEqualTo(FeedKode.TPS);
-        assertThat(hendelse.get().getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
-        assertThat(hendelse.get().getPayload()).isEqualTo("payload1");
-    }
-
-    @Test
-    public void skal_ikke_returnere_hendelser_som_er_HÅNDTERT_uten_å_være_sendt_til_FPSAK() {
-        // Arrange
-        InngåendeHendelse hendelse1 = InngåendeHendelse.builder() // Er ikke HÅNDTERT - OK
-                .hendelseId("A")
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload1")
-                .feedKode(FeedKode.PDL)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
-        InngåendeHendelse hendelse2 = InngåendeHendelse.builder() // Er HÅNDTERT uten SENDT - ikke OK
-                .hendelseId("B")
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload1")
-                .feedKode(FeedKode.PDL)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .sendtTidspunkt(null)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
-        InngåendeHendelse hendelse3 = InngåendeHendelse.builder() // Er HÅNDTERT med SENDT - OK
-                .hendelseId("C")
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload1")
-                .feedKode(FeedKode.PDL)
-                .requestUuid("req_uuid")
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .sendtTidspunkt(LocalDateTime.now())
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelse1);
-        hendelseRepository.lagreInngåendeHendelse(hendelse2);
-        hendelseRepository.lagreInngåendeHendelse(hendelse3);
-        repoRule.getEntityManager().flush();
-
         // Act
-        List<InngåendeHendelse> resultat = hendelseRepository.finnAlleHendelserFraSisteUkeAvType(HendelseType.PDL_FØDSEL_OPPRETTET, FeedKode.PDL);
+        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(FeedKode.PDL, HENDELSE_ID);
 
         // Assert
-        assertThat(resultat.size()).isEqualTo(2);
-        List<String> ider = resultat.stream().map(InngåendeHendelse::getHendelseId).collect(Collectors.toList());
-        assertThat(ider).containsExactly("A", "C");
+        assertThat(hendelse).isPresent();
+        assertThat(hendelse.get().getHendelseId()).isEqualTo(HENDELSE_ID);
+        assertThat(hendelse.get().getFeedKode()).isEqualTo(FeedKode.PDL);
+        assertThat(hendelse.get().getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
+        assertThat(hendelse.get().getPayload()).isEqualTo("payload1");
     }
 }

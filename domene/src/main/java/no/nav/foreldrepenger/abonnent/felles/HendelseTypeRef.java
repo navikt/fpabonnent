@@ -22,10 +22,6 @@ import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 @Documented
 public @interface HendelseTypeRef {
 
-    String FØDSELSMELDINGOPPRETTET = "FOEDSELSMELDINGOPPRETTET";
-    String DØDSMELDINGOPPRETTET = "DOEDSMELDINGOPPRETTET";
-    String DØDFØDSELOPPRETTET = "DOEDFOEDSELOPPRETTET";
-
     String PDL_FØDSEL_HENDELSE = "PDL_FØDSEL_HENDELSE";
     String PDL_DØD_HENDELSE = "PDL_DØD_HENDELSE";
     String PDL_DØDFØDSEL_HENDELSE = "PDL_DØDFØDSEL_HENDELSE";

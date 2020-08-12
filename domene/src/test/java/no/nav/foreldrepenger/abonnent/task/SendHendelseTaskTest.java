@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,23 +20,20 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
-import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
-import no.nav.foreldrepenger.abonnent.feed.domain.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.feed.tps.FødselsmeldingOpprettetHendelseTjeneste;
+import no.nav.foreldrepenger.abonnent.feed.domain.PdlFødselHendelsePayload;
+import no.nav.foreldrepenger.abonnent.feed.tps.PdlFødselHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseConsumer;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
-import no.nav.foreldrepenger.abonnent.pdl.PdlFeatureToggleTjeneste;
 import no.nav.foreldrepenger.abonnent.tjenester.InngåendeHendelseTjeneste;
-import no.nav.tjenester.person.feed.v2.Meldingstype;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 public class SendHendelseTaskTest {
 
-    private static final String FØDSELSMELDINGSTYPE = Meldingstype.FOEDSELSMELDINGOPPRETTET.name();
+    private static final HendelseType HENDELSE_TYPE = HendelseType.PDL_FØDSEL_OPPRETTET;
     private static final LocalDate FØDSELSDATO = LocalDate.parse("2018-01-01");
 
     @Rule
@@ -49,12 +47,12 @@ public class SendHendelseTaskTest {
     @Before
     public void setup() {
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
-        HendelseTjeneste fødselHendelseTjeneste = new FødselsmeldingOpprettetHendelseTjeneste();
-        when(hendelseTjenesteProvider.finnTjeneste(eq(HendelseType.FØDSELSMELDINGOPPRETTET), anyString())).thenReturn(fødselHendelseTjeneste);
+        HendelseTjeneste fødselHendelseTjeneste = new PdlFødselHendelseTjeneste();
+        when(hendelseTjenesteProvider.finnTjeneste(eq(HENDELSE_TYPE), anyString())).thenReturn(fødselHendelseTjeneste);
 
         mockHendelseConsumer = mock(HendelseConsumer.class);
         inngåendeHendelseTjeneste = mock(InngåendeHendelseTjeneste.class);
-        sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste, hendelseTjenesteProvider, new PdlFeatureToggleTjeneste(), mock(HendelseRepository.class));
+        sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste, hendelseTjenesteProvider);
 
         prosessTaskData = new ProsessTaskData(SendHendelseTask.TASKNAME);
         prosessTaskData.setSekvens("1");
@@ -66,13 +64,12 @@ public class SendHendelseTaskTest {
         HendelserDataWrapper hendelse = new HendelserDataWrapper(prosessTaskData);
         hendelse.setHendelseRequestUuid("req_uuid");
         hendelse.setHendelseId("1");
-        hendelse.setHendelseType(FØDSELSMELDINGSTYPE);
+        hendelse.setHendelseType(HENDELSE_TYPE.getKode());
         hendelse.setFødselsdato(FØDSELSDATO);
         hendelse.setAktørIdBarn(new HashSet<>(singletonList("1")));
-        hendelse.setAktørIdMor(new HashSet<>(singletonList("2")));
-        hendelse.setAktørIdFar(new HashSet<>(singletonList("3")));
+        hendelse.setAktørIdForeldre(Set.of("2", "3"));
 
-        ArgumentCaptor<FødselHendelsePayload> captor = ArgumentCaptor.forClass(FødselHendelsePayload.class);
+        ArgumentCaptor<PdlFødselHendelsePayload> captor = ArgumentCaptor.forClass(PdlFødselHendelsePayload.class);
 
         // Act
         sendHendelseTask.doTask(hendelse.getProsessTaskData());
@@ -81,13 +78,11 @@ public class SendHendelseTaskTest {
         verify(mockHendelseConsumer, times(1)).sendHendelse(captor.capture());
         verify(inngåendeHendelseTjeneste, times(1)).oppdaterHendelseSomSendtNå(captor.capture());
         assertThat(captor.getAllValues()).hasSize(2);
-        for (FødselHendelsePayload payload : captor.getAllValues()) {
+        for (PdlFødselHendelsePayload payload : captor.getAllValues()) {
             assertThat(payload.getHendelseId()).isEqualTo("1");
-            assertThat(payload.getType()).isEqualTo(FØDSELSMELDINGSTYPE);
-            assertThat(payload.getAktørIdMor()).isPresent();
-            assertThat(payload.getAktørIdMor().get()).contains("2");
-            assertThat(payload.getAktørIdFar()).isPresent();
-            assertThat(payload.getAktørIdFar().get()).contains("3");
+            assertThat(payload.getType()).isEqualTo(HENDELSE_TYPE.getKode());
+            assertThat(payload.getAktørIdForeldre()).isPresent();
+            assertThat(payload.getAktørIdForeldre().get()).containsExactlyInAnyOrder("2", "3");
             assertThat(payload.getFødselsdato()).isPresent().hasValue(FØDSELSDATO);
         }
     }
@@ -98,29 +93,27 @@ public class SendHendelseTaskTest {
         HendelserDataWrapper hendelse = new HendelserDataWrapper(prosessTaskData);
         hendelse.setHendelseRequestUuid("req_uuid");
         hendelse.setHendelseId("1");
-        hendelse.setHendelseType(FØDSELSMELDINGSTYPE);
+        hendelse.setHendelseType(HENDELSE_TYPE.getKode());
         hendelse.setFødselsdato(FØDSELSDATO);
         hendelse.setAktørIdBarn(new HashSet<>(asList("1","2")));
-        hendelse.setAktørIdMor(new HashSet<>(asList("3","4","5")));
-        hendelse.setAktørIdFar(new HashSet<>(asList("6","7")));
+        hendelse.setAktørIdForeldre(new HashSet<>(asList("3","4","5","6","7")));
 
-        ArgumentCaptor<FødselHendelsePayload> captor = ArgumentCaptor.forClass(FødselHendelsePayload.class);
+        ArgumentCaptor<PdlFødselHendelsePayload> captor = ArgumentCaptor.forClass(PdlFødselHendelsePayload.class);
 
         // Act
         sendHendelseTask.doTask(hendelse.getProsessTaskData());
 
         // Assert
         assertThat(hendelse.getProsessTaskData().getPropertyValue(HendelserDataWrapper.AKTØR_ID_BARN)).isEqualTo("1,2");
-        assertThat(hendelse.getProsessTaskData().getPropertyValue(HendelserDataWrapper.AKTØR_ID_MOR)).isEqualTo("3,4,5");
-        assertThat(hendelse.getProsessTaskData().getPropertyValue(HendelserDataWrapper.AKTØR_ID_FAR)).isEqualTo("6,7");
+        assertThat(hendelse.getProsessTaskData().getPropertyValue(HendelserDataWrapper.AKTØR_ID_FORELDRE)).isEqualTo("3,4,5,6,7");
         verify(mockHendelseConsumer, times(1)).sendHendelse(captor.capture());
-        FødselHendelsePayload payload = captor.getValue();
+        PdlFødselHendelsePayload payload = captor.getValue();
         assertThat(payload.getHendelseId()).isEqualTo("1");
-        assertThat(payload.getType()).isEqualTo(FØDSELSMELDINGSTYPE);
-        assertThat(payload.getAktørIdMor()).isPresent();
-        assertThat(payload.getAktørIdMor().get()).containsExactly("3","4","5");
-        assertThat(payload.getAktørIdFar()).isPresent();
-        assertThat(payload.getAktørIdFar().get()).containsExactly("6","7");
+        assertThat(payload.getType()).isEqualTo(HENDELSE_TYPE.getKode());
+        assertThat(payload.getAktørIdBarn()).isPresent();
+        assertThat(payload.getAktørIdBarn().get()).containsExactlyInAnyOrder("1", "2");
+        assertThat(payload.getAktørIdForeldre()).isPresent();
+        assertThat(payload.getAktørIdForeldre().get()).containsExactlyInAnyOrder("3", "4", "5", "6", "7");
         assertThat(payload.getFødselsdato()).isPresent().hasValue(FØDSELSDATO);
     }
 

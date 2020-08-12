@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
@@ -38,7 +37,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
         DødHendelseDto dto = new DødHendelseDto();
-        dto.setId(HendelseMapper.DØD_HENDELSE_TYPE + "_" + getHendelseId());
+        dto.setId(DødHendelseDto.HENDELSE_TYPE + "_" + getHendelseId());
         dto.setEndringstype(Endringstype.valueOf(endringstype));
         dto.setAktørId(finnAktørId(this));
         this.getDødsdato().ifPresent(dto::setDødsdato);

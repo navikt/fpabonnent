@@ -50,7 +50,7 @@ public class HendelseConsumerTest {
         baseEndpoint = new URI("/test");
         hendelseEndpoint = baseEndpoint.resolve("motta");
         grovsorterEndpoint = baseEndpoint.resolve("grovsorter");
-        consumer = new HendelseConsumer(oidcRestClient, baseEndpoint, new HendelseMapper());
+        consumer = new HendelseConsumer(oidcRestClient, baseEndpoint);
     }
 
     @Test
@@ -66,8 +66,8 @@ public class HendelseConsumerTest {
         if (hendelseDto instanceof FødselHendelseDto) {
             FødselHendelseDto fødselHendelseDto = (FødselHendelseDto) hendelseDto;
             assertThat(fødselHendelseDto.getFødselsdato()).isEqualTo(FØDSELSDATO);
-            assertThat(fødselHendelseDto.getHendelsetype()).isEqualTo(HendelseMapper.FØDSEL_HENDELSE_TYPE);
-            assertThat(fødselHendelseDto.getAktørIdForeldre()).containsExactly(new AktørIdDto(AKTØR_ID_FAR), new AktørIdDto(AKTØR_ID_MOR));
+            assertThat(fødselHendelseDto.getHendelsetype()).isEqualTo(FødselHendelseDto.HENDELSE_TYPE);
+            assertThat(fødselHendelseDto.getAktørIdForeldre()).containsExactlyInAnyOrder(new AktørIdDto(AKTØR_ID_FAR), new AktørIdDto(AKTØR_ID_MOR));
         }
     }
 

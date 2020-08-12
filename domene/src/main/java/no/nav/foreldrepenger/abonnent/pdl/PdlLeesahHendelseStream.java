@@ -23,23 +23,16 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
 
     private KafkaStreams stream;
     private Topic<String, Personhendelse> topic;
-    private PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste;
 
     PdlLeesahHendelseStream() {
     }
 
     @Inject
     public PdlLeesahHendelseStream(PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer,
-                                   PdlLeesahHendelseProperties pdlLeesahHendelseProperties,
-                                   PdlFeatureToggleTjeneste pdlFeatureToggleTjeneste) {
+                                   PdlLeesahHendelseProperties pdlLeesahHendelseProperties) {
         this.topic = pdlLeesahHendelseProperties.getTopic();
-        if (pdlFeatureToggleTjeneste.skalKonsumerePdl()) {
-            LOG.info("Starter konsumering av PDL Kafka topic");
-            this.stream = createKafkaStreams(topic, pdlLeesahHendelseHåndterer, pdlLeesahHendelseProperties);
-        } else {
-            LOG.info("Starter ikke konsumering av PDL Kafka topic");
-        }
-        this.pdlFeatureToggleTjeneste = pdlFeatureToggleTjeneste;
+        LOG.info("Starter konsumering av PDL Kafka topic");
+        this.stream = createKafkaStreams(topic, pdlLeesahHendelseHåndterer, pdlLeesahHendelseProperties);
     }
 
     @SuppressWarnings("resource")
@@ -82,11 +75,9 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
 
     @Override
     public void start() {
-        if (pdlFeatureToggleTjeneste.skalKonsumerePdl()) {
-            addShutdownHooks();
-            stream.start();
-            LOG.info("Starter konsumering av topic={}, tilstand={}", getTopicName(), stream.state());
-        }
+        addShutdownHooks();
+        stream.start();
+        LOG.info("Starter konsumering av topic={}, tilstand={}", getTopicName(), stream.state());
     }
 
     public KafkaStreams.State getTilstand() {
