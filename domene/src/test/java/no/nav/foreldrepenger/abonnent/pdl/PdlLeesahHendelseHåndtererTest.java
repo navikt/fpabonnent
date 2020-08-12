@@ -44,7 +44,7 @@ public class PdlLeesahHendelseHåndtererTest {
         prosessTaskRepository = mock(ProsessTaskRepository.class);
         tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste();
 
-        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskRepository, tpsForsinkelseTjeneste, new PdlFeatureToggleTjeneste());
+        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskRepository, tpsForsinkelseTjeneste);
     }
 
     @Test

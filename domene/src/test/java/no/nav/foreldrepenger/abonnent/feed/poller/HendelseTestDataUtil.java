@@ -1,94 +1,81 @@
 package no.nav.foreldrepenger.abonnent.feed.poller;
 
 import static java.util.Collections.singletonList;
-import static java.util.Set.of;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
-import no.nav.foreldrepenger.abonnent.feed.domain.FødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.feed.domain.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.feed.tps.TpsHendelseHjelper;
+import no.nav.foreldrepenger.abonnent.feed.domain.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HendelseType;
 import no.nav.foreldrepenger.abonnent.kodeverdi.HåndtertStatusType;
-import no.nav.tjenester.person.feed.common.v1.FeedEntry;
-import no.nav.tjenester.person.feed.v2.Ident;
-import no.nav.tjenester.person.feed.v2.foedselsmelding.FoedselsmeldingOpprettet;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PdlEndringstype;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PdlFødsel;
 
 public class HendelseTestDataUtil {
 
-    private static final HendelseType MELDINGSTYPE = HendelseType.FØDSELSMELDINGOPPRETTET;
-    public static final Long SEKVENSNUMMER = 1L;
+    public static final HendelseType MELDINGSTYPE = HendelseType.PDL_FØDSEL_OPPRETTET;
+    public static final String HENDELSE_ID = UUID.randomUUID().toString();
     public static final LocalDate FØDSELSDATO = LocalDate.of(2018, 1,30);
     public static final String AKTØR_ID_BARN = "1678462152535";
     public static final String AKTØR_ID_MOR = "1678462152536";
     public static final String AKTØR_ID_FAR = "1678462152537";
 
-    public static FeedEntry lagFødselsmelding() {
-        FoedselsmeldingOpprettet fodsel = new FoedselsmeldingOpprettet();
-        fodsel.setFoedselsdato(FØDSELSDATO);
-        fodsel.setPersonIdenterBarn(of(lagAktørIdIdent(AKTØR_ID_BARN)));
-        fodsel.setPersonIdenterMor(of(lagAktørIdIdent(AKTØR_ID_MOR)));
-        fodsel.setPersonIdenterFar(of(lagAktørIdIdent(AKTØR_ID_FAR)));
+    public static PdlFødsel lagFødselsmelding() {
+        PdlFødsel.Builder fødsel = new PdlFødsel.Builder();
+        fødsel.medHendelseId(HENDELSE_ID);
+        fødsel.medHendelseType(MELDINGSTYPE);
+        fødsel.medEndringstype(PdlEndringstype.OPPRETTET);
+        fødsel.medFødselsdato(FØDSELSDATO);
+        fødsel.leggTilPersonident(AKTØR_ID_BARN);
 
-        return FeedEntry.builder()
-                .type(MELDINGSTYPE.getKode())
-                .sequence(SEKVENSNUMMER)
-                .content(fodsel)
-                .build();
+        PdlFødsel pdlFødsel = fødsel.build();
+        pdlFødsel.setAktørIdForeldre(Set.of(AKTØR_ID_MOR, AKTØR_ID_FAR));
+
+        return pdlFødsel;
     }
 
-    public static FeedEntry lagFødselsmelding(Set<Ident> aktørIdBarn, Set<Ident> aktørIdMor, Set<Ident> aktørIdFar, LocalDate fødselsDato) {
-        FoedselsmeldingOpprettet fodsel = new FoedselsmeldingOpprettet();
-        fodsel.setFoedselsdato(fødselsDato);
-        fodsel.setPersonIdenterBarn(aktørIdBarn);
-        fodsel.setPersonIdenterMor(aktørIdMor);
-        fodsel.setPersonIdenterFar(aktørIdFar);
-
-        return FeedEntry.builder()
-                .type(MELDINGSTYPE.getKode())
-                .sequence(SEKVENSNUMMER)
-                .content(fodsel)
-                .build();
+    public static PdlFødsel lagFødselsmelding(Set<String> aktørIdBarn, Set<String> aktørIdForeldre, LocalDate fødselsdato) {
+        return lagFødselsmelding(HENDELSE_ID, aktørIdBarn, aktørIdForeldre, fødselsdato);
     }
 
-    public static FødselHendelsePayload lagFødselsHendelsePayload() {
-        FødselHendelsePayload.Builder builder = new FødselHendelsePayload.Builder();
+    public static PdlFødsel lagFødselsmelding(String hendelseId, Set<String> aktørIdBarn, Set<String> aktørIdForeldre, LocalDate fødselsdato) {
+        PdlFødsel.Builder fødsel = new PdlFødsel.Builder();
+        fødsel.medHendelseId(hendelseId);
+        fødsel.medHendelseType(MELDINGSTYPE);
+        fødsel.medEndringstype(PdlEndringstype.OPPRETTET);
+        fødsel.medFødselsdato(fødselsdato);
+        aktørIdBarn.stream().forEach(fødsel::leggTilPersonident);
+
+        PdlFødsel pdlFødsel = fødsel.build();
+        pdlFødsel.setAktørIdForeldre(aktørIdForeldre);
+
+        return pdlFødsel;
+    }
+
+    public static PdlFødselHendelsePayload lagFødselsHendelsePayload() {
+        PdlFødselHendelsePayload.Builder builder = new PdlFødselHendelsePayload.Builder();
         return builder
-                .hendelseId("" + SEKVENSNUMMER)
+                .hendelseId(HENDELSE_ID)
                 .type(MELDINGSTYPE.getKode())
+                .endringstype("OPPRETTET")
                 .aktørIdBarn(new HashSet<>(singletonList(AKTØR_ID_BARN)))
-                .aktørIdMor(new HashSet<>(singletonList(AKTØR_ID_MOR)))
-                .aktørIdFar(new HashSet<>(singletonList(AKTØR_ID_FAR)))
+                .aktørIdForeldre(Set.of(AKTØR_ID_MOR, AKTØR_ID_FAR))
                 .fødselsdato(FØDSELSDATO)
                 .build();
     }
 
-    public static InngåendeHendelse lagInngåendeFødselsHendelse(long id, String uuid, HåndtertStatusType håndtertStatus) {
+    public static InngåendeHendelse lagInngåendeFødselsHendelse(String hendelseId, String requestUuid, HåndtertStatusType håndtertStatus) {
         return InngåendeHendelse.builder()
-                .hendelseId("" + id)
+                .hendelseId(hendelseId)
                 .type(MELDINGSTYPE)
                 .payload("payload")
-                .feedKode(FeedKode.TPS)
-                .requestUuid(uuid)
+                .feedKode(FeedKode.PDL)
+                .requestUuid(requestUuid)
                 .håndtertStatus(håndtertStatus)
                 .build();
-    }
-
-    public static Ident lagFnrIdent(String fnr) {
-        if (Objects.isNull(fnr)) {
-            return null;
-        }
-        return new Ident(fnr, TpsHendelseHjelper.FNR_IDENT_TYPE);
-    }
-
-    public static Ident lagAktørIdIdent(String aktørId) {
-        if (Objects.isNull(aktørId)) {
-            return null;
-        }
-        return new Ident(aktørId, TpsHendelseHjelper.AKTØR_ID_IDENT_TYPE);
     }
 }

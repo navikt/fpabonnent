@@ -23,7 +23,6 @@ public class HendelseConsumer {
     private static final String GROVSORTER_HENDELSE_PATH = "grovsorter";
 
     private OidcRestClient oidcRestClient;
-    private HendelseMapper hendelseMapper;
     private URI baseEndpoint;
     private URI sendHendelseEndpoint;
     private URI grovsorterEndpoint;
@@ -33,18 +32,16 @@ public class HendelseConsumer {
     }
 
     @Inject
-    public HendelseConsumer(OidcRestClient oidcRestClient, @KonfigVerdi(HENDELSE_BASE_ENDPOINT) URI baseEndpoint,
-                            HendelseMapper hendelseMapper) {
+    public HendelseConsumer(OidcRestClient oidcRestClient, @KonfigVerdi(HENDELSE_BASE_ENDPOINT) URI baseEndpoint) {
         this.oidcRestClient = oidcRestClient;
         this.baseEndpoint = baseEndpoint;
-        this.hendelseMapper = hendelseMapper;
         sendHendelseEndpoint = this.baseEndpoint.resolve(SEND_HENDELSE_PATH);
         grovsorterEndpoint = this.baseEndpoint.resolve(GROVSORTER_HENDELSE_PATH);
     }
 
     public void sendHendelse(HendelsePayload hendelsePayload) {
         Objects.requireNonNull(hendelsePayload, SEND_HENDELSE_PATH); //$NON-NLS-1$
-        HendelseWrapperDto hendelseWrapperDto = hendelseMapper.map(hendelsePayload);
+        HendelseWrapperDto hendelseWrapperDto = hendelsePayload.mapPayloadTilDto();
         oidcRestClient.post(sendHendelseEndpoint, hendelseWrapperDto);
     }
 

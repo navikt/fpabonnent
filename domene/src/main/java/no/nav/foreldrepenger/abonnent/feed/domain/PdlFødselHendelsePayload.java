@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseMapper;
 import no.nav.foreldrepenger.abonnent.kodeverdi.FeedKode;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
@@ -39,7 +38,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
         FødselHendelseDto dto = new FødselHendelseDto();
-        dto.setId(HendelseMapper.FØDSEL_HENDELSE_TYPE + "_" + getHendelseId());
+        dto.setId(FødselHendelseDto.HENDELSE_TYPE + "_" + getHendelseId());
         dto.setEndringstype(Endringstype.valueOf(endringstype));
         this.getFødselsdato().ifPresent(dto::setFødselsdato);
         this.getAktørIdForeldre().ifPresent(foreldre -> dto.setAktørIdForeldre(foreldre.stream().map(AktørIdDto::new).collect(Collectors.toList())));

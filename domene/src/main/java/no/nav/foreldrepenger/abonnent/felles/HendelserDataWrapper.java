@@ -22,8 +22,6 @@ public class HendelserDataWrapper {
     public static final String INNGÅENDE_HENDELSE_ID = "hendelse.ihId";
     public static final String HENDELSE_TYPE = "hendelse.type";
     private static final String ENDRINGSTYPE = "hendelse.endringstype";
-    public static final String AKTØR_ID_MOR = "hendelse.aktoerIdMor";
-    public static final String AKTØR_ID_FAR = "hendelse.aktoerIdFar";
     public static final String AKTØR_ID_FORELDRE = "hendelse.aktoerIdForeldre";
     public static final String AKTØR_ID_BARN = "hendelse.aktoerIdBarn";
     private static final String FØDSELSDATO = "hendelse.foedselsdato";
@@ -129,22 +127,6 @@ public class HendelserDataWrapper {
 
     public void setEndringstype(String endringstype) {
         prosessTaskData.setProperty(ENDRINGSTYPE, endringstype);
-    }
-
-    public Optional<Set<String>> getAktørIdMor() {
-        return getKommaseparertPropertySomSet(AKTØR_ID_MOR);
-    }
-
-    public void setAktørIdMor(Set<String> aktørId) {
-        setKommaseparertPropertyFraSet(AKTØR_ID_MOR, aktørId);
-    }
-
-    public Optional<Set<String>> getAktørIdFar() {
-        return getKommaseparertPropertySomSet(AKTØR_ID_FAR);
-    }
-
-    public void setAktørIdFar(Set<String> aktørId) {
-        setKommaseparertPropertyFraSet(AKTØR_ID_FAR, aktørId);
     }
 
     public Optional<Set<String>> getAktørIdForeldre() {

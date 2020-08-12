@@ -16,8 +16,8 @@ public class AktørIdTjenesteTest {
     @Test
     public void skal_bare_returnere_gyldige_aktørIder() {
         // Arrange
-        HendelsePayload gyldig = new FødselHendelsePayload.Builder().aktørIdMor(Set.of(GYLDIG)).build();
-        HendelsePayload ugyldig = new FødselHendelsePayload.Builder().aktørIdMor(Set.of(UGYLDIG)).build();
+        HendelsePayload gyldig = new PdlFødselHendelsePayload.Builder().aktørIdForeldre(Set.of(GYLDIG)).build();
+        HendelsePayload ugyldig = new PdlFødselHendelsePayload.Builder().aktørIdForeldre(Set.of(UGYLDIG)).build();
 
         List<HendelsePayload> hendelser = asList(gyldig, ugyldig);
 

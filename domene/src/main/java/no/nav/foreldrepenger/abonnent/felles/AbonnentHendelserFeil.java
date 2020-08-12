@@ -15,9 +15,6 @@ public interface AbonnentHendelserFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FP-690327", feilmelding = "Prosessering av preconditions for %s mangler %s. TaskId: %s", logLevel = WARN)
     Feil prosesstaskPreconditionManglerProperty(String taskname, String property, Long taskId);
     
-    @TekniskFeil(feilkode = "FP-730005", feilmelding = "Kan ikke konvertere feed-content. type=%s, sekvensnummer=%s", logLevel = LogLevel.ERROR)
-    Feil kanIkkeKonvertereFeedContent(String type, long sekvensnummer);
-    
     @TekniskFeil(feilkode = "FP-309345", feilmelding = "Ukjent meldingstype - kan ikke finne hendelsestjeneste. type=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
     Feil ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(String type, String hendelseId);
 

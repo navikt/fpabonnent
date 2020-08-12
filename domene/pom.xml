@@ -47,16 +47,6 @@
             <artifactId>person-klient</artifactId>
         </dependency>
 
-        <!-- NAV -->
-        <dependency>
-            <groupId>no.nav.tjenester</groupId>
-            <artifactId>person-api-feed-common-v1</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenester</groupId>
-            <artifactId>person-api-feed-v2</artifactId>
-        </dependency>
-
         <!-- Eksterne -->
         <dependency>
             <groupId>javax.jms</groupId>

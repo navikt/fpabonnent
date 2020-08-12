@@ -28,10 +28,6 @@
         <prosesstask.version>2.4.2-20200703105213-95d753a</prosesstask.version>
         <fp-kontrakter.version>5.1-20200810151031-853914b</fp-kontrakter.version>
 
-        <!-- Eksterne tjenestekontrakter -->
-        <person-api-feed.version>1.1.0</person-api-feed.version>
-        <person-api-feed-common.version>1.0.1</person-api-feed-common.version>
-
         <!-- Eksterne -->
         <assertj.version>3.16.1</assertj.version>
         <flyway.version>4.2.0</flyway.version>
@@ -170,17 +166,6 @@
                         <artifactId>hibernate-validator</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>no.nav.tjenester</groupId>
-                <artifactId>person-api-feed-v2</artifactId>
-                <version>${person-api-feed.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.tjenester</groupId>
-                <artifactId>person-api-feed-common-v1</artifactId>
-                <version>${person-api-feed-common.version}</version>
             </dependency>
 
             <!-- Eksterne -->

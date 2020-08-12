@@ -17,11 +17,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HendelseType implements Kodeverdi {
 
-    FØDSELSMELDINGOPPRETTET("FOEDSELSMELDINGOPPRETTET"),
-    DØDSMELDINGOPPRETTET("DOEDSMELDINGOPPRETTET"),
-    DØDFØDSELOPPRETTET("DOEDFOEDSELOPPRETTET"),
-
     // Ikke lengre støttet, men beholdes så lenge det finnes data i tabeller:
+    @Deprecated
+    FØDSELSMELDINGOPPRETTET("FOEDSELSMELDINGOPPRETTET"),
+    @Deprecated
+    DØDSMELDINGOPPRETTET("DOEDSMELDINGOPPRETTET"),
+    @Deprecated
+    DØDFØDSELOPPRETTET("DOEDFOEDSELOPPRETTET"),
     @Deprecated
     OPPHØERT("OPPHOERT_v1"),
     @Deprecated
