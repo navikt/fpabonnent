@@ -75,11 +75,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.abonnent</groupId>
-                <artifactId>feedpoller</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.abonnent</groupId>
                 <artifactId>migreringer</artifactId>
                 <version>${project.version}</version>
             </dependency>

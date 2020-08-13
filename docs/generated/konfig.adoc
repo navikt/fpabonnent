@@ -10,7 +10,7 @@
 |person-feed-v2.url|URL til Person-feed|no.nav.foreldrepenger.abonnent.feed.tps.TpsFeedPoller
 |feed.pagesize.value|Antall hendelser som leses hver gang en feed polles|no.nav.foreldrepenger.abonnent.feed.tps.TpsFeedPoller
 |personfeed.polling.aktivert|Angir om Person-feed vil polles for hendelser (true/false)|no.nav.foreldrepenger.abonnent.feed.tps.TpsFeedPoller
-|fpsakhendelser.v1.url|URL til FPSAK der det sjekkes om hendelser er relevante, og hvis så blir sendt|no.nav.foreldrepenger.abonnent.fpsak.consumer.HendelseConsumer
+|fpsakhendelser.v1.url|URL til FPSAK der det sjekkes om hendelser er relevante, og hvis så blir sendt|no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer
 |infotrygd.hendelser.api.url|URL til Infotrygd-feed|no.nav.foreldrepenger.abonnent.selftest.InfotrygdFeedSelftestConsumerImpl
 |person-feed-v2.url|URL til Person-feed|no.nav.foreldrepenger.abonnent.selftest.TpsFeedSelftestConsumerImpl
 |application.name|Applikasjonens navn|no.nav.foreldrepenger.abonnent.web.app.selftest.Selftests

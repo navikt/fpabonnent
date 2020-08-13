@@ -5,7 +5,7 @@
 ====
 .Konfigurasjon
 * *Kode:* hendelser.sendHendelse
-* *Klasse:* no.nav.foreldrepenger.abonnent.task.SendHendelseTask
+* *Klasse:* no.nav.foreldrepenger.abonnent.felles.task.SendHendelseTask
 * *Feilhåndteringalgoritme:* Eksponentiell back-off med tak
 * *Maks forsøk:* 3
 ====
@@ -15,7 +15,7 @@
 ====
 .Konfigurasjon
 * *Kode:* hendelser.grovsorter
-* *Klasse:* no.nav.foreldrepenger.abonnent.task.SorterHendelserTask
+* *Klasse:* no.nav.foreldrepenger.abonnent.felles.task.SorterHendelserTask
 * *Feilhåndteringalgoritme:* Eksponentiell back-off med tak
 * *Maks forsøk:* 3
 ====
