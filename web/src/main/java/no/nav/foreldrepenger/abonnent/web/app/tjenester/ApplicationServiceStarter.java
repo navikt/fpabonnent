@@ -15,8 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.hotspot.DefaultExports;
-import no.nav.foreldrepenger.abonnent.felles.RequestContextHandler;
-import no.nav.foreldrepenger.abonnent.pdl.KafkaIntegration;
+import no.nav.foreldrepenger.abonnent.pdl.kafka.KafkaIntegration;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 
 /**

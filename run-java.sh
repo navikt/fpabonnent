@@ -24,4 +24,4 @@ export STARTUP_CLASS=${STARTUP_CLASS:-"no.nav.foreldrepenger.abonnent.web.server
 export LOGBACK_CONFIG=${LOGBACK_CONFIG:-"./conf/logback.xml"}
 export CLASSPATH="app.jar:lib/*"
 
-exec java -cp ${CLASSPATH?} ${DEFAULT_JAVA_OPTS:-} ${JAVA_OPTS} -Dlogback.configurationFile=${LOGBACK_CONFIG?} -Dwebapp=${WEBAPP:-"./webapp"} -Dapplication.name=FPABONNENT -Dfeed.pagesize.value=${FEED_PAGESIZE:-"1000"} ${STARTUP_CLASS?} ${SERVER_PORT:-8080} $@
+exec java -cp ${CLASSPATH?} ${DEFAULT_JAVA_OPTS:-} ${JAVA_OPTS} -Dlogback.configurationFile=${LOGBACK_CONFIG?} -Dwebapp=${WEBAPP:-"./webapp"} -Dapplication.name=FPABONNENT ${STARTUP_CLASS?} ${SERVER_PORT:-8080} $@

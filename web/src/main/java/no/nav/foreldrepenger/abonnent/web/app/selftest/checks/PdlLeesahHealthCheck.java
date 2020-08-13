@@ -5,7 +5,7 @@ import javax.inject.Inject;
 
 import org.apache.kafka.streams.KafkaStreams;
 
-import no.nav.foreldrepenger.abonnent.pdl.PdlLeesahHendelseStream;
+import no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahHendelseStream;
 
 @ApplicationScoped
 public class PdlLeesahHealthCheck extends ExtHealthCheck {

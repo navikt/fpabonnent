@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.abonnent.web.app.selftest.checks;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.abonnent.selftest.HendelseSelftestConsumer;
+import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseSelftestConsumer;
 
 @ApplicationScoped
 public class HendelserRestServiceHealthCheck extends WebServiceHealthCheck {
