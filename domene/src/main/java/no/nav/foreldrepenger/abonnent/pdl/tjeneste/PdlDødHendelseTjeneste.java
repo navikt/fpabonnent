@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
+import static java.util.Set.of;
 import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsHendelseHjelper.hentUtAktørIderFraString;
 import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsHendelseHjelper.optionalStringTilLocalDate;
 
@@ -87,24 +88,30 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
 
     @Override
     public boolean vurderOmHendelseKanForkastes(PdlDødHendelsePayload payload) {
-        if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && payload.getTidligereHendelseId() != null) {
-            return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, payload.getTidligereHendelseId());
+        Optional<InngåendeHendelse> tidligereHendelse = getTidligereHendelse(payload.getTidligereHendelseId());
+        if (of(PdlEndringstype.ANNULLERT.name(), PdlEndringstype.KORRIGERT.name()).contains(payload.getEndringstype())
+                && tidligereHendelse.isEmpty()) {
+            LOGGER.info("Hendelse {} vil bli forkastet da endringstypen er {}, uten at vi har mottatt tidligere hendelse {}",
+                    payload.getHendelseId(), payload.getEndringstype(), payload.getTidligereHendelseId());
+            return true;
+        } else if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && tidligereHendelse.isPresent()) {
+            return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, tidligereHendelse);
         }
         return false;
     }
 
-    private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(PdlDødHendelsePayload payload, String tidligereHendelseId) {
-        Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, FeedKode.PDL);
+    private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(PdlDødHendelsePayload payload, Optional<InngåendeHendelse> tidligereHendelse) {
         if (tidligereHendelse.isPresent() && tidligereHendelse.get().erSendtTilFpsak()) {
             boolean harSammeDato = payload.getDødsdato().isPresent() && payload.getDødsdato().equals(payloadFraString(tidligereHendelse.get().getPayload()).getDødsdato());
             if (harSammeDato) {
                 LOGGER.info("Hendelse {} vil bli forkastet da endringstypen er KORRIGERT, uten at dødsdatoen {} er endret siden hendelse {}, som er forrige hendelse som ble sendt til FPSAK",
-                        payload.getHendelseId(), payload.getDødsdato(), tidligereHendelseId);
+                        payload.getHendelseId(), payload.getDødsdato(), tidligereHendelse.get().getHendelseId());
             }
             return harSammeDato;
         } else if (tidligereHendelse.isPresent() && tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() != null) {
             // Gjøre sammenlikningen mot neste tidligere hendelse i stedet, i tilfelle den er sendt til Fpsak
-            return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, tidligereHendelse.get().getTidligereHendelseId());
+            Optional<InngåendeHendelse> nesteTidligereHendelse = getTidligereHendelse(tidligereHendelse.get().getTidligereHendelseId());
+            return nesteTidligereHendelse.isPresent() && sjekkOmHendelseHarSammeVerdiOgErSendt(payload, nesteTidligereHendelse);
         }
         return false;
     }
@@ -146,6 +153,12 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
             }
         }
         LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
+    }
+
+    private Optional<InngåendeHendelse> getTidligereHendelse(String tidligereHendelseId) {
+        return tidligereHendelseId != null ?
+                hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, FeedKode.PDL) :
+                Optional.empty();
     }
 
     private boolean harRegistrertDødsdato(Optional<Set<String>> aktørIder) {

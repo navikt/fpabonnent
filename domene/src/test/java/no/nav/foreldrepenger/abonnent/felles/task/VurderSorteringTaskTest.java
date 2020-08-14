@@ -31,6 +31,7 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
+import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
@@ -273,7 +274,7 @@ public class VurderSorteringTaskTest {
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
                 .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
-        InngåendeHendelse hendelseKorrigert1 = InngåendeHendelse.builder()
+        InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
                 .hendelseId("B")
                 .type(HendelseType.PDL_FØDSEL_KORRIGERT)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
@@ -283,11 +284,11 @@ public class VurderSorteringTaskTest {
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert1);
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert);
         repoRule.getEntityManager().flush();
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert1.getId());
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
         hendelserDataWrapper.setHendelseId("B");
 
@@ -298,7 +299,79 @@ public class VurderSorteringTaskTest {
         vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
 
         // Assert
-        InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert1.getId());
+        InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert.getId());
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+
+        verify(personTjeneste, times(0)).erRegistrert(any());
+        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
+    @Test
+    public void skal_ikke_grovsortere_korrigering_der_tidligere_fødselshendelse_ikke_finnes_i_vårt_system() {
+        // Arrange
+        InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
+                .hendelseId("B")
+                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .feedKode(FeedKode.PDL)
+                .sendtTidspunkt(null)
+                .requestUuid("2")
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+                .tidligereHendelseId("A")
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert);
+        repoRule.getEntityManager().flush();
+
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+        hendelserDataWrapper.setHendelseId("B");
+
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert.getId());
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+
+        verify(personTjeneste, times(0)).erRegistrert(any());
+        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
+    @Test
+    public void skal_ikke_grovsortere_annullering_der_tidligere_dødshendelse_ikke_finnes_i_vårt_system() {
+        // Arrange
+        InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
+                .hendelseId("B")
+                .type(HendelseType.PDL_DØD_ANNULLERT)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .feedKode(FeedKode.PDL)
+                .sendtTidspunkt(null)
+                .requestUuid("2")
+                .payload(JsonMapper.toJson(opprettDødAnnullert(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.ANNULLERT, "B", "A").build()))
+                .tidligereHendelseId("A")
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert);
+        repoRule.getEntityManager().flush();
+
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_DØD_ANNULLERT.getKode());
+        hendelserDataWrapper.setHendelseId("B");
+
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
 
         verify(personTjeneste, times(0)).erRegistrert(any());
@@ -378,5 +451,17 @@ public class VurderSorteringTaskTest {
         pdlFødsel.medOpprettet(opprettetTid);
         pdlFødsel.medTidligereHendelseId(tidligereHendelseID);
         return pdlFødsel;
+    }
+
+    private PdlDød.Builder opprettDødAnnullert(LocalDateTime opprettetTid, LocalDate dødsdato, PdlEndringstype endringstype, String hendelseId, String tidligereHendelseID) {
+        PdlDød.Builder pdlDød = PdlDød.builder();
+        pdlDød.medHendelseId(hendelseId);
+        pdlDød.medHendelseType(HendelseType.PDL_DØD_ANNULLERT);
+        pdlDød.medEndringstype(endringstype);
+        pdlDød.leggTilPersonident(AKTØR_ID_BARN);
+        pdlDød.medDødsdato(dødsdato);
+        pdlDød.medOpprettet(opprettetTid);
+        pdlDød.medTidligereHendelseId(tidligereHendelseID);
+        return pdlDød;
     }
 }
