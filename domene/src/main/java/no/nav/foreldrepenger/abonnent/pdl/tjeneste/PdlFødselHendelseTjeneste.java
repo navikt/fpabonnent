@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
+import static java.util.Set.of;
 import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsHendelseHjelper.hentUtAktørIderFraString;
 import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsHendelseHjelper.optionalStringTilLocalDate;
 
@@ -95,24 +96,31 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
             LOGGER.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet",
                     payload.getHendelseId(), payload.getFødselsdato().get());
             return true;
-        } else if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && payload.getTidligereHendelseId() != null) {
-            return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, payload.getTidligereHendelseId());
+        }
+        Optional<InngåendeHendelse> tidligereHendelse = getTidligereHendelse(payload.getTidligereHendelseId());
+        if (of(PdlEndringstype.ANNULLERT.name(), PdlEndringstype.KORRIGERT.name()).contains(payload.getEndringstype())
+                && tidligereHendelse.isEmpty()) {
+            LOGGER.info("Hendelse {} vil bli forkastet da endringstypen er {}, uten at vi har mottatt tidligere hendelse {}",
+                    payload.getHendelseId(), payload.getEndringstype(), payload.getTidligereHendelseId());
+            return true;
+        } else if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && tidligereHendelse.isPresent()) {
+            return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, tidligereHendelse);
         }
         return false;
     }
 
-    private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(PdlFødselHendelsePayload payload, String tidligereHendelseId) {
-        Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, FeedKode.PDL);
+    private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(PdlFødselHendelsePayload payload, Optional<InngåendeHendelse> tidligereHendelse) {
         if (tidligereHendelse.isPresent() && tidligereHendelse.get().erSendtTilFpsak()) {
             boolean harSammeDato = payload.getFødselsdato().isPresent() && payload.getFødselsdato().equals(payloadFraString(tidligereHendelse.get().getPayload()).getFødselsdato());
             if (harSammeDato) {
                 LOGGER.info("Hendelse {} vil bli forkastet da endringstypen er KORRIGERT, uten at fødselsdatoen {} er endret siden hendelse {}, som er forrige hendelse som ble sendt til FPSAK",
-                        payload.getHendelseId(), payload.getFødselsdato(), tidligereHendelseId);
+                        payload.getHendelseId(), payload.getFødselsdato(), tidligereHendelse.get().getHendelseId());
             }
             return harSammeDato;
         } else if (tidligereHendelse.isPresent() && tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() != null) {
             // Gjøre sammenlikningen mot neste tidligere hendelse i stedet, i tilfelle den er sendt til Fpsak
-            return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, tidligereHendelse.get().getTidligereHendelseId());
+            Optional<InngåendeHendelse> nesteTidligereHendelse = getTidligereHendelse(tidligereHendelse.get().getTidligereHendelseId());
+            return nesteTidligereHendelse.isPresent() && sjekkOmHendelseHarSammeVerdiOgErSendt(payload, nesteTidligereHendelse);
         }
         return false;
     }
@@ -166,6 +174,12 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
         } else {
             LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
         }
+    }
+
+    private Optional<InngåendeHendelse> getTidligereHendelse(String tidligereHendelseId) {
+        return tidligereHendelseId != null ?
+                hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, FeedKode.PDL) :
+                Optional.empty();
     }
 
     private Set<AktørId> getForeldre(PdlFødselHendelsePayload payload) {
