@@ -11,7 +11,7 @@ public abstract class HendelsePayload {
 
     protected String tidligereHendelseId;
 
-    protected String type;
+    protected String hendelseType;
 
     protected String endringstype;
 
@@ -28,8 +28,8 @@ public abstract class HendelsePayload {
         return tidligereHendelseId;
     }
 
-    public String getType() {
-        return type;
+    public String getHendelseType() {
+        return hendelseType;
     }
 
     public String getEndringstype() {
@@ -44,7 +44,5 @@ public abstract class HendelsePayload {
 
     public abstract HendelseWrapperDto mapPayloadTilDto();
 
-    public abstract boolean erAtomisk();
-
-    public abstract FeedKode getFeedKode();
+    public abstract HendelseKilde getHendelseKilde();
 }

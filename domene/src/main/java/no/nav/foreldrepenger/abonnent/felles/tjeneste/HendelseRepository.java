@@ -13,7 +13,7 @@ import javax.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 
@@ -34,8 +34,7 @@ public class HendelseRepository {
     private static final String SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT = "order by opprettetTidspunkt asc"; //$NON-NLS-1$
 
     private static final String HÅNDTERT_STATUS = "håndtertStatus";
-    private static final String FEED_KODE = "feedKode";
-    private static final String REQUEST_UUID = "requestUuid";
+    private static final String HENDELSE_KILDE = "hendelseKilde";
     private static final String HENDELSE_ID = "hendelseId";
 
     private EntityManager entityManager;
@@ -50,30 +49,33 @@ public class HendelseRepository {
         this.entityManager = entityManager;
     }
 
-    public List<InngåendeHendelse> finnHendelserSomErSendtTilSorteringMedRequestUUID(String requestUUID) {
-        TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
-                "from InngåendeHendelse where requestUuid = :requestUuid " + //$NON-NLS-1$
-                        "and håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
-                        SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
-        query.setParameter(REQUEST_UUID, requestUUID);
-        query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.SENDT_TIL_SORTERING);
-        return query.getResultList();
-    }
-
     public InngåendeHendelse finnEksaktHendelse(Long inngåendeHendelseId) {
         return entityManager.find(InngåendeHendelse.class, inngåendeHendelseId);
     }
 
-    public Optional<InngåendeHendelse> finnHendelseFraIdHvisFinnes(String hendelseId, FeedKode feedKode) {
+    public Optional<InngåendeHendelse> finnHendelseSomErSendtTilSortering(String hendelseId) {
         TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
-                "from InngåendeHendelse where feedKode = :feedKode " + //$NON-NLS-1$
-                        "and hendelseId = :hendelseId ", InngåendeHendelse.class); //$NON-NLS-1$
-        query.setParameter(FEED_KODE, feedKode);
+                "from InngåendeHendelse where hendelseId = :hendelseId " + //$NON-NLS-1$
+                        "and håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
+                        SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
         query.setParameter(HENDELSE_ID, hendelseId);
+        query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.SENDT_TIL_SORTERING);
+        return queryTilOptional(hendelseId, query);
+    }
 
+    public Optional<InngåendeHendelse> finnHendelseFraIdHvisFinnes(String hendelseId, HendelseKilde hendelseKilde) {
+        TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
+                "from InngåendeHendelse where hendelseKilde = :hendelseKilde " + //$NON-NLS-1$
+                        "and hendelseId = :hendelseId ", InngåendeHendelse.class); //$NON-NLS-1$
+        query.setParameter(HENDELSE_KILDE, hendelseKilde);
+        query.setParameter(HENDELSE_ID, hendelseId);
+        return queryTilOptional(hendelseId, query);
+    }
+
+    private Optional<InngåendeHendelse> queryTilOptional(String hendelseId, TypedQuery<InngåendeHendelse> query) {
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelse(feedKode.getKode(), hendelseId).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelse(hendelseId).getFeilmelding());
         } else if (resultater.isEmpty()) {
             return Optional.empty();
         }
@@ -100,21 +102,21 @@ public class HendelseRepository {
         inngåendeHendelse.setSendtTidspunkt(LocalDateTime.now());
     }
 
-    public Optional<InngåendeHendelse> finnGrovsortertHendelse(FeedKode feedKode, String hendelseId) {
+    public Optional<InngåendeHendelse> finnGrovsortertHendelse(HendelseKilde hendelseKilde, String hendelseId) {
         TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
-                "from InngåendeHendelse where feedKode = :feedKode " + //$NON-NLS-1$
+                "from InngåendeHendelse where hendelseKilde = :hendelseKilde " + //$NON-NLS-1$
                         "and hendelseId = :hendelseId " + //$NON-NLS-1$
                         "and håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
                         SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
-        query.setParameter(FEED_KODE, feedKode);
+        query.setParameter(HENDELSE_KILDE, hendelseKilde);
         query.setParameter(HENDELSE_ID, hendelseId);
         query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.GROVSORTERT);
 
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelseMedStatus(feedKode.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelseMedStatus(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
         } else if (resultater.isEmpty()) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantIkkeHendelse(feedKode.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantIkkeHendelse(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
             return Optional.empty();
         }
         return Optional.of(resultater.get(0));

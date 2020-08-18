@@ -26,21 +26,18 @@ public class InngåendeHendelse extends BaseEntitet {
     @Column(name = "tidligere_hendelse_id")
     private String tidligereHendelseId;
 
-    @Convert(converter = FeedKode.KodeverdiConverter.class)
-    @Column(name="feed_kode", nullable = false)
-    private FeedKode feedKode;
+    @Convert(converter = HendelseKilde.KodeverdiConverter.class)
+    @Column(name="kilde", nullable = false)
+    private HendelseKilde hendelseKilde;
 
     @Convert(converter = HendelseType.KodeverdiConverter.class)
     @Column(name="type", nullable = false)
-    private HendelseType type;
+    private HendelseType hendelseType;
 
     @Lob
     @Column(name = "payload")
     private String payload;
     
-    @Column(name = "REQUEST_UUID")
-    private String requestUuid;
-
     @Column(name = "haandteres_etter")
     private LocalDateTime håndteresEtterTidspunkt;
 
@@ -59,10 +56,9 @@ public class InngåendeHendelse extends BaseEntitet {
         this.id = builder.id;
         this.hendelseId = builder.hendelseId;
         this.tidligereHendelseId = builder.tidligereHendelseId;
-        this.feedKode = builder.feedKode;
-        this.type = builder.type;
+        this.hendelseKilde = builder.hendelseKilde;
+        this.hendelseType = builder.hendelseType;
         this.payload = builder.payload;
-        this.requestUuid = builder.requestUuid;
         this.håndteresEtterTidspunkt = builder.håndteresEtterTidspunkt;
         this.håndtertStatus = builder.håndtertStatus;
         this.sendtTidspunkt = builder.sendtTidspunkt;
@@ -80,21 +76,17 @@ public class InngåendeHendelse extends BaseEntitet {
         return tidligereHendelseId;
     }
 
-    public FeedKode getFeedKode() {
-        return feedKode;
+    public HendelseKilde getHendelseKilde() {
+        return hendelseKilde;
     }
 
-    public HendelseType getType() {
-        return type;
+    public HendelseType getHendelseType() {
+        return hendelseType;
     }
 
     public String getPayload() {
         return payload;
     }   
-
-    public String getRequestUuid() {
-        return requestUuid;
-    }
 
     public LocalDateTime getHåndteresEtterTidspunkt() {
         return håndteresEtterTidspunkt;
@@ -136,10 +128,9 @@ public class InngåendeHendelse extends BaseEntitet {
         private Long id;
         private String hendelseId;
         private String tidligereHendelseId;
-        private FeedKode feedKode;
-        private HendelseType type;
+        private HendelseKilde hendelseKilde;
+        private HendelseType hendelseType;
         private String payload;
-        private String requestUuid;
         private LocalDateTime håndteresEtterTidspunkt;
         private HåndtertStatusType håndtertStatus;
         private LocalDateTime sendtTidspunkt;
@@ -159,23 +150,18 @@ public class InngåendeHendelse extends BaseEntitet {
             return this;
         }
 
-        public Builder feedKode(FeedKode feedKode) {
-            this.feedKode = feedKode;
+        public Builder hendelseKilde(HendelseKilde hendelseKilde) {
+            this.hendelseKilde = hendelseKilde;
             return this;
         }
 
-        public Builder type(HendelseType type) {
-            this.type = type;
+        public Builder hendelseType(HendelseType hendelseType) {
+            this.hendelseType = hendelseType;
             return this;
         }
 
         public Builder payload(String payload) {
             this.payload = payload;
-            return this;
-        }
-
-        public Builder requestUuid(String requestUuid) {
-            this.requestUuid = requestUuid;
             return this;
         }
 

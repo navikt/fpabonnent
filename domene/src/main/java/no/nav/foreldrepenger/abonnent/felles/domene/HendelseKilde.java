@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonFormat(shape = Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
-public enum FeedKode implements Kodeverdi { //TODO(JEJ): Rename til noe mer generelt når person-feed saneres
+public enum HendelseKilde implements Kodeverdi {
 
     // Ligger igjen til evt databaseopprydding:
     @Deprecated
@@ -31,22 +31,22 @@ public enum FeedKode implements Kodeverdi { //TODO(JEJ): Rename til noe mer gene
     UDEFINERT("-"),
     ;
 
-    public static final String KODEVERK = "FEED_KODE";
+    public static final String KODEVERK = "HENDELSE_KILDE";
 
-    private static final Map<String, FeedKode> KODER = new LinkedHashMap<>();
+    private static final Map<String, HendelseKilde> KODER = new LinkedHashMap<>();
 
     private String kode;
 
-    FeedKode() {
+    HendelseKilde() {
         // Hibernate trenger den
     }
 
-    private FeedKode(String kode) {
+    private HendelseKilde(String kode) {
         this.kode = kode;
     }
 
     @JsonCreator
-    public static FeedKode fraKode(@JsonProperty("kode") String kode) {
+    public static HendelseKilde fraKode(@JsonProperty("kode") String kode) {
         if (kode == null) {
             return null;
         }
@@ -57,7 +57,7 @@ public enum FeedKode implements Kodeverdi { //TODO(JEJ): Rename til noe mer gene
         return ad;
     }
 
-    public static FeedKode fraKodeDefaultUdefinert(@JsonProperty("kode") String kode) {
+    public static HendelseKilde fraKodeDefaultUdefinert(@JsonProperty("kode") String kode) {
         if (kode == null) {
             return UDEFINERT;
         }
@@ -89,14 +89,14 @@ public enum FeedKode implements Kodeverdi { //TODO(JEJ): Rename til noe mer gene
     }
 
     @Converter(autoApply = true)
-    public static class KodeverdiConverter implements AttributeConverter<FeedKode, String> {
+    public static class KodeverdiConverter implements AttributeConverter<HendelseKilde, String> {
         @Override
-        public String convertToDatabaseColumn(FeedKode attribute) {
+        public String convertToDatabaseColumn(HendelseKilde attribute) {
             return attribute == null ? null : attribute.getKode();
         }
 
         @Override
-        public FeedKode convertToEntityAttribute(String dbData) {
+        public HendelseKilde convertToEntityAttribute(String dbData) {
             return dbData == null ? null : fraKode(dbData);
         }
     }

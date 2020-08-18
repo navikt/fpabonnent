@@ -47,7 +47,7 @@ public class PdlFødselHendelseTjenesteTest {
 
         // Assert
         assertThat(payload).isNotNull();
-        assertThat(payload.getType()).isEqualTo(MELDINGSTYPE.getKode());
+        assertThat(payload.getHendelseType()).isEqualTo(MELDINGSTYPE.getKode());
         assertThat(payload.getHendelseId()).isEqualTo(HENDELSE_ID);
         assertThat(payload.getAktørIdBarn().get()).contains(AKTØR_ID_BARN);
         assertThat(payload.getAktørIdForeldre()).contains(Set.of(AKTØR_ID_MOR, AKTØR_ID_FAR));
@@ -65,7 +65,7 @@ public class PdlFødselHendelseTjenesteTest {
 
         // Assert
         assertThat(payload).isNotNull();
-        assertThat(payload.getType()).isEqualTo(MELDINGSTYPE.getKode());
+        assertThat(payload.getHendelseType()).isEqualTo(MELDINGSTYPE.getKode());
         assertThat(payload.getHendelseId()).isEqualTo(HENDELSE_ID);
         assertThat(payload.getAktørIdBarn().get()).isEmpty();
         assertThat(payload.getAktørIdForeldre()).contains(Set.of(AKTØR_ID_MOR, AKTØR_ID_FAR));
@@ -84,7 +84,7 @@ public class PdlFødselHendelseTjenesteTest {
 
         // Assert
         assertThat(payload).isNotNull();
-        assertThat(payload.getType()).isEqualTo(MELDINGSTYPE.getKode());
+        assertThat(payload.getHendelseType()).isEqualTo(MELDINGSTYPE.getKode());
         assertThat(payload.getHendelseId()).isEqualTo(HENDELSE_ID);
         assertThat(payload.getAktørIdBarn()).isPresent();
         assertThat(payload.getAktørIdBarn().get()).hasSize(2).hasSameElementsAs(aktørIdBarn);
@@ -104,7 +104,7 @@ public class PdlFødselHendelseTjenesteTest {
 
         // Assert
         assertThat(payload).isNotNull();
-        assertThat(payload.getType()).isEqualTo(MELDINGSTYPE.getKode());
+        assertThat(payload.getHendelseType()).isEqualTo(MELDINGSTYPE.getKode());
         assertThat(payload.getHendelseId()).isEqualTo(HENDELSE_ID);
         assertThat(payload.getAktørIdBarn()).isPresent();
         assertThat(payload.getAktørIdForeldre()).isPresent();
@@ -121,7 +121,7 @@ public class PdlFødselHendelseTjenesteTest {
 
         // Assert
         assertThat(payload).isNotNull();
-        assertThat(payload.getType()).isEqualTo(MELDINGSTYPE.getKode());
+        assertThat(payload.getHendelseType()).isEqualTo(MELDINGSTYPE.getKode());
         assertThat(payload.getHendelseId()).isEqualTo(HENDELSE_ID);
         assertThat(payload.getAktørIdBarn().get()).isEmpty();
         assertThat(payload.getAktørIdForeldre()).isEmpty();

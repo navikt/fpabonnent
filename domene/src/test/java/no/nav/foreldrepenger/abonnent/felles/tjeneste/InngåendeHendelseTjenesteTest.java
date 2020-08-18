@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -11,18 +9,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
@@ -33,8 +27,6 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePaylo
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
 
 public class InngåendeHendelseTjenesteTest {
-
-    private static final String REQ_UUID = "req_uuid";
 
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
@@ -50,62 +42,43 @@ public class InngåendeHendelseTjenesteTest {
     }
 
     @Test
-    public void skal_returnere_liste_med_FødselHendelsePayload() {
+    public void skal_opprette_PdlFødselHendelsePayload() {
         // Arrange
-        List<InngåendeHendelse> inngåendeHendelser = singletonList(lagInngåendeHendelse("1"));
+        InngåendeHendelse inngåendeHendelse = lagInngåendeHendelse("1");
 
         // Act
-        List<HendelsePayload> resultat = inngåendeHendelseTjeneste.getPayloadsForInngåendeHendelser(inngåendeHendelser);
+        HendelsePayload resultat = inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
 
         // Assert
         assertThat(resultat).isNotNull();
-        assertThat(resultat).hasSize(1);
-        assertThat(resultat.get(0).getHendelseId()).isEqualTo("1");
+        assertThat(resultat.getHendelseId()).isEqualTo("1");
+        assertThat(resultat).isInstanceOf(PdlFødselHendelsePayload.class);
     }
     
-    @Test
-    public void skal_returnere_tom_liste() {
-        // Arrange + Act
-        List<HendelsePayload> resultat = inngåendeHendelseTjeneste.getPayloadsForInngåendeHendelser(new ArrayList<>());
-
-        // Assert
-        assertThat(resultat).isEmpty();
-    }
-
     //TODO(JEJ): Kommentere inn når payload fjernes igjen:
     @Ignore
     @Test
-    public void skal_markere_ikke_relevante_hendelser_som_håndterte_og_fjerne_payload() {
+    public void skal_markere_hendelse_som_håndtert_og_fjerne_payload() {
         // Arrange
-        InngåendeHendelse hendelse1 = lagInngåendeHendelse("1");
-        InngåendeHendelse hendelse2 = lagInngåendeHendelse("2");
-        InngåendeHendelse hendelse3 = lagInngåendeHendelse("3");
-        InngåendeHendelse hendelse4 = lagInngåendeHendelse("4");
-        InngåendeHendelse hendelse5 = lagInngåendeHendelse("5");
-        List<InngåendeHendelse> alleHendelser = asList(hendelse1, hendelse2, hendelse3, hendelse4, hendelse5);
-        List<InngåendeHendelse> relevanteHendelser = asList(hendelse1, hendelse3, hendelse5);
-        List<HendelsePayload> payloadRelevanteHendelser = inngåendeHendelseTjeneste.getPayloadsForInngåendeHendelser(relevanteHendelser);
-        Map<String, InngåendeHendelse> inngåendeHendelserMap = alleHendelser.stream()
-                .collect(Collectors.toMap(InngåendeHendelse::getHendelseId, ih -> ih));
+        InngåendeHendelse hendelse = lagInngåendeHendelse("1");
 
         // Act
-        inngåendeHendelseTjeneste.markerIkkeRelevanteHendelserSomHåndtert(inngåendeHendelserMap, payloadRelevanteHendelser);
+        inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(hendelse);
 
         // Assert
         ArgumentCaptor<InngåendeHendelse> argumentCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
-        verify(hendelseRepository, times(2))
+        verify(hendelseRepository, times(1))
                 .oppdaterHåndtertStatus(argumentCaptor.capture(), eq(HåndtertStatusType.HÅNDTERT));
-        verify(hendelseRepository, times(2))
+        verify(hendelseRepository, times(1))
                 .fjernPayload(argumentCaptor.capture());
-        assertThat(argumentCaptor.getAllValues().stream().map(InngåendeHendelse::getHendelseId).collect(Collectors.toList()))
-                .containsExactly("2", "4", "2", "4");
+        assertThat(argumentCaptor.getValue().getHendelseId()).isEqualTo("1");
     }
 
     @Test
     public void skal_markere_hendelse_som_sendt_nå_og_håndtert() {
         // Arrange
         InngåendeHendelse hendelse = lagInngåendeHendelse("1");
-        when(hendelseRepository.finnGrovsortertHendelse(any(FeedKode.class), anyString())).thenReturn(Optional.of(hendelse));
+        when(hendelseRepository.finnGrovsortertHendelse(any(HendelseKilde.class), anyString())).thenReturn(Optional.of(hendelse));
 
         // Act
         var payload = new PdlFødselHendelsePayload.Builder().hendelseId("1").build();
@@ -127,10 +100,9 @@ public class InngåendeHendelseTjenesteTest {
 
         return new InngåendeHendelse.Builder()
                 .hendelseId(hendelseId)
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .payload(inngåendeHendelsePayload)
-                .feedKode(FeedKode.PDL)
-                .requestUuid(REQ_UUID)
+                .hendelseKilde(HendelseKilde.PDL)
                 .build();
     }
 }

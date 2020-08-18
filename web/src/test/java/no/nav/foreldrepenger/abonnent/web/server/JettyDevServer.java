@@ -43,8 +43,6 @@ public class JettyDevServer extends JettyServer {
     }
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("feed.pagesize.value", "1000");
-
         for (String arg : args) {
             if (arg.equals(VTP_ARGUMENT)) {
                 vtp = true;

@@ -17,7 +17,7 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
@@ -68,7 +68,7 @@ public class PdlLeesahHendelseHåndterer {
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
         setCallIdForHendelse(payload);
 
-        Optional<InngåendeHendelse> inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(), FeedKode.PDL);
+        Optional<InngåendeHendelse> inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(), HendelseKilde.PDL);
         if (inngåendeHendelse.isPresent()) {
             LOG.warn("FPABONNENT mottok duplikat hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
@@ -161,12 +161,11 @@ public class PdlLeesahHendelseHåndterer {
 
     private InngåendeHendelse lagreInngåendeHendelse(PdlPersonhendelse personhendelse, HåndtertStatusType håndtertStatusType) {
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
-                .type(personhendelse.getHendelseType())
+                .hendelseType(personhendelse.getHendelseType())
                 .hendelseId(personhendelse.getHendelseId())
                 .tidligereHendelseId(personhendelse.getTidligereHendelseId())
-                .requestUuid(personhendelse.getHendelseId()) //TODO(JEJ): Fjerne felt når person-feed saneres?
                 .payload(JsonMapper.toJson(personhendelse))
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .håndtertStatus(håndtertStatusType)
                 .build();
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);

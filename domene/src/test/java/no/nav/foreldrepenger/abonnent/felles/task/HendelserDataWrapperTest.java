@@ -38,11 +38,11 @@ public class HendelserDataWrapperTest {
     public void test_beholder_properties_og_payload_fra_forrige_steg() throws Exception {
         String innPayload = "<xml>test</xml>";
         wrapper = new HendelserDataWrapper(eksisterendeData);
-        wrapper.setHendelseRequestUuid("72ee35aa-002f-400e-9956-8d8674aea949");
+        wrapper.setHendelseId("72ee35aa-002f-400e-9956-8d8674aea949");
         wrapper.setPayload(innPayload);
 
         HendelserDataWrapper wrapperNesteSteg = wrapper.nesteSteg(PROSESSTASK_STEG2);
-        assertThat(wrapperNesteSteg.getHendelseRequestUuid()).as("Forventer at requestUuid blir med til neste steg.").isEqualTo(wrapper.getHendelseRequestUuid());
+        assertThat(wrapperNesteSteg.getHendelseId()).as("Forventer at hendelseId blir med til neste steg.").isEqualTo(wrapper.getHendelseId());
         assertThat(wrapperNesteSteg.getProsessTaskData().getPayload()).as("Forventer at payload også blir kopiert over").isNotNull();
         assertThat(wrapperNesteSteg.getPayloadAsString()).as("Forventer at payload kan hentes ut som string").hasValue(innPayload);
     }

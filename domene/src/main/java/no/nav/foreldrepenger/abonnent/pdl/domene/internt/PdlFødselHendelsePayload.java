@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
@@ -28,7 +28,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
     private PdlFødselHendelsePayload(Builder builder) {
         this.hendelseId = builder.hendelseId;
         this.tidligereHendelseId = builder.tidligereHendelseId;
-        this.type = builder.type;
+        this.hendelseType = builder.hendelseType;
         this.endringstype = builder.endringstype;
         this.hendelseOpprettetTid = builder.hendelseOpprettetTid;
         this.aktørIdBarn = builder.aktørIdBarn;
@@ -74,13 +74,8 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
     }
 
     @Override
-    public boolean erAtomisk() {
-        return true;
-    }
-
-    @Override
-    public FeedKode getFeedKode() {
-        return FeedKode.PDL;
+    public HendelseKilde getHendelseKilde() {
+        return HendelseKilde.PDL;
     }
 
     @Override
@@ -92,7 +87,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
 
         if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) return false;
         if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) return false;
-        if (type != null ? !type.equals(payload.type) : payload.type != null) return false;
+        if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) return false;
         if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
         if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) return false;
         if (aktørIdBarn != null ? !aktørIdBarn.equals(payload.aktørIdBarn) : payload.aktørIdBarn != null) return false;
@@ -104,7 +99,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
     public int hashCode() {
         int result = hendelseId != null ? hendelseId.hashCode() : 0;
         result = 31 * result + (tidligereHendelseId != null ? tidligereHendelseId.hashCode() : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (hendelseType != null ? hendelseType.hashCode() : 0);
         result = 31 * result + (endringstype != null ? endringstype.hashCode() : 0);
         result = 31 * result + (hendelseOpprettetTid != null ? hendelseOpprettetTid.hashCode() : 0);
         result = 31 * result + (aktørIdBarn != null ? aktørIdBarn.hashCode() : 0);
@@ -116,7 +111,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
     public static class Builder {
         private String hendelseId;
         private String tidligereHendelseId;
-        private String type;
+        private String hendelseType;
         private String endringstype;
         private LocalDateTime hendelseOpprettetTid;
         private Set<String> aktørIdBarn;
@@ -133,8 +128,8 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
             return this;
         }
 
-        public Builder type(String type) {
-            this.type = type;
+        public Builder hendelseType(String hendelseType) {
+            this.hendelseType = hendelseType;
             return this;
         }
 

@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
@@ -99,7 +99,6 @@ public class VurderSorteringTaskTest {
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.getTaskType()).isEqualTo(SorterHendelserTask.TASKNAME);
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_REQUEST_UUID)).isEqualTo(HENDELSE_ID);
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
@@ -169,11 +168,10 @@ public class VurderSorteringTaskTest {
         // Arrange
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
                 .hendelseId("A")
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .sendtTidspunkt(LocalDateTime.now())
-                .requestUuid("1")
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusYears(10), PdlEndringstype.OPPRETTET, "A", null).build()))
                 .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
@@ -207,31 +205,28 @@ public class VurderSorteringTaskTest {
 
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
                 .hendelseId("A")
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .sendtTidspunkt(LocalDateTime.now())
-                .requestUuid("1")
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
                 .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
         InngåendeHendelse hendelseKorrigert1 = InngåendeHendelse.builder()
                 .hendelseId("B")
-                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
                 .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .sendtTidspunkt(null)
-                .requestUuid("2")
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert1);
         InngåendeHendelse hendelseKorrigert2 = InngåendeHendelse.builder()
                 .hendelseId("C")
-                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .feedKode(FeedKode.PDL)
-                .requestUuid("3")
+                .hendelseKilde(HendelseKilde.PDL)
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.KORRIGERT, "C", "B").build()))
                 .tidligereHendelseId("B")
                 .build();
@@ -266,21 +261,19 @@ public class VurderSorteringTaskTest {
         // Arrange
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
                 .hendelseId("A")
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .sendtTidspunkt(LocalDateTime.now())
-                .requestUuid("1")
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
                 .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
                 .hendelseId("B")
-                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .sendtTidspunkt(null)
-                .requestUuid("2")
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .build();
@@ -312,11 +305,10 @@ public class VurderSorteringTaskTest {
         // Arrange
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
                 .hendelseId("B")
-                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .sendtTidspunkt(null)
-                .requestUuid("2")
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .build();
@@ -348,11 +340,10 @@ public class VurderSorteringTaskTest {
         // Arrange
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
                 .hendelseId("B")
-                .type(HendelseType.PDL_DØD_ANNULLERT)
+                .hendelseType(HendelseType.PDL_DØD_ANNULLERT)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .sendtTidspunkt(null)
-                .requestUuid("2")
                 .payload(JsonMapper.toJson(opprettDødAnnullert(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.ANNULLERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .build();
@@ -385,20 +376,18 @@ public class VurderSorteringTaskTest {
         LocalDateTime håndteresTidspunktA = LocalDateTime.now();
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
                 .hendelseId("A")
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .feedKode(FeedKode.PDL)
-                .requestUuid("1")
+                .hendelseKilde(HendelseKilde.PDL)
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
                 .håndteresEtterTidspunkt(håndteresTidspunktA)
                 .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
                 .hendelseId("B")
-                .type(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .feedKode(FeedKode.PDL)
-                .requestUuid("2")
+                .hendelseKilde(HendelseKilde.PDL)
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .håndteresEtterTidspunkt(håndteresTidspunktA.minusMinutes(2))
@@ -435,7 +424,7 @@ public class VurderSorteringTaskTest {
     private InngåendeHendelse opprettInngåendeHendelse(LocalDateTime opprettetTid) {
         PdlFødsel.Builder pdlFødsel = opprettFødsel(opprettetTid, LocalDate.now(), PdlEndringstype.OPPRETTET, HENDELSE_ID, null);
         return InngåendeHendelse.builder()
-                .type(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
                 .payload(JsonMapper.toJson(pdlFødsel.build()))
                 .build();

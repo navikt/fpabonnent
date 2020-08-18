@@ -15,7 +15,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 public class HendelserDataWrapper {
 
-    public static final String HENDELSE_REQUEST_UUID = "hendelse.requestUuid";
     public static final String HENDELSE_ID = "hendelse.sekvensnummer";
     public static final String INNGÅENDE_HENDELSE_ID = "hendelse.ihId";
     public static final String HENDELSE_TYPE = "hendelse.type";
@@ -27,9 +26,6 @@ public class HendelserDataWrapper {
     private static final String DØDFØDSELSDATO = "hendelse.doedfoedselsdato";
     private static final String AKTØR_ID = "hendelse.aktoerId";
     private static final String AKTØR_ID_LISTE = "hendelse.aktoerIdListe";
-    private static final String FOM = "hendelse.fom";
-    private static final String IDENT_DATO = "hendelse.identDato";
-    private static final String TYPE_YTELSE = "hendelse.typeYtelse";
 
     private final ProsessTaskData prosessTaskData;
 
@@ -80,14 +76,6 @@ public class HendelserDataWrapper {
 
     public Long getId() {
         return prosessTaskData.getId();
-    }
-
-    public String getHendelseRequestUuid() {
-        return prosessTaskData.getPropertyValue(HENDELSE_REQUEST_UUID);
-    }
-
-    public void setHendelseRequestUuid(String hendelseRequestUuid) {
-        prosessTaskData.setProperty(HENDELSE_REQUEST_UUID, hendelseRequestUuid);
     }
 
     public Optional<String> getHendelseId() {
@@ -157,38 +145,6 @@ public class HendelserDataWrapper {
 
     public void setAktørIdListe(Set<String> aktørId) {
         setKommaseparertPropertyFraSet(AKTØR_ID_LISTE, aktørId);
-    }
-
-    public Optional<LocalDate> getFom() {
-        String property =  prosessTaskData.getPropertyValue(FOM);
-        if (property != null) {
-            if (property.contains(";")) {
-                throw new IllegalStateException("Inneholder flere bursdager.");
-            }
-            return Optional.of(LocalDate.parse(property));
-        }
-        return Optional.empty();
-    }
-
-    public void setFom(LocalDate paramVerdi) {
-        prosessTaskData.setProperty(FOM, paramVerdi.toString());
-    }
-
-    public Optional<String> getIdentDato() {
-        return Optional.ofNullable(prosessTaskData.getPropertyValue(IDENT_DATO));
-    }
-
-    public void setIdentDato(String paramVerdi) {
-        prosessTaskData.setProperty(IDENT_DATO, paramVerdi);
-    }
-
-    public Optional<String> getTypeYtelse() {
-        String verdi = prosessTaskData.getPropertyValue(TYPE_YTELSE);
-        return Optional.ofNullable(verdi);
-    }
-
-    public void setTypeYtelse(String paramVerdi) {
-        prosessTaskData.setProperty(TYPE_YTELSE, paramVerdi);
     }
 
     public Optional<String> getFødselsdato() {
