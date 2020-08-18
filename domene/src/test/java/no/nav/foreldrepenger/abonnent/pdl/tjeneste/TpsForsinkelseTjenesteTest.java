@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
@@ -229,18 +229,18 @@ public class TpsForsinkelseTjenesteTest {
 
         InngåendeHendelse hendelseA = InngåendeHendelse.builder()
                 .hendelseId("A")
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
                 .håndteresEtterTidspunkt(tidspunktA)
                 .build();
         InngåendeHendelse hendelseB = InngåendeHendelse.builder()
                 .hendelseId("B")
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
                 .tidligereHendelseId("A")
                 .build();
 
-        when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq("A"), eq(FeedKode.PDL))).thenReturn(Optional.of(hendelseA));
+        when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq("A"), eq(HendelseKilde.PDL))).thenReturn(Optional.of(hendelseA));
 
         // Act
         LocalDateTime resultat1 = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(LocalDateTime.now(), hendelseB);
@@ -259,18 +259,18 @@ public class TpsForsinkelseTjenesteTest {
 
         InngåendeHendelse hendelseA = InngåendeHendelse.builder()
                 .hendelseId("A")
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .håndtertStatus(HåndtertStatusType.HÅNDTERT)
                 .håndteresEtterTidspunkt(tidspunktA)
                 .build();
         InngåendeHendelse hendelseB = InngåendeHendelse.builder()
                 .hendelseId("B")
-                .feedKode(FeedKode.PDL)
+                .hendelseKilde(HendelseKilde.PDL)
                 .håndtertStatus(HåndtertStatusType.MOTTATT)
                 .tidligereHendelseId("A")
                 .build();
 
-        when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq("A"), eq(FeedKode.PDL))).thenReturn(Optional.of(hendelseA));
+        when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq("A"), eq(HendelseKilde.PDL))).thenReturn(Optional.of(hendelseA));
 
         // Act
         LocalDateTime resultat1 = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(input, hendelseB);

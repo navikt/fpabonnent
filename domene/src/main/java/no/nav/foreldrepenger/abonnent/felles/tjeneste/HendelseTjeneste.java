@@ -13,8 +13,6 @@ public interface HendelseTjeneste<T extends HendelsePayload> {
 
     void populerDatawrapper(T payload, HendelserDataWrapper dataWrapper);
 
-    boolean ikkeAtomiskHendelseSkalSendes(T payload);
-
     default boolean vurderOmHendelseKanForkastes(T payload) {
         return false;
     }

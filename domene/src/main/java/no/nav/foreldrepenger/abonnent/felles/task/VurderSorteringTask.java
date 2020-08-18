@@ -82,7 +82,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     private boolean enTidligereHendelseLiggerUbehandlet(InngåendeHendelse inngåendeHendelse) {
         // Scenario som kanskje kan oppstå hvis hendelsene kommer samtidig på Kafka, og blir plukket av forskjellige noder samtidig
         if (inngåendeHendelse.getTidligereHendelseId() != null) {
-            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(), inngåendeHendelse.getFeedKode());
+            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(), inngåendeHendelse.getHendelseKilde());
             if (tidligereHendelse.isPresent() && !HåndtertStatusType.HÅNDTERT.equals(tidligereHendelse.get().getHåndtertStatus())) {
                 LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert enda, og vil derfor vente til den er ferdig",
                         inngåendeHendelse.getHendelseId(), tidligereHendelse.get().getHendelseId());
@@ -94,10 +94,9 @@ public class VurderSorteringTask implements ProsessTaskHandler {
 
     private void opprettSorteringTask(String hendelseId, InngåendeHendelse inngåendeHendelse) {
         HendelserDataWrapper grovsorteringTask = new HendelserDataWrapper(new ProsessTaskData(SorterHendelserTask.TASKNAME));
-        grovsorteringTask.setHendelseRequestUuid(hendelseId);
         grovsorteringTask.setHendelseId(hendelseId);
         grovsorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
-        grovsorteringTask.setHendelseType(inngåendeHendelse.getType().getKode());
+        grovsorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
         prosessTaskRepository.lagre(grovsorteringTask.getProsessTaskData());
         hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.SENDT_TIL_SORTERING);
     }
@@ -106,13 +105,13 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         if (hendelsenErUnderEnUkeGammel(hendelsePayload.getHendelseOpprettetTid())) {
             LocalDateTime nesteKjøringEtter = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse);
             LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}",
-                    hendelsePayload.getHendelseId(), inngåendeHendelse.getType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
+                    hendelsePayload.getHendelseId(), inngåendeHendelse.getHendelseType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
             hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, nesteKjøringEtter);
             HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
             vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
             vurderSorteringTask.setHendelseId(hendelsePayload.getHendelseId());
             vurderSorteringTask.setNesteKjøringEtter(nesteKjøringEtter);
-            vurderSorteringTask.setHendelseType(inngåendeHendelse.getType().getKode());
+            vurderSorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
             prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
         } else {
             hendelseTjeneste.loggFeiletHendelse(hendelsePayload);

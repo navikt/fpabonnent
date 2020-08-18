@@ -26,12 +26,8 @@ public class AktørIdTjeneste {
     private AktørIdTjeneste() {
     }
 
-    public static List<String> getAktørIderForSortering(List<HendelsePayload> payloadList) {
-        List<String> aktørIderFraPayload = new ArrayList<>();
-        for (HendelsePayload payload : payloadList) {
-            Set<String> aktørIder = payload.getAktørIderForSortering();
-            aktørIderFraPayload.addAll(aktørIder);
-        }
+    public static List<String> getAktørIderForSortering(HendelsePayload payload) {
+        List<String> aktørIderFraPayload = new ArrayList<>(payload.getAktørIderForSortering());
         return filtrerBortUgyldigeAktørIder(aktørIderFraPayload);
     }
 

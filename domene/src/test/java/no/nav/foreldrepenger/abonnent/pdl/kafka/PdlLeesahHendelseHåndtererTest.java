@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
@@ -74,8 +74,8 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"DOEDSFALL_V1\"", "\"endringstype\":\"OPPRETTET\"", "\"hendelseType\":{\"kode\":\"PDL_DOED_OPPRETTET\"", "\"kodeverk\":\"HENDELSE_TYPE\"}");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
-        assertThat(inngåendeHendelse.getFeedKode()).isEqualTo(FeedKode.PDL);
-        assertThat(inngåendeHendelse.getType()).isEqualTo(HendelseType.PDL_DØD_OPPRETTET);
+        assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
+        assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_DØD_OPPRETTET);
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
@@ -109,8 +109,8 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"", "\"hendelseType\":{\"kode\":\"PDL_FOEDSEL_ANNULLERT\"", "\"kodeverk\":\"HENDELSE_TYPE\"}");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
-        assertThat(inngåendeHendelse.getFeedKode()).isEqualTo(FeedKode.PDL);
-        assertThat(inngåendeHendelse.getType()).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT);
+        assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
+        assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT);
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);

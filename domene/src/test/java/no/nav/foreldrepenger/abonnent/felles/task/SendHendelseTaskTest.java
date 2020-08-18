@@ -61,7 +61,6 @@ public class SendHendelseTaskTest {
     public void skal_sende_fødselshendelse() {
         // Arrange
         HendelserDataWrapper hendelse = new HendelserDataWrapper(prosessTaskData);
-        hendelse.setHendelseRequestUuid("req_uuid");
         hendelse.setHendelseId("1");
         hendelse.setHendelseType(HENDELSE_TYPE.getKode());
         hendelse.setFødselsdato(FØDSELSDATO);
@@ -79,7 +78,7 @@ public class SendHendelseTaskTest {
         assertThat(captor.getAllValues()).hasSize(2);
         for (PdlFødselHendelsePayload payload : captor.getAllValues()) {
             assertThat(payload.getHendelseId()).isEqualTo("1");
-            assertThat(payload.getType()).isEqualTo(HENDELSE_TYPE.getKode());
+            assertThat(payload.getHendelseType()).isEqualTo(HENDELSE_TYPE.getKode());
             assertThat(payload.getAktørIdForeldre()).isPresent();
             assertThat(payload.getAktørIdForeldre().get()).containsExactlyInAnyOrder("2", "3");
             assertThat(payload.getFødselsdato()).isPresent().hasValue(FØDSELSDATO);
@@ -90,7 +89,6 @@ public class SendHendelseTaskTest {
     public void skal_håndtere_fødselshendelse_med_mange_aktørIder() {
         // Arrange
         HendelserDataWrapper hendelse = new HendelserDataWrapper(prosessTaskData);
-        hendelse.setHendelseRequestUuid("req_uuid");
         hendelse.setHendelseId("1");
         hendelse.setHendelseType(HENDELSE_TYPE.getKode());
         hendelse.setFødselsdato(FØDSELSDATO);
@@ -108,7 +106,7 @@ public class SendHendelseTaskTest {
         verify(mockHendelseConsumer, times(1)).sendHendelse(captor.capture());
         PdlFødselHendelsePayload payload = captor.getValue();
         assertThat(payload.getHendelseId()).isEqualTo("1");
-        assertThat(payload.getType()).isEqualTo(HENDELSE_TYPE.getKode());
+        assertThat(payload.getHendelseType()).isEqualTo(HENDELSE_TYPE.getKode());
         assertThat(payload.getAktørIdBarn()).isPresent();
         assertThat(payload.getAktørIdBarn().get()).containsExactlyInAnyOrder("1", "2");
         assertThat(payload.getAktørIdForeldre()).isPresent();
@@ -120,7 +118,6 @@ public class SendHendelseTaskTest {
     public void skal_kaste_feil_for_ukjent_hendelse() {
         // Arrange
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
-        dataWrapper.setHendelseRequestUuid("req_uuid");
         dataWrapper.setHendelseId("1");
         dataWrapper.setHendelseType(null);
         dataWrapper.setAktørId("1");

@@ -15,11 +15,11 @@ public interface AbonnentHendelserFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FP-690327", feilmelding = "Prosessering av preconditions for %s mangler %s. TaskId: %s", logLevel = WARN)
     Feil prosesstaskPreconditionManglerProperty(String taskname, String property, Long taskId);
     
-    @TekniskFeil(feilkode = "FP-309345", feilmelding = "Ukjent meldingstype - kan ikke finne hendelsestjeneste. type=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
-    Feil ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(String type, String hendelseId);
+    @TekniskFeil(feilkode = "FP-309345", feilmelding = "Ukjent hendelsestype - kan ikke finne hendelsestjeneste. hendelseType=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
+    Feil ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(String hendelseType, String hendelseId);
 
-    @TekniskFeil(feilkode = "FP-125639", feilmelding = "Mer enn en hendelsestjeneste funnet. type=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
-    Feil merEnnEnHendelseTjenesteFunnet(String type, String hendelseId);
+    @TekniskFeil(feilkode = "FP-125639", feilmelding = "Mer enn en hendelsestjeneste funnet. hendelseType=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
+    Feil merEnnEnHendelseTjenesteFunnet(String hendelseType, String hendelseId);
 
     @TekniskFeil(feilkode = "FP-846675", feilmelding = "Ukjent Hendelse Type <%s>", logLevel = LogLevel.WARN)
     Feil ukjentHendelseType(String hendelseType);

@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
@@ -60,7 +60,7 @@ public class HendelseTestDataUtil {
         PdlFødselHendelsePayload.Builder builder = new PdlFødselHendelsePayload.Builder();
         return builder
                 .hendelseId(HENDELSE_ID)
-                .type(MELDINGSTYPE.getKode())
+                .hendelseType(MELDINGSTYPE.getKode())
                 .endringstype("OPPRETTET")
                 .aktørIdBarn(new HashSet<>(singletonList(AKTØR_ID_BARN)))
                 .aktørIdForeldre(Set.of(AKTØR_ID_MOR, AKTØR_ID_FAR))
@@ -68,13 +68,12 @@ public class HendelseTestDataUtil {
                 .build();
     }
 
-    public static InngåendeHendelse lagInngåendeFødselsHendelse(String hendelseId, String requestUuid, HåndtertStatusType håndtertStatus) {
+    public static InngåendeHendelse lagInngåendeFødselsHendelse(String hendelseId, HåndtertStatusType håndtertStatus) {
         return InngåendeHendelse.builder()
                 .hendelseId(hendelseId)
-                .type(MELDINGSTYPE)
+                .hendelseType(MELDINGSTYPE)
                 .payload("payload")
-                .feedKode(FeedKode.PDL)
-                .requestUuid(requestUuid)
+                .hendelseKilde(HendelseKilde.PDL)
                 .håndtertStatus(håndtertStatus)
                 .build();
     }

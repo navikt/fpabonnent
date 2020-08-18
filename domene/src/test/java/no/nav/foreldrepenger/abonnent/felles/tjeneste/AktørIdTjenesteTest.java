@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -19,13 +18,10 @@ public class AktørIdTjenesteTest {
     @Test
     public void skal_bare_returnere_gyldige_aktørIder() {
         // Arrange
-        HendelsePayload gyldig = new PdlFødselHendelsePayload.Builder().aktørIdForeldre(Set.of(GYLDIG)).build();
-        HendelsePayload ugyldig = new PdlFødselHendelsePayload.Builder().aktørIdForeldre(Set.of(UGYLDIG)).build();
-
-        List<HendelsePayload> hendelser = asList(gyldig, ugyldig);
+        HendelsePayload hendelse = new PdlFødselHendelsePayload.Builder().aktørIdForeldre(Set.of(GYLDIG, UGYLDIG)).build();
 
         // Act
-        List<String> aktørIderForSortering = AktørIdTjeneste.getAktørIderForSortering(hendelser);
+        List<String> aktørIderForSortering = AktørIdTjeneste.getAktørIderForSortering(hendelse);
 
         // Assert
         assertThat(aktørIderForSortering).containsOnly(GYLDIG);

@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
@@ -57,7 +57,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
         return new PdlFødselHendelsePayload.Builder()
                 .hendelseId(pdlFødsel.getHendelseId())
                 .tidligereHendelseId(pdlFødsel.getTidligereHendelseId())
-                .type(pdlFødsel.getHendelseType().getKode())
+                .hendelseType(pdlFødsel.getHendelseType().getKode())
                 .endringstype(pdlFødsel.getEndringstype().name())
                 .hendelseOpprettetTid(pdlFødsel.getOpprettet())
                 .aktørIdBarn(hentUtAktørIderFraString(pdlFødsel.getPersonidenter(), pdlFødsel.getHendelseId()))
@@ -70,7 +70,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     public PdlFødselHendelsePayload payloadFraWrapper(HendelserDataWrapper dataWrapper) {
         return new PdlFødselHendelsePayload.Builder()
                 .hendelseId(dataWrapper.getHendelseId().orElse(null))
-                .type(dataWrapper.getHendelseType().orElse(null))
+                .hendelseType(dataWrapper.getHendelseType().orElse(null))
                 .endringstype(dataWrapper.getEndringstype().orElse(null))
                 .aktørIdBarn(dataWrapper.getAktørIdBarn().orElse(null))
                 .aktørIdForeldre(dataWrapper.getAktørIdForeldre().orElse(null))
@@ -83,11 +83,6 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
         payload.getAktørIdBarn().ifPresent(dataWrapper::setAktørIdBarn);
         payload.getAktørIdForeldre().ifPresent(dataWrapper::setAktørIdForeldre);
         payload.getFødselsdato().ifPresent(dataWrapper::setFødselsdato);
-    }
-
-    @Override
-    public boolean ikkeAtomiskHendelseSkalSendes(PdlFødselHendelsePayload payload) {
-        return true;
     }
 
     @Override
@@ -135,7 +130,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 return resultat;
             }
         } else {
-            LOGGER.warn("Hendelse {} med type {} har ikke barns aktørId", payload.getHendelseId(), payload.getType());
+            LOGGER.warn("Hendelse {} med type {} har ikke barns aktørId", payload.getHendelseId(), payload.getHendelseType());
         }
         return new FødselKlarForSorteringResultat(false);
     }
@@ -170,15 +165,15 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
             }
         }
         if (info) {
-            LOGGER.info(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
+            LOGGER.info(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         } else {
-            LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
+            LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         }
     }
 
     private Optional<InngåendeHendelse> getTidligereHendelse(String tidligereHendelseId) {
         return tidligereHendelseId != null ?
-                hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, FeedKode.PDL) :
+                hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, HendelseKilde.PDL) :
                 Optional.empty();
     }
 

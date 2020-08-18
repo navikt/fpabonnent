@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.FeedKode;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
@@ -56,7 +56,7 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
         return new PdlDødHendelsePayload.Builder()
                 .hendelseId(pdlDød.getHendelseId())
                 .tidligereHendelseId(pdlDød.getTidligereHendelseId())
-                .type(pdlDød.getHendelseType().getKode())
+                .hendelseType(pdlDød.getHendelseType().getKode())
                 .endringstype(pdlDød.getEndringstype().name())
                 .hendelseOpprettetTid(pdlDød.getOpprettet())
                 .aktørId(hentUtAktørIderFraString(pdlDød.getPersonidenter(), pdlDød.getHendelseId()))
@@ -68,7 +68,7 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
     public PdlDødHendelsePayload payloadFraWrapper(HendelserDataWrapper dataWrapper) {
         return new PdlDødHendelsePayload.Builder()
                 .hendelseId(dataWrapper.getHendelseId().orElse(null))
-                .type(dataWrapper.getHendelseType().orElse(null))
+                .hendelseType(dataWrapper.getHendelseType().orElse(null))
                 .endringstype(dataWrapper.getEndringstype().orElse(null))
                 .aktørId(dataWrapper.getAktørIdListe().orElse(null))
                 .dødsdato(optionalStringTilLocalDate(dataWrapper.getDødsdato()))
@@ -79,11 +79,6 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
     public void populerDatawrapper(PdlDødHendelsePayload payload, HendelserDataWrapper dataWrapper) {
         payload.getAktørId().ifPresent(dataWrapper::setAktørIdListe);
         payload.getDødsdato().ifPresent(dataWrapper::setDødsdato);
-    }
-
-    @Override
-    public boolean ikkeAtomiskHendelseSkalSendes(PdlDødHendelsePayload payload) {
-        return true;
     }
 
     @Override
@@ -152,12 +147,12 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
                 årsak = "Årsaken er at det fortsatt ikke er registrert dødsdato i TPS.";
             }
         }
-        LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getType(), payload.getHendelseOpprettetTid());
+        LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
     }
 
     private Optional<InngåendeHendelse> getTidligereHendelse(String tidligereHendelseId) {
         return tidligereHendelseId != null ?
-                hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, FeedKode.PDL) :
+                hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, HendelseKilde.PDL) :
                 Optional.empty();
     }
 

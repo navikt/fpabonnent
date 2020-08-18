@@ -2,11 +2,9 @@ package no.nav.foreldrepenger.abonnent.felles.task;
 
 import static no.nav.foreldrepenger.abonnent.felles.tjeneste.AktørIdTjeneste.getAktørIderForSortering;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -55,67 +53,51 @@ public class SorterHendelserTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
-        precondition(dataWrapper);
-        String requestUUID = dataWrapper.getHendelseRequestUuid();
+        String hendelseId = getHendelseId(dataWrapper);
 
-        List<InngåendeHendelse> inngåendeHendelserListe = inngåendeHendelseTjeneste.hentHendelserSomErSendtTilSorteringMedUUID(requestUUID);
-        List<HendelsePayload> payloadListe = inngåendeHendelseTjeneste.getPayloadsForInngåendeHendelser(inngåendeHendelserListe);
-        List<String> aktørIderForSortering = getAktørIderForSortering(payloadListe);
+        Optional<InngåendeHendelse> inngåendeHendelse = inngåendeHendelseTjeneste.finnHendelseSomErSendtTilSortering(hendelseId);
+        if (inngåendeHendelse.isEmpty()) {
+            LOGGER.warn("Fant ikke InngåendeHendelse for HendelseId {} - kan ikke grovsortere", hendelseId);
+            return;
+        }
+
+        HendelsePayload hendelsePayload = inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse.get());
+        List<String> aktørIderForSortering = getAktørIderForSortering(hendelsePayload);
         List<String> filtrertAktørIdList = hendelseConsumer.grovsorterAktørIder(aktørIderForSortering);
-        List<HendelsePayload> relevanteHendelser = filtrerUtRelevanteHendelser(payloadListe, filtrertAktørIdList);
 
-        Map<String, InngåendeHendelse> inngåendeHendelserMap = inngåendeHendelserListe.stream()
-                .collect(Collectors.toMap(InngåendeHendelse::getHendelseId, ih -> ih));
-        inngåendeHendelseTjeneste.markerIkkeRelevanteHendelserSomHåndtert(inngåendeHendelserMap, relevanteHendelser);
+        if (!hendelseErRelevant(filtrertAktørIdList, hendelsePayload)) {
+            LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK",
+                    hendelsePayload.getHendelseId(), hendelsePayload.getHendelseType());
+            inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(inngåendeHendelse.get());
+            return;
+        }
 
-        if (!relevanteHendelser.isEmpty()) {
-            for (HendelsePayload payload : relevanteHendelser) {
-                HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(
-                        HendelseType.fraKodeDefaultUdefinert(payload.getType()), payload.getHendelseId());
+        opprettSendHendelseTask(dataWrapper, hendelsePayload);
+        inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelse.get(), HåndtertStatusType.GROVSORTERT);
+        LOGGER.info("Opprettet SendHendelseTask for hendelse {}", hendelseId);
+    }
 
-                if (payload.erAtomisk() || hendelseTjeneste.ikkeAtomiskHendelseSkalSendes(payload)) {
-                    HendelserDataWrapper nesteSteg = dataWrapper.nesteSteg(SendHendelseTask.TASKNAME);
-                    nesteSteg.setHendelseId(payload.getHendelseId());
-                    nesteSteg.setHendelseType(payload.getType());
-                    nesteSteg.setEndringstype(payload.getEndringstype());
-                    hendelseTjeneste.populerDatawrapper(payload, nesteSteg);
-
-                    prosessTaskRepository.lagre(nesteSteg.getProsessTaskData());
-                    inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelserMap.get(payload.getHendelseId()), HåndtertStatusType.GROVSORTERT);
-                } else {
-                    inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelserMap.get(payload.getHendelseId()), HåndtertStatusType.HÅNDTERT);
-                }
-            }
-
-            LOGGER.info("Opprettet SendHendelseTask for hendelser med request UUID: {}", requestUUID); // NOSONAR
+    private String getHendelseId(HendelserDataWrapper dataWrapper) {
+        if (dataWrapper.getHendelseId().isEmpty()) {
+            throw AbonnentHendelserFeil.FACTORY.prosesstaskPreconditionManglerProperty(TASKNAME, HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId()).toException();
+        } else {
+            return dataWrapper.getHendelseId().get();
         }
     }
 
-    private void precondition(HendelserDataWrapper dataWrapper) {
-        if (dataWrapper.getHendelseRequestUuid() == null) {
-            throw AbonnentHendelserFeil.FACTORY.prosesstaskPreconditionManglerProperty(TASKNAME, HendelserDataWrapper.HENDELSE_REQUEST_UUID, dataWrapper.getId()).toException();
-        }
+    private void opprettSendHendelseTask(HendelserDataWrapper dataWrapper, HendelsePayload hendelsePayload) {
+        HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(
+                HendelseType.fraKodeDefaultUdefinert(hendelsePayload.getHendelseType()), hendelsePayload.getHendelseId());
+
+        HendelserDataWrapper nesteSteg = dataWrapper.nesteSteg(SendHendelseTask.TASKNAME);
+        nesteSteg.setHendelseId(hendelsePayload.getHendelseId());
+        nesteSteg.setHendelseType(hendelsePayload.getHendelseType());
+        nesteSteg.setEndringstype(hendelsePayload.getEndringstype());
+        hendelseTjeneste.populerDatawrapper(hendelsePayload, nesteSteg);
+        prosessTaskRepository.lagre(nesteSteg.getProsessTaskData());
     }
 
-    private List<HendelsePayload> filtrerUtRelevanteHendelser(List<HendelsePayload> payloadList, List<String> aktørIdList) {
-        if (payloadList.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<HendelsePayload> listPayload = new ArrayList<>();
-
-        for (HendelsePayload hendelsePayload : payloadList) {
-            if (finnRelevanteHendelser(aktørIdList, hendelsePayload)) {
-                listPayload.add(hendelsePayload);
-            } else {
-                LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK",
-                        hendelsePayload.getHendelseId(), hendelsePayload.getType());
-            }
-        }
-        return listPayload;
-    }
-
-    private boolean finnRelevanteHendelser(List<String> aktørIdList, HendelsePayload hendelsePayload) {
+    private boolean hendelseErRelevant(List<String> aktørIdList, HendelsePayload hendelsePayload) {
         return !Collections.disjoint(hendelsePayload.getAktørIderForSortering(), aktørIdList);
     }
 
