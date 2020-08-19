@@ -1,8 +1,6 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
-import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,9 +51,5 @@ public class TpsHendelseHjelper {
         if (aktørIder.size() > 1) {
             AbonnentHendelserFeil.FACTORY.merEnnEnAktørId(aktørIder.size(), hendelseId).log(LOGGER);
         }
-    }
-
-    public static LocalDate optionalStringTilLocalDate(Optional<String> innDato) {
-        return innDato.stream().map(LocalDate::parse).findFirst().orElse(null);
     }
 }

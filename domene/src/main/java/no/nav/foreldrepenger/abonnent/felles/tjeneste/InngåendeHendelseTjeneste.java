@@ -51,6 +51,6 @@ public class InngåendeHendelseTjeneste {
 
     public HendelsePayload hentUtPayloadFraInngåendeHendelse(InngåendeHendelse inngåendeHendelse) {
         return hendelseTjenesteProvider.finnTjeneste(inngåendeHendelse.getHendelseType(), inngåendeHendelse.getHendelseId())
-                .payloadFraString(inngåendeHendelse.getPayload());
+                .payloadFraJsonString(inngåendeHendelse.getPayload());
     }
 }

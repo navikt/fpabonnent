@@ -58,7 +58,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         Optional<Long> inngåendeHendelseId = dataWrapper.getInngåendeHendelseId();
         inngåendeHendelseId.orElseThrow(() -> new IllegalStateException("Prosesstask " + prosessTaskData.getId() + " peker ikke på en gyldig inngående hendelse og kan derfor ikke sorteres videre"));
         InngåendeHendelse inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId.get());
-        HendelsePayload hendelsePayload = hendelseTjeneste.payloadFraString(inngåendeHendelse.getPayload());
+        HendelsePayload hendelsePayload = hendelseTjeneste.payloadFraJsonString(inngåendeHendelse.getPayload());
 
         if (hendelseTjeneste.vurderOmHendelseKanForkastes(hendelsePayload)) {
             ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse);
@@ -73,7 +73,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         KlarForSorteringResultat klarForSorteringResultat = hendelseTjeneste.vurderOmKlarForSortering(hendelsePayload);
         if (klarForSorteringResultat.hendelseKlarForSortering()) {
             hendelseTjeneste.berikHendelseHvisNødvendig(inngåendeHendelse, klarForSorteringResultat);
-            opprettSorteringTask(hendelsePayload.getHendelseId(), inngåendeHendelse);
+            opprettSorteringTask(hendelsePayload.getHendelseId(), inngåendeHendelse, dataWrapper);
         } else {
             opprettVurderSorteringTaskHvisIkkeHendelsenErForGammel(hendelsePayload, inngåendeHendelse, hendelseTjeneste);
         }
@@ -92,8 +92,8 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         return false;
     }
 
-    private void opprettSorteringTask(String hendelseId, InngåendeHendelse inngåendeHendelse) {
-        HendelserDataWrapper grovsorteringTask = new HendelserDataWrapper(new ProsessTaskData(SorterHendelserTask.TASKNAME));
+    private void opprettSorteringTask(String hendelseId, InngåendeHendelse inngåendeHendelse, HendelserDataWrapper dataWrapper) {
+        HendelserDataWrapper grovsorteringTask = dataWrapper.nesteSteg(SorterHendelserTask.TASKNAME);
         grovsorteringTask.setHendelseId(hendelseId);
         grovsorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
         grovsorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());

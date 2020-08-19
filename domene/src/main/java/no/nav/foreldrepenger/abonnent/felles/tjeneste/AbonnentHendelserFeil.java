@@ -30,4 +30,6 @@ public interface AbonnentHendelserFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FP-295374", feilmelding = "Finner ikke unik aktørId. Fant %s aktørId på hendelseId=%s", logLevel = LogLevel.INFO)
     Feil merEnnEnAktørId(int antall, String hendelseId);
 
+    @TekniskFeil(feilkode = "FP-144656", feilmelding = "InngåendeHendelse ID mangler på prosess task %s med TaskId=%s", logLevel = LogLevel.WARN)
+    Feil manglerInngåendeHendelseIdPåProsesstask(String prosesstaskType, Long taskId);
 }

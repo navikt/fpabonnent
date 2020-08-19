@@ -13,13 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -37,17 +34,14 @@ public class SorterHendelserTask implements ProsessTaskHandler {
     private ProsessTaskRepository prosessTaskRepository;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
     private HendelseConsumer hendelseConsumer;
-    private HendelseTjenesteProvider hendelseTjenesteProvider;
 
     @Inject
     public SorterHendelserTask(ProsessTaskRepository prosessTaskRepository,
                                InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
-                               HendelseConsumer hendelseConsumer,
-                               HendelseTjenesteProvider hendelseTjenesteProvider) {
+                               HendelseConsumer hendelseConsumer) {
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.prosessTaskRepository = prosessTaskRepository;
         this.hendelseConsumer = hendelseConsumer;
-        this.hendelseTjenesteProvider = hendelseTjenesteProvider;
     }
 
     @Override
@@ -86,19 +80,13 @@ public class SorterHendelserTask implements ProsessTaskHandler {
     }
 
     private void opprettSendHendelseTask(HendelserDataWrapper dataWrapper, HendelsePayload hendelsePayload) {
-        HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(
-                HendelseType.fraKodeDefaultUdefinert(hendelsePayload.getHendelseType()), hendelsePayload.getHendelseId());
-
         HendelserDataWrapper nesteSteg = dataWrapper.nesteSteg(SendHendelseTask.TASKNAME);
         nesteSteg.setHendelseId(hendelsePayload.getHendelseId());
         nesteSteg.setHendelseType(hendelsePayload.getHendelseType());
-        nesteSteg.setEndringstype(hendelsePayload.getEndringstype());
-        hendelseTjeneste.populerDatawrapper(hendelsePayload, nesteSteg);
         prosessTaskRepository.lagre(nesteSteg.getProsessTaskData());
     }
 
     private boolean hendelseErRelevant(List<String> aktørIdList, HendelsePayload hendelsePayload) {
         return !Collections.disjoint(hendelsePayload.getAktørIderForSortering(), aktørIdList);
     }
-
 }

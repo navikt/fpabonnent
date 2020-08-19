@@ -33,7 +33,6 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
@@ -72,9 +71,6 @@ public class SorterHendelserTaskTest {
     @Inject
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
-    @Inject
-    private HendelseTjenesteProvider hendelseTjenesteProvider;
-
     private HendelseConsumer mockHendelseConsumer;
     private ProsessTaskRepository mockProsessTaskRepository;
 
@@ -84,7 +80,7 @@ public class SorterHendelserTaskTest {
         mockProsessTaskRepository = mock(ProsessTaskRepository.class);
 
         sorterHendelserTask = new SorterHendelserTask(mockProsessTaskRepository, inngåendeHendelseTjeneste,
-                mockHendelseConsumer, hendelseTjenesteProvider);
+                mockHendelseConsumer);
 
         prosessTaskData = new ProsessTaskData(PROSESSTASK_STEG);
         prosessTaskData.setSekvens("1");
@@ -116,12 +112,13 @@ public class SorterHendelserTaskTest {
     @Test
     public void skal_ikke_opprette_SendHendelseTask_når_grovsortering_returnerer_tom_liste() {
         // Arrange
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
         when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
 
-        InngåendeHendelse hendelse1 = lagInngåendeHendelse(FMELDING);
-        hendelseRepository.lagreInngåendeHendelse(hendelse1);
+        InngåendeHendelse hendelse = lagInngåendeHendelse();
+        hendelseRepository.lagreInngåendeHendelse(hendelse);
         repoRule.getEntityManager().flush();
+        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
+        dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
         // Act
         sorterHendelserTask.doTask(dataWrapper.getProsessTaskData());
@@ -135,12 +132,13 @@ public class SorterHendelserTaskTest {
     @Test
     public void skal_opprette_SendHendelseTask() {
         // Arrange
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
         List<String> eksisterendeAktørIder = Arrays.asList(FORELDER1, FORELDER2);
 
-        InngåendeHendelse hendelse = lagInngåendeHendelse(FMELDING);
+        InngåendeHendelse hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreInngåendeHendelse(hendelse);
         repoRule.getEntityManager().flush();
+        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
+        dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
         when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
         ArgumentCaptor<ProsessTaskData> argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
@@ -153,24 +151,23 @@ public class SorterHendelserTaskTest {
         assertThat(argumentCaptor.getValue().getTaskType()).isEqualTo(SendHendelseTask.TASKNAME);
         HendelserDataWrapper data = new HendelserDataWrapper(argumentCaptor.getValue());
         assertThat(data.getHendelseType()).isPresent().hasValue(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
-        assertThat(data.getAktørIdBarn()).isPresent();
-        assertThat(data.getAktørIdBarn().get()).contains(BARNET);
-        assertThat(data.getAktørIdForeldre()).isPresent();
-        assertThat(data.getAktørIdForeldre().get()).containsExactlyInAnyOrder(FORELDER1, FORELDER2);
-        assertThat(data.getFødselsdato()).isPresent().hasValue(FØDSELSDATO.toString());
+        assertThat(data.getHendelseId()).isPresent().hasValue(FMELDING.getHendelseId());
+        InngåendeHendelse inngåendeHendelse = finnHendelseMedHendelseId(HENDELSE_ID);
+        assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
+        assertThat(data.getInngåendeHendelseId()).isPresent().hasValue(inngåendeHendelse.getId());
     }
 
     @Test
     public void skal_ikke_opprette_SendHendelseTask_for_ikke_relevant_aktørid() {
         // Arrange
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
-
         List<String> eksisterendeAktørIder = Arrays.asList("12", "13");
         when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
 
-        InngåendeHendelse hendelse = lagInngåendeHendelse(FMELDING);
+        InngåendeHendelse hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreInngåendeHendelse(hendelse);
         repoRule.getEntityManager().flush();
+        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
+        dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
         // Act
         sorterHendelserTask.doTask(dataWrapper.getProsessTaskData());
@@ -187,11 +184,11 @@ public class SorterHendelserTaskTest {
         return dataWrapper;
     }
 
-    private InngåendeHendelse lagInngåendeHendelse(PdlFødsel pdlFødsel) {
+    private InngåendeHendelse lagInngåendeHendelse() {
         return InngåendeHendelse.builder()
-                .hendelseId(pdlFødsel.getHendelseId())
+                .hendelseId(FMELDING.getHendelseId())
                 .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload(JsonMapper.toJson(pdlFødsel))
+                .payload(JsonMapper.toJson(FMELDING))
                 .hendelseKilde(HendelseKilde.PDL)
                 .håndtertStatus(HåndtertStatusType.SENDT_TIL_SORTERING)
                 .build();
