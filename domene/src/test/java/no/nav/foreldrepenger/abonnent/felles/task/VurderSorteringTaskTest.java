@@ -34,6 +34,7 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseTjeneste;
 import no.nav.foreldrepenger.abonnent.tps.AktørId;
@@ -58,6 +59,9 @@ public class VurderSorteringTaskTest {
     @Inject
     private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
 
+    @Inject
+    private HendelseTjenesteHjelper hendelseTjenesteHjelper;
+
     private PersonTjeneste personTjeneste = mock(PersonTjeneste.class);
 
     private HendelseRepository hendelseRepository = new HendelseRepository(repoRule.getEntityManager());
@@ -66,7 +70,7 @@ public class VurderSorteringTaskTest {
 
     @Before
     public void before() {
-        HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(personTjeneste, hendelseRepository);
+        HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(personTjeneste, hendelseTjenesteHjelper);
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         when(hendelseTjenesteProvider.finnTjeneste(any(HendelseType.class), anyString())).thenReturn(hendelseTjeneste);
         vurderSorteringTask = new VurderSorteringTask(prosessTaskRepository, tpsForsinkelseTjeneste, hendelseTjenesteProvider, hendelseRepository);
@@ -80,7 +84,9 @@ public class VurderSorteringTaskTest {
 
         InngåendeHendelse inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now());
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
-        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        ProsessTaskData vurderSorteringTask = new ProsessTaskData(VurderSorteringTask.TASKNAME);
+        vurderSorteringTask.setSekvens("1");
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(vurderSorteringTask);
         hendelserDataWrapper.setInngåendeHendelseId(inngåendeHendelse.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         hendelserDataWrapper.setHendelseId(HENDELSE_ID);
@@ -89,7 +95,7 @@ public class VurderSorteringTaskTest {
         doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
-        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+        this.vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
 
         // Assert
         InngåendeHendelse beriketHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelse.getId());
@@ -97,11 +103,12 @@ public class VurderSorteringTaskTest {
         PdlFødsel beriketFødsel = JsonMapper.fromJson(beriketHendelse.getPayload(), PdlFødsel.class);
         assertThat(beriketFødsel.getAktørIdForeldre()).containsExactlyInAnyOrder(AKTØR_ID_MOR, AKTØR_ID_FAR);
 
-        ProsessTaskData prosessTaskData = taskCaptor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo(SorterHendelserTask.TASKNAME);
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
+        ProsessTaskData sorterHendelseTask = taskCaptor.getValue();
+        assertThat(sorterHendelseTask.getTaskType()).isEqualTo(SorterHendelseTask.TASKNAME);
+        assertThat(sorterHendelseTask.getSekvens()).isEqualTo("2");
+        assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
+        assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
+        assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
     }
 
     @Test
@@ -125,12 +132,12 @@ public class VurderSorteringTaskTest {
         vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
 
         // Assert
-        ProsessTaskData prosessTaskData = taskCaptor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
-        assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse).toLocalDate());
+        ProsessTaskData vurderSorteringTask = taskCaptor.getValue();
+        assertThat(vurderSorteringTask.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
+        assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
+        assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
+        assertThat(vurderSorteringTask.getNesteKjøringEtter().toLocalDate()).isEqualTo(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse).toLocalDate());
 
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelse.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
@@ -233,7 +240,9 @@ public class VurderSorteringTaskTest {
         hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert2);
         repoRule.getEntityManager().flush();
 
-        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        ProsessTaskData vurderSorteringTask = new ProsessTaskData(VurderSorteringTask.TASKNAME);
+        vurderSorteringTask.setSekvens("1");
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(vurderSorteringTask);
         hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert2.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
         hendelserDataWrapper.setHendelseId("C");
@@ -242,7 +251,7 @@ public class VurderSorteringTaskTest {
         doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
-        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+        this.vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
 
         // Assert
         InngåendeHendelse beriketHendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert2.getId());
@@ -250,10 +259,11 @@ public class VurderSorteringTaskTest {
         PdlFødsel beriketFødsel = JsonMapper.fromJson(beriketHendelse.getPayload(), PdlFødsel.class);
         assertThat(beriketFødsel.getAktørIdForeldre()).containsExactlyInAnyOrder(AKTØR_ID_MOR, AKTØR_ID_FAR);
 
-        ProsessTaskData prosessTaskData = taskCaptor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo(SorterHendelserTask.TASKNAME);
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("C");
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+        ProsessTaskData sorterHendelseTask = taskCaptor.getValue();
+        assertThat(sorterHendelseTask.getTaskType()).isEqualTo(SorterHendelseTask.TASKNAME);
+        assertThat(sorterHendelseTask.getSekvens()).isEqualTo("2");
+        assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("C");
+        assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
     }
 
     @Test
@@ -411,11 +421,11 @@ public class VurderSorteringTaskTest {
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
         assertThat(hendelse.getHåndteresEtterTidspunkt()).isEqualTo(håndteresTidspunktA.plusMinutes(2));
 
-        ProsessTaskData prosessTaskData = taskCaptor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("B");
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
-        assertThat(prosessTaskData.getNesteKjøringEtter()).isEqualTo(håndteresTidspunktA.plusMinutes(2));
+        ProsessTaskData vurderSorteringTask = taskCaptor.getValue();
+        assertThat(vurderSorteringTask.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("B");
+        assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+        assertThat(vurderSorteringTask.getNesteKjøringEtter()).isEqualTo(håndteresTidspunktA.plusMinutes(2));
 
         verify(personTjeneste, times(0)).erRegistrert(any());
         verify(personTjeneste, times(0)).registrerteForeldre(any());

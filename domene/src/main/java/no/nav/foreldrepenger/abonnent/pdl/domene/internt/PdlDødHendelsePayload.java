@@ -61,6 +61,11 @@ public class PdlDødHendelsePayload extends HendelsePayload {
     }
 
     @Override
+    public Optional<LocalDate> getHendelseDato() {
+        return getDødsdato();
+    }
+
+    @Override
     public Set<String> getAktørIderForSortering() {
         Set<String> set = new HashSet<>();
         if (aktørId != null) {

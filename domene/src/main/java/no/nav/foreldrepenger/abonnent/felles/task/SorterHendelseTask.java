@@ -24,21 +24,21 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
-@ProsessTask(SorterHendelserTask.TASKNAME)
-public class SorterHendelserTask implements ProsessTaskHandler {
+@ProsessTask(SorterHendelseTask.TASKNAME)
+public class SorterHendelseTask implements ProsessTaskHandler {
 
     public static final String TASKNAME = "hendelser.grovsorter";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SorterHendelserTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SorterHendelseTask.class);
 
     private ProsessTaskRepository prosessTaskRepository;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
     private HendelseConsumer hendelseConsumer;
 
     @Inject
-    public SorterHendelserTask(ProsessTaskRepository prosessTaskRepository,
-                               InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
-                               HendelseConsumer hendelseConsumer) {
+    public SorterHendelseTask(ProsessTaskRepository prosessTaskRepository,
+                              InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
+                              HendelseConsumer hendelseConsumer) {
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.prosessTaskRepository = prosessTaskRepository;
         this.hendelseConsumer = hendelseConsumer;

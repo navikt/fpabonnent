@@ -93,7 +93,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     }
 
     private void opprettSorteringTask(String hendelseId, InngåendeHendelse inngåendeHendelse, HendelserDataWrapper dataWrapper) {
-        HendelserDataWrapper grovsorteringTask = dataWrapper.nesteSteg(SorterHendelserTask.TASKNAME);
+        HendelserDataWrapper grovsorteringTask = dataWrapper.nesteSteg(SorterHendelseTask.TASKNAME);
         grovsorteringTask.setHendelseId(hendelseId);
         grovsorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
         grovsorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());

@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.abonnent.felles.domene;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
@@ -45,4 +47,6 @@ public abstract class HendelsePayload {
     public abstract HendelseWrapperDto mapPayloadTilDto();
 
     public abstract HendelseKilde getHendelseKilde();
+
+    public abstract Optional<LocalDate> getHendelseDato();
 }

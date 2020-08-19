@@ -59,6 +59,11 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
     }
 
     @Override
+    public Optional<LocalDate> getHendelseDato() {
+        return getFødselsdato();
+    }
+
+    @Override
     public Set<String> getAktørIderForSortering() {
         Set<String> set = new HashSet<>();
 
