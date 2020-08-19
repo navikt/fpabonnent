@@ -1,5 +1,0 @@
-= Integrasjon
-
-include::konsument-tjenester.adoc[leveloffset=+1]
-include::produsent-tjenester.adoc[leveloffset=+1]
-include::tps.adoc[leveloffset=+1]
