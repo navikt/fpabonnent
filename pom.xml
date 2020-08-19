@@ -9,7 +9,6 @@
 
     <modules>
         <module>migreringer</module>
-<!--        <module>docs</module> -->
         <module>domene</module>
         <module>web</module>
     </modules>

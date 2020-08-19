@@ -1,6 +1,0 @@
-= Database
-
-== Diagrammer
-
-include::{generated}/defaultDS.adoc[leveloffset=0]
-
