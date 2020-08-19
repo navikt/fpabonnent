@@ -42,7 +42,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
-public class SorterHendelserTaskTest {
+public class SorterHendelseTaskTest {
 
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"));
@@ -65,7 +65,7 @@ public class SorterHendelserTaskTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     private HendelseRepository hendelseRepository = new HendelseRepository(repoRule.getEntityManager());
-    private SorterHendelserTask sorterHendelserTask;
+    private SorterHendelseTask sorterHendelseTask;
     private ProsessTaskData prosessTaskData;
 
     @Inject
@@ -79,7 +79,7 @@ public class SorterHendelserTaskTest {
         mockHendelseConsumer = mock(HendelseConsumer.class);
         mockProsessTaskRepository = mock(ProsessTaskRepository.class);
 
-        sorterHendelserTask = new SorterHendelserTask(mockProsessTaskRepository, inngåendeHendelseTjeneste,
+        sorterHendelseTask = new SorterHendelseTask(mockProsessTaskRepository, inngåendeHendelseTjeneste,
                 mockHendelseConsumer);
 
         prosessTaskData = new ProsessTaskData(PROSESSTASK_STEG);
@@ -93,7 +93,7 @@ public class SorterHendelserTaskTest {
         expectedException.expectMessage("FP-690327");
 
         // Act
-        sorterHendelserTask.doTask(prosessTaskData);
+        sorterHendelseTask.doTask(prosessTaskData);
     }
 
     @Test
@@ -103,7 +103,7 @@ public class SorterHendelserTaskTest {
         when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
 
         // Act
-        sorterHendelserTask.doTask(dataWrapper.getProsessTaskData());
+        sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
 
         // Assert
         verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
@@ -121,7 +121,7 @@ public class SorterHendelserTaskTest {
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
         // Act
-        sorterHendelserTask.doTask(dataWrapper.getProsessTaskData());
+        sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
 
         // Assert
         verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
@@ -144,7 +144,7 @@ public class SorterHendelserTaskTest {
         ArgumentCaptor<ProsessTaskData> argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
 
         // Act
-        sorterHendelserTask.doTask(dataWrapper.getProsessTaskData());
+        sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
 
         // Assert
         verify(mockProsessTaskRepository).lagre(argumentCaptor.capture());
@@ -170,7 +170,7 @@ public class SorterHendelserTaskTest {
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
         // Act
-        sorterHendelserTask.doTask(dataWrapper.getProsessTaskData());
+        sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
 
         // Assert
         verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
