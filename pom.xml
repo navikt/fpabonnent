@@ -44,7 +44,7 @@
         <weld-web.version>3.1.4.Final</weld-web.version>
         <javax.el.version>3.0.1-b11</javax.el.version>
         <swagger.version>2.1.4</swagger.version>
-        <swagger-ui.version>3.31.1</swagger-ui.version>
+        <swagger-ui.version>3.32.1</swagger-ui.version>
         <kafka.version>2.6.0</kafka.version>
         <avro.version>1.10.0</avro.version>
         <confluent.version>5.5.0</confluent.version>
