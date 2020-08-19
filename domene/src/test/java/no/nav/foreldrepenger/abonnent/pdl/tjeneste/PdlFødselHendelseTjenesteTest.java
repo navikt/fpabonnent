@@ -43,7 +43,7 @@ public class PdlFødselHendelseTjenesteTest {
         PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding();
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraString(JsonMapper.toJson(fødselmelding));
+        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -61,7 +61,7 @@ public class PdlFødselHendelseTjenesteTest {
                 of(AKTØR_ID_MOR, AKTØR_ID_FAR), FØDSELSDATO);
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraString(JsonMapper.toJson(fødselmelding));
+        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -80,7 +80,7 @@ public class PdlFødselHendelseTjenesteTest {
         PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(aktørIdBarn, aktørIdForeldre, FØDSELSDATO);
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraString(JsonMapper.toJson(fødselmelding));
+        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -100,7 +100,7 @@ public class PdlFødselHendelseTjenesteTest {
                 of("10018876555", "1234567890988", "30102040506", "1234567890989"), FØDSELSDATO);
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraString(JsonMapper.toJson(fødselmelding));
+        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -117,7 +117,7 @@ public class PdlFødselHendelseTjenesteTest {
         PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(Collections.emptySet(), Collections.emptySet(), null);
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraString(JsonMapper.toJson(fødselmelding));
+        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -132,6 +132,6 @@ public class PdlFødselHendelseTjenesteTest {
     public void skal_få_IO_exception_ved_konvertering_av_payload_med_syntaksfeil_i_payload() {
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("Fikk IO exception ved parsing av JSON");
-        hendelseTjeneste.payloadFraString("{{\"foo\":\"bar\"}");
+        hendelseTjeneste.payloadFraJsonString("{{\"foo\":\"bar\"}");
     }
 }

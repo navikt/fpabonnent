@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
 import static java.util.Set.of;
 import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsHendelseHjelper.hentUtAktørIderFraString;
-import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsHendelseHjelper.optionalStringTilLocalDate;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
-import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTypeRef;
@@ -51,7 +49,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     }
 
     @Override
-    public PdlFødselHendelsePayload payloadFraString(String payload) {
+    public PdlFødselHendelsePayload payloadFraJsonString(String payload) {
         PdlFødsel pdlFødsel = JsonMapper.fromJson(payload, PdlFødsel.class);
 
         return new PdlFødselHendelsePayload.Builder()
@@ -64,25 +62,6 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 .aktørIdForeldre(pdlFødsel.getAktørIdForeldre())
                 .fødselsdato(pdlFødsel.getFødselsdato())
                 .build();
-    }
-
-    @Override
-    public PdlFødselHendelsePayload payloadFraWrapper(HendelserDataWrapper dataWrapper) {
-        return new PdlFødselHendelsePayload.Builder()
-                .hendelseId(dataWrapper.getHendelseId().orElse(null))
-                .hendelseType(dataWrapper.getHendelseType().orElse(null))
-                .endringstype(dataWrapper.getEndringstype().orElse(null))
-                .aktørIdBarn(dataWrapper.getAktørIdBarn().orElse(null))
-                .aktørIdForeldre(dataWrapper.getAktørIdForeldre().orElse(null))
-                .fødselsdato(optionalStringTilLocalDate(dataWrapper.getFødselsdato()))
-                .build();
-    }
-
-    @Override
-    public void populerDatawrapper(PdlFødselHendelsePayload payload, HendelserDataWrapper dataWrapper) {
-        payload.getAktørIdBarn().ifPresent(dataWrapper::setAktørIdBarn);
-        payload.getAktørIdForeldre().ifPresent(dataWrapper::setAktørIdForeldre);
-        payload.getFødselsdato().ifPresent(dataWrapper::setFødselsdato);
     }
 
     @Override
@@ -106,7 +85,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
     private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(PdlFødselHendelsePayload payload, Optional<InngåendeHendelse> tidligereHendelse) {
         if (tidligereHendelse.isPresent() && tidligereHendelse.get().erSendtTilFpsak()) {
-            boolean harSammeDato = payload.getFødselsdato().isPresent() && payload.getFødselsdato().equals(payloadFraString(tidligereHendelse.get().getPayload()).getFødselsdato());
+            boolean harSammeDato = payload.getFødselsdato().isPresent() && payload.getFødselsdato().equals(payloadFraJsonString(tidligereHendelse.get().getPayload()).getFødselsdato());
             if (harSammeDato) {
                 LOGGER.info("Hendelse {} vil bli forkastet da endringstypen er KORRIGERT, uten at fødselsdatoen {} er endret siden hendelse {}, som er forrige hendelse som ble sendt til FPSAK",
                         payload.getHendelseId(), payload.getFødselsdato(), tidligereHendelse.get().getHendelseId());

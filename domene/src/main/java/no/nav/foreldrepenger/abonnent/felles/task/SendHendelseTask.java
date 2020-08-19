@@ -7,11 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
+import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
+import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -27,15 +26,15 @@ public class SendHendelseTask implements ProsessTaskHandler {
 
     private HendelseConsumer hendelseConsumer;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
-    private HendelseTjenesteProvider hendelseTjenesteProvider;
+    private HendelseRepository hendelseRepository;
 
     @Inject
     public SendHendelseTask(HendelseConsumer hendelseConsumer,
                             InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
-                            HendelseTjenesteProvider hendelseTjenesteProvider) {
+                            HendelseRepository hendelseRepository) {
         this.hendelseConsumer = hendelseConsumer;
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
-        this.hendelseTjenesteProvider = hendelseTjenesteProvider;
+        this.hendelseRepository = hendelseRepository;
     }
 
     @Override
@@ -49,10 +48,9 @@ public class SendHendelseTask implements ProsessTaskHandler {
     }
 
     private HendelsePayload getHendelsePayload(HendelserDataWrapper dataWrapper) {
-        String type = dataWrapper.getHendelseType()
-                .orElseThrow(() -> AbonnentHendelserFeil.FACTORY.ukjentHendelseType(null).toException());
-        HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider
-                .finnTjeneste(HendelseType.fraKode(type), dataWrapper.getHendelseId().orElse(null));
-        return hendelseTjeneste.payloadFraWrapper(dataWrapper);
+        Long inngåendeHendelseId = dataWrapper.getInngåendeHendelseId()
+                .orElseThrow(() -> AbonnentHendelserFeil.FACTORY.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(), dataWrapper.getProsessTaskData().getId()).toException());
+        InngåendeHendelse inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId);
+        return inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
     }
 }
