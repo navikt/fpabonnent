@@ -33,4 +33,9 @@ public class AktørWebServiceHealthCheck extends WebServiceHealthCheck {
     protected void performWebServiceSelftest() {
         aktorSelftestConsumer.ping();
     }
+
+    @Override
+    public boolean erKritiskTjeneste() {
+        return false;
+    }
 }
