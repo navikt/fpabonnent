@@ -19,7 +19,6 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.env.Environment;
 
 @Dependent
 public class PdlLeesahHendelseProperties {
@@ -44,16 +43,17 @@ public class PdlLeesahHendelseProperties {
                                        @KonfigVerdi("systembruker.password") String password,
                                        @KonfigVerdi(value = "javax.net.ssl.trustStore") String trustStorePath,
                                        @KonfigVerdi(value = "javax.net.ssl.trustStorePassword") String trustStorePassword,
-                                       @KonfigVerdi("kafka.topic.pdl.leesah.hendelse") String topic,
+                                       @KonfigVerdi("kafka.pdl.leesah.application.id") String applicationId,
+                                       @KonfigVerdi("kafka.pdl.leesah.topic") String topic,
                                        @KonfigVerdi(value = KAFKA_AVRO_SERDE_CLASS, defaultVerdi = "io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde") String kafkaAvroSerdeClass) {
-        this.personhendelseTopic = new Topic<>(topic, Serdes.String(), getSerde(kafkaAvroSerdeClass));
         this.bootstrapServers = bootstrapServers;
         this.schemaRegistryUrl = schemaRegistry;
         this.username = username;
         this.password = password;
         this.trustStorePath = trustStorePath;
         this.trustStorePassword = trustStorePassword;
-        this.applicationId = getNaisAppName() + "-" + Environment.current().getNamespace().getNamespace();
+        this.applicationId = applicationId;
+        this.personhendelseTopic = new Topic<>(topic, Serdes.String(), getSerde(kafkaAvroSerdeClass));
     }
 
     public Topic<String, Personhendelse> getTopic() {
@@ -105,7 +105,7 @@ public class PdlLeesahHendelseProperties {
          * man enkelte ganger får feil partition (dvs partitions fra annen topic
          * enn den man skal ha).
          */
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, getApplicationId() + "-" + personhendelseTopic.getConsumerClientId());
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, getApplicationId());
         LOG.info("Stream APPLICATION_ID_CONFIG: {}", props.getProperty(StreamsConfig.APPLICATION_ID_CONFIG));
         props.put(StreamsConfig.CLIENT_ID_CONFIG, personhendelseTopic.getConsumerClientId());
         LOG.info("Stream CLIENT_ID_CONFIG: {}", props.getProperty(StreamsConfig.CLIENT_ID_CONFIG));
@@ -148,13 +148,5 @@ public class PdlLeesahHendelseProperties {
             }
         }
         return serde;
-    }
-
-    private String getNaisAppName() {
-        String naisAppName = Environment.current().getProperty("NAIS_APP_NAME");
-        if (naisAppName == null || naisAppName.isBlank()) {
-            naisAppName = "fpabonnent";
-        }
-        return naisAppName;
     }
 }

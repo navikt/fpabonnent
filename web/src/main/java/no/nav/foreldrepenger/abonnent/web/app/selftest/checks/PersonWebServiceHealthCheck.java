@@ -33,4 +33,9 @@ public class PersonWebServiceHealthCheck extends WebServiceHealthCheck {
     protected void performWebServiceSelftest() {
         selftestConsumer.ping();
     }
+
+    @Override
+    public boolean erKritiskTjeneste() {
+        return false;
+    }
 }

@@ -32,7 +32,7 @@
         <flyway.version>4.2.0</flyway.version>
         <hamcrest.version>1.3</hamcrest.version>
         <junit.version>5.5.2</junit.version>
-        <mockito.version>3.4.6</mockito.version>
+        <mockito.version>3.5.2</mockito.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
@@ -40,10 +40,10 @@
         <metrics.version>4.1.12.1</metrics.version>
         <prometheus.version>0.9.0</prometheus.version>
         <resteasy-validator-provider.version>3.13.0.Final</resteasy-validator-provider.version>
-        <weld-web.version>3.1.4.Final</weld-web.version>
+        <weld-web.version>3.1.5.Final</weld-web.version>
         <javax.el.version>3.0.1-b11</javax.el.version>
         <swagger.version>2.1.4</swagger.version>
-        <swagger-ui.version>3.31.1</swagger-ui.version>
+        <swagger-ui.version>3.32.1</swagger-ui.version>
         <kafka.version>2.6.0</kafka.version>
         <avro.version>1.10.0</avro.version>
         <confluent.version>5.5.0</confluent.version>
@@ -399,6 +399,23 @@
     </dependencyManagement>
 
     <build>
+        <resources>
+            <!-- filtrerer for å sette opp swagger versjon korrekt -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.html</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.html</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -484,7 +501,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
-                    <version>1.2.4</version>
+                    <version>1.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
