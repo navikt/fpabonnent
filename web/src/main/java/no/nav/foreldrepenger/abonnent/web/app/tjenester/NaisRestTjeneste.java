@@ -10,7 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Operation;
-import no.nav.foreldrepenger.abonnent.web.app.selftest.SelftestService;
+import no.nav.foreldrepenger.abonnent.web.app.selftest.checks.DatabaseHealthCheck;
 
 @Path("/health")
 @Produces(TEXT_PLAIN)
@@ -22,16 +22,16 @@ public class NaisRestTjeneste {
     private static final String RESPONSE_OK = "OK";
 
     private ApplicationServiceStarter starterService;
-    private SelftestService selftestService;
+    private DatabaseHealthCheck databaseHealthCheck;
 
     public NaisRestTjeneste() {
         // CDI
     }
 
     @Inject
-    public NaisRestTjeneste(ApplicationServiceStarter starterService, SelftestService selftestService) {
+    public NaisRestTjeneste(ApplicationServiceStarter starterService, DatabaseHealthCheck databaseHealthCheck) {
         this.starterService = starterService;
-        this.selftestService = selftestService;
+        this.databaseHealthCheck = databaseHealthCheck;
     }
 
     @GET
@@ -55,17 +55,14 @@ public class NaisRestTjeneste {
     @Path("isReady")
     @Operation(description = "sjekker om poden er klar", tags = "nais", hidden = true)
     public Response isReady() {
-        if (selftestService.kritiskTjenesteFeilet()) {
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                    .build();
-        } else if (!starterService.isKafkaAlive()) {
+        if (starterService.isKafkaAlive() && databaseHealthCheck.isReady()) {
             return Response
-                    .serverError()
+                    .ok(RESPONSE_OK)
                     .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
                     .build();
         } else {
-            return Response.ok(RESPONSE_OK)
+            return Response
+                    .status(Response.Status.SERVICE_UNAVAILABLE)
                     .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
                     .build();
         }

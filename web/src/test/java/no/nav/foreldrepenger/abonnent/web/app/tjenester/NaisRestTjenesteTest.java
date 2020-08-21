@@ -10,18 +10,18 @@ import javax.ws.rs.core.Response;
 import org.junit.Before;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.abonnent.web.app.selftest.SelftestService;
+import no.nav.foreldrepenger.abonnent.web.app.selftest.checks.DatabaseHealthCheck;
 
 public class NaisRestTjenesteTest {
 
     private NaisRestTjeneste restTjeneste;
 
     private ApplicationServiceStarter serviceStarterMock = mock(ApplicationServiceStarter.class);
-    private SelftestService selftestServiceMock = mock(SelftestService.class);
+    private DatabaseHealthCheck databaseHealthCheckMock = mock(DatabaseHealthCheck.class);
 
     @Before
     public void setup() {
-        restTjeneste = new NaisRestTjeneste(serviceStarterMock, selftestServiceMock);
+        restTjeneste = new NaisRestTjeneste(serviceStarterMock, databaseHealthCheckMock);
     }
 
     @Test
@@ -43,9 +43,9 @@ public class NaisRestTjenesteTest {
     }
 
     @Test
-    public void isReady_skal_returnere_service_unavailable_når_kritiske_selftester_feiler() {
+    public void isReady_skal_returnere_service_unavailable_når_databasetest_feiler() {
         when(serviceStarterMock.isKafkaAlive()).thenReturn(true);
-        when(selftestServiceMock.kritiskTjenesteFeilet()).thenReturn(true);
+        when(databaseHealthCheckMock.isReady()).thenReturn(false);
 
         Response response = restTjeneste.isReady();
 
@@ -53,19 +53,19 @@ public class NaisRestTjenesteTest {
     }
 
     @Test
-    public void isReady_skal_returnere_server_error_når_kafka_feiler() {
+    public void isReady_skal_returnere_service_unavailable_når_kafka_feiler() {
         when(serviceStarterMock.isKafkaAlive()).thenReturn(false);
-        when(selftestServiceMock.kritiskTjenesteFeilet()).thenReturn(false);
+        when(databaseHealthCheckMock.isReady()).thenReturn(true);
 
         Response response = restTjeneste.isReady();
 
-        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        assertThat(response.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
     }
 
     @Test
-    public void isReady_skal_returnere_status_ok_når_selftester_er_ok() {
+    public void isReady_skal_returnere_status_ok_når_database_og_kafka_er_ok() {
         when(serviceStarterMock.isKafkaAlive()).thenReturn(true);
-        when(selftestServiceMock.kritiskTjenesteFeilet()).thenReturn(false);
+        when(databaseHealthCheckMock.isReady()).thenReturn(true);
 
         Response response = restTjeneste.isReady();
 
