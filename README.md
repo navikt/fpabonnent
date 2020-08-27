@@ -11,7 +11,8 @@ Applikasjonen tar inn hendelser fra potensielt flere kilder og videresender diss
 
 ### Lokal utvikling
 * For å teste applikasjonen ende-til-ende lokalt må man benytte VTP + Autotest, sammen med FP-Sak.
-* I VTP finnes en REST-tjeneste /api/pdl/leesah som gir mulighet til å opprette hendelser på intern Kafka-topic. FP-Abonnent lytter på denne når den kjøres med --vtp-flagget.
+* I VTP finnes en REST-tjeneste /api/pdl/leesah som gir mulighet til å opprette hendelser på intern Kafka-topic. FP-Abonnent lytter på denne når den kjøres lokalt.
+* For at VTP skal opprette PDL-topicen må environment for VTP settes til dette + komma-separert liste over andre topics du evt. trenger lokalt: CREATE_TOPICS=aapen-person-pdl-leesah-v1-vtp
 * For å få hendelsen prosessert uten å vente på forsinkelsen, må du sette NESTE_KJOERING_ETTER på prosesstasken til nåtid i PROSESS_TASK-tabellen.
 * Hvis du trenger at hendelsen reflekteres som en endring i TPS når FP-Sak oppdaterer registerdata, må dette hackes til i TPS-mocken i VTP.
 

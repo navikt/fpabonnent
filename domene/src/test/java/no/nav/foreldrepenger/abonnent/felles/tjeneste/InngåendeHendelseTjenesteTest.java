@@ -55,7 +55,7 @@ public class InngåendeHendelseTjenesteTest {
         assertThat(resultat).isInstanceOf(PdlFødselHendelsePayload.class);
     }
     
-    //TODO(JEJ): Kommentere inn når payload fjernes igjen:
+    //TODO(TFP-3680): Kommentere inn når payload fjernes igjen:
     @Ignore
     @Test
     public void skal_markere_hendelse_som_håndtert_og_fjerne_payload() {
