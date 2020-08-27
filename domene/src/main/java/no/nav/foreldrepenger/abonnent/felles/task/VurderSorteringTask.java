@@ -125,7 +125,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
 
     private void ferdigstillHendelseUtenVidereHåndtering(InngåendeHendelse inngåendeHendelse) {
         hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.HÅNDTERT);
-        //TODO(JEJ): Kommentere inn slik at vi fjerner payload når vi har sett at det fungerer (+ bestille patch til null på gamle):
+        //TODO(TFP-3680): Kommentere inn slik at vi fjerner payload når vi har sett at det fungerer (+ bestille patch til null på gamle):
         //hendelseRepository.fjernPayload(inngåendeHendelse);
     }
 
