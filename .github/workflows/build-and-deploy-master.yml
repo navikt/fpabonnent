@@ -79,8 +79,8 @@ jobs:
             Kommenter med <b>/promote env namespace</b>, hvor <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
             <table>
             <tr><th>Cluster</th><th>Namespace</th></tr>
-            <tr><td>dev-fss</td><td>q1, q0</td></tr>
-            <tr><td>prod-fss</td><td>default</td></tr>
+            <tr><td>dev-fss</td><td>q1, teamforeldrepenger</td></tr>
+            <tr><td>prod-fss</td><td>default, teamforeldrepenger</td></tr>
             </table>
 
       - name: Trigg deploy til Q1

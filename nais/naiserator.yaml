@@ -49,8 +49,8 @@ spec:
       mountPath: /config/oracle
     - kvPath: {{serviceuserkv}}
       mountPath: /secrets/serviceuser/
-    - kvPath: {{othercredskv}}
-      mountPath: /var/run/secrets/nais.io/vault 
+    - kvPath: /kv/{{cluster}}/fss/fpsak/{{namespace}}
+      mountPath: /var/run/secrets/nais.io/vault
   env:
 {{#each env}}
    - name: {{@key}}
