@@ -21,7 +21,7 @@
 		"OPENIDCONNECT_USERNAME": "fpabonnent-p",
 		"OPENIDCONNECT_ISSOHOST": "https://isso.adeo.no:443/isso/oauth2",
 		"SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
-		"FPSAKHENDELSER_V1_URL": "http://fpsak.default/fpsak/api/hendelser/",
+		"FPSAKHENDELSER_V1_URL": "https://fpsak.nais.adeo.no/fpsak/api/hendelser/",
 		"AKTOER_V2_URL": "https://app.adeo.no/aktoerregister/ws/Aktoer/v2",
 		"PERSON_V3_URL": "https://wasapp.adeo.no/tpsws/ws/Person/v3"
 	}

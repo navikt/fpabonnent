@@ -1,7 +1,9 @@
 {
-	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q1",
+    "cluster": "preprod",
+    "oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q1",
 	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_q1-fpabonnent_q1",
 	"serviceuserkv": "/serviceuser/data/dev/srvfpabonnent",
+    "cluster": "preprod",
 	"namespace": "q1",
 	"ingresses": [
 		"https://fpabonnent-q1.nais.preprod.local/"
