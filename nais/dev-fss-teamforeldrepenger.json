@@ -17,7 +17,7 @@
       "KAFKA_SCHEMA_REGISTRY_URL": "https://kafka-schema-registry.nais.preprod.local",
       "KAFKA_PDL_LEESAH_APPLICATION_ID": "fpabonnent-q1-KC-aapen-person-pdl-leesah-v1",
       "KAFKA_PDL_LEESAH_TOPIC": "aapen-person-pdl-leesah-v1",
-      "LOADBALANCER_URL": "https://fpabonnent.dev.adeo.no",
+      "LOADBALANCER_URL": "https://fpabonnent.nais.preprod.local",
       "OIDC_OPENAM_JWKSURL": "https://isso-q.adeo.no:443/isso/oauth2/connect/jwk_uri",
       "OIDC_OPENAM_ISSUERURL": "https://isso-q.adeo.no:443/isso/oauth2",
       "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
