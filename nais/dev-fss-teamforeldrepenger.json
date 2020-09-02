@@ -5,7 +5,8 @@
 	"serviceuserkv": "/serviceuser/data/dev/srvfpabonnent",
 	"namespace": "teamforeldrepenger",
 	"ingresses": [
-		"https://fpabonnent-teamforeldrepenger.nais.preprod.local/",
+      "https://fpabonnent-q1.nais.preprod.local/",
+      "https://fpabonnent-teamforeldrepenger.nais.preprod.local/",
       "https://fpabonnent.nais.preprod.local/",
       "https://fpabonnent.dev.adeo.no/"
 	],
