@@ -6,8 +6,7 @@
 	"namespace": "q1",
 	"ingresses": [
 		"https://fpabonnent-q1.nais.preprod.local/",
-        "https://fpabonnent.nais.preprod.local/",
-        "https://fpabonnent.dev.adeo.no/"
+        "https://fpabonnent-q1.dev.adeo.no/"
     ],
 	"env": {
       "ABAC_PDP_ENDPOINT_URL": "https://wasapp-q1.adeo.no/asm-pdp/authorize",
