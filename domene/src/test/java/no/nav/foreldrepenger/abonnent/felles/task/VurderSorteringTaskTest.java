@@ -311,6 +311,60 @@ public class VurderSorteringTaskTest {
     }
 
     @Test
+    public void skal_ikke_grovsortere_korrigering_der_tidligere_fødselshendelser_ikke_ble_sendt_til_fpsak() {
+        // Arrange
+        InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
+                .hendelseId("A")
+                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+                .hendelseKilde(HendelseKilde.PDL)
+                .sendtTidspunkt(null)
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now().minusDays(2), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
+        InngåendeHendelse hendelseKorrigert1 = InngåendeHendelse.builder()
+                .hendelseId("B")
+                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+                .hendelseKilde(HendelseKilde.PDL)
+                .sendtTidspunkt(null)
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now().minusDays(1), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+                .tidligereHendelseId("A")
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert1);
+        InngåendeHendelse hendelseKorrigert2 = InngåendeHendelse.builder()
+                .hendelseId("C")
+                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .hendelseKilde(HendelseKilde.PDL)
+                .sendtTidspunkt(null)
+                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "C", "B").build()))
+                .tidligereHendelseId("B")
+                .build();
+        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert2);
+        repoRule.getEntityManager().flush();
+
+        HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert2.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
+        hendelserDataWrapper.setHendelseId("C");
+
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert2.getId());
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+
+        verify(personTjeneste, times(0)).erRegistrert(any());
+        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
+    @Test
     public void skal_ikke_grovsortere_korrigering_der_tidligere_fødselshendelse_ikke_finnes_i_vårt_system() {
         // Arrange
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
