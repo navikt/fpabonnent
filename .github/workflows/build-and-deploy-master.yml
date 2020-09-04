@@ -91,3 +91,10 @@ jobs:
           issue-number: ${{ steps.createdeployissue.outputs.number }}
           body: /promote dev-fss q1
 
+      - name: Trigg deploy til teamforeldrepenger
+        if: success()
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.NOTIFICATION }}
+          issue-number: ${{ steps.createdeployissue.outputs.number }}
+          body: /promote dev-fss teamforeldrepenger
