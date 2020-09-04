@@ -60,14 +60,20 @@ public class HendelseTjenesteHjelper {
     }
 
     private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(HendelsePayload payload, Optional<InngåendeHendelse> tidligereHendelse, Function<String, HendelsePayload> payloadFraJsonString) {
-        if (tidligereHendelse.isPresent() && tidligereHendelse.get().erSendtTilFpsak()) {
+        if (tidligereHendelse.isEmpty()) {
+            return false;
+        } else if (tidligereHendelse.get().erSendtTilFpsak()) {
             boolean harSammeDato = payload.getHendelseDato().isPresent() && payload.getHendelseDato().equals(payloadFraJsonString.apply(tidligereHendelse.get().getPayload()).getHendelseDato());
             if (harSammeDato) {
                 LOGGER.info("Hendelse {} av type {} vil bli forkastet da endringstypen er KORRIGERT, uten at datoen {} er endret siden hendelse {}, som er forrige hendelse som ble sendt til FPSAK",
                         payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseDato(), tidligereHendelse.get().getHendelseId());
             }
             return harSammeDato;
-        } else if (tidligereHendelse.isPresent() && tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() != null) {
+        } else if (tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() == null) {
+            LOGGER.info("Hendelse {} av type {} vil bli forkastet da endringstypen er {}, uten at vi har sendt tidligere hendelse {}",
+                    payload.getHendelseId(), payload.getHendelseType(), payload.getEndringstype(), tidligereHendelse.get().getHendelseId());
+            return true;
+        } else if (tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() != null) {
             // Gjøre sammenlikningen mot neste tidligere hendelse i stedet, i tilfelle den er sendt til Fpsak
             Optional<InngåendeHendelse> nesteTidligereHendelse = getTidligereHendelse(tidligereHendelse.get().getTidligereHendelseId());
             return nesteTidligereHendelse.isPresent() && sjekkOmHendelseHarSammeVerdiOgErSendt(payload, nesteTidligereHendelse, payloadFraJsonString);
