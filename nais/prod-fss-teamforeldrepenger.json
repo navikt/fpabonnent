@@ -3,7 +3,6 @@
 	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
 	"oraclecredskv": "/oracle/data/prod/creds/fpabonnent_p-fpabonnent_p",
 	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",
-	"namespace": "teamforeldrepenger",
 	"ingresses": [ "https://fpabonnent.nais.adeo.no" ],
 	"env": {
 		"ABAC_PDP_ENDPOINT_URL": "https://wasapp.adeo.no/asm-pdp/authorize",
@@ -21,7 +20,7 @@
 		"OPENIDCONNECT_USERNAME": "fpabonnent-p",
 		"OPENIDCONNECT_ISSOHOST": "https://isso.adeo.no:443/isso/oauth2",
 		"SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
-		"FPSAKHENDELSER_V1_URL": "https://fpsak.nais.adeo.no/fpsak/api/hendelser/",
+		"FPSAKHENDELSER_V1_URL": "http://fpsak/fpsak/api/hendelser/",
 		"AKTOER_V2_URL": "https://app.adeo.no/aktoerregister/ws/Aktoer/v2",
 		"PERSON_V3_URL": "https://wasapp.adeo.no/tpsws/ws/Person/v3"
 	}

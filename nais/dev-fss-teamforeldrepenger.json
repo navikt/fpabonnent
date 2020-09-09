@@ -3,7 +3,6 @@
 	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q1",
 	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_q1-fpabonnent_q1",
 	"serviceuserkv": "/serviceuser/data/dev/srvfpabonnent",
-	"namespace": "teamforeldrepenger",
 	"ingresses": [
         "https://fpabonnent-q1.nais.preprod.local/",
         "https://fpabonnent-q1.dev.adeo.no/"
@@ -11,7 +10,7 @@
 	"env": {
       "ABAC_PDP_ENDPOINT_URL": "https://wasapp-q1.adeo.no/asm-pdp/authorize",
       "ABAC_ATTRIBUTT_DRIFT": "no.nav.abac.attributter.foreldrepenger.drift",
-      "FPSAKHENDELSER_V1_URL": "https://fpsak-q1.nais.preprod.local/fpsak/api/hendelser/",
+      "FPSAKHENDELSER_V1_URL": "http://fpsak/fpsak/api/hendelser/",
       "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
       "KAFKA_SCHEMA_REGISTRY_URL": "https://kafka-schema-registry.nais.preprod.local",
       "KAFKA_PDL_LEESAH_APPLICATION_ID": "fpabonnent-q1-KC-aapen-person-pdl-leesah-v1",
