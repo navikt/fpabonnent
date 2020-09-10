@@ -43,7 +43,6 @@ jobs:
                             repo: context.issue.repo,
                             issue_number: ${{ github.event.client_payload.github.payload.issue.number }} }
             github.issues.createComment({...issue,
-                                    title: 'Deploy av ${{ env.TAG }}',
                                     body: 'promote til ${{ github.event.client_payload.slash_command.args }} feilet'})
             github.issues.addLabels({...issue, labels: ['deployment-failed','${{ env.CLUSTER }}:${{ env.NAMESPACE }}'])
 
