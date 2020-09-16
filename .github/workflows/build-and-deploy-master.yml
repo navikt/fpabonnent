@@ -107,11 +107,19 @@ jobs:
             <tr><td>prod-fss</td><td>default</td></tr>
             </table>
 
-      - name: Trigger verdikjedetestene i fpsak-autotest prosjektet
+#      - name: Trigger verdikjedetestene i fpsak-autotest prosjektet
+#        if: success()
+#        uses: peter-evans/repository-dispatch@v1
+#        with:
+#          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+#          repository: navikt/fpsak-autotest
+#          event-type: fpabonnent-verdikjede
+#          client-payload: '{ "trigger": "${{ github.repository }}", "version": "${{ env.TAG }}", "issue-number": "${{ steps.createdeployissue.outputs.number }}" }'
+
+      - name: Trigg deploy teamforeldrepenger i dev-fss
         if: success()
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/create-or-update-comment@v1
         with:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-          repository: navikt/fpsak-autotest
-          event-type: fpabonnent-verdikjede
-          client-payload: '{ "trigger": "${{ github.repository }}", "version": "${{ env.TAG }}", "issue-number": "${{ steps.createdeployissue.outputs.number }}" }'
+          issue-number: ${{ steps.createdeployissue.outputs.number }}
+          body: /promote dev-fss
