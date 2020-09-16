@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.task.VurderSorteringTask;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseKonfig;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
@@ -43,7 +45,9 @@ public class PdlLeesahHendelseHåndtererTest {
     public void before() {
         hendelseRepository = mock(HendelseRepository.class);
         prosessTaskRepository = mock(ProsessTaskRepository.class);
-        tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste();
+        TpsForsinkelseKonfig tpsForsinkelseKonfig = mock(TpsForsinkelseKonfig.class);
+        when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
+        tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste(tpsForsinkelseKonfig, hendelseRepository);
 
         hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskRepository, tpsForsinkelseTjeneste);
     }

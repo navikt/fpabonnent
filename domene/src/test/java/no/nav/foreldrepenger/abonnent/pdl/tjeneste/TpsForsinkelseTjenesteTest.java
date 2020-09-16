@@ -20,11 +20,14 @@ public class TpsForsinkelseTjenesteTest {
 
     private HendelseRepository hendelseRepository = mock(HendelseRepository.class);
 
+    private TpsForsinkelseKonfig tpsForsinkelseKonfig;
     private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
 
     @Before
     public void before() {
-        tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste(hendelseRepository);
+        tpsForsinkelseKonfig = mock(TpsForsinkelseKonfig.class);
+        when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
+        tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste(tpsForsinkelseKonfig, hendelseRepository);
     }
 
     @Test
@@ -283,4 +286,15 @@ public class TpsForsinkelseTjenesteTest {
                 LocalDateTime.of(2023, 5, 2, 6, 59));
     }
 
+    @Test
+    public void skal_ikke_forsinke_hendelser_når_konfig_er_deaktivert() {
+        // Arrange
+        when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(false);
+
+        // Act
+        LocalDateTime resultat = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(LocalDateTime.now(), mock(InngåendeHendelse.class));
+
+        // Assert
+        assertThat(resultat).isBetween(LocalDateTime.now().minusMinutes(1), LocalDateTime.now().plusMinutes(1));
+    }
 }
