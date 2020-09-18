@@ -111,7 +111,7 @@ jobs:
         if: success()
         uses: peter-evans/repository-dispatch@v1
         with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          token: ${{ secrets.NOTIFICATION }}
           repository: navikt/fpsak-autotest
           event-type: fpabonnent-verdikjede
           client-payload: '{ "trigger": "${{ github.repository }}", "version": "${{ env.TAG }}", "issue-number": "${{ steps.createdeployissue.outputs.number }}" }'
