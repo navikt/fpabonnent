@@ -36,6 +36,7 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseKonfig;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseTjeneste;
 import no.nav.foreldrepenger.abonnent.tps.AktørId;
 import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
@@ -56,7 +57,6 @@ public class VurderSorteringTaskTest {
 
     private ProsessTaskRepository prosessTaskRepository = mock(ProsessTaskRepository.class);
 
-    @Inject
     private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
 
     @Inject
@@ -70,9 +70,14 @@ public class VurderSorteringTaskTest {
 
     @Before
     public void before() {
+        TpsForsinkelseKonfig tpsForsinkelseKonfig = mock(TpsForsinkelseKonfig.class);
+        when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
+        tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste(tpsForsinkelseKonfig, hendelseRepository);
+
         HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(personTjeneste, hendelseTjenesteHjelper);
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         when(hendelseTjenesteProvider.finnTjeneste(any(HendelseType.class), anyString())).thenReturn(hendelseTjeneste);
+
         vurderSorteringTask = new VurderSorteringTask(prosessTaskRepository, tpsForsinkelseTjeneste, hendelseTjenesteProvider, hendelseRepository);
     }
 

@@ -49,6 +49,7 @@ public class TpsForsinkelseTjeneste {
             MonthDay.of(12, 31)
     );
 
+    private TpsForsinkelseKonfig tpsForsinkelseKonfig;
     private HendelseRepository hendelseRepository;
 
     public TpsForsinkelseTjeneste() {
@@ -56,11 +57,15 @@ public class TpsForsinkelseTjeneste {
     }
 
     @Inject
-    public TpsForsinkelseTjeneste(HendelseRepository hendelseRepository) {
+    public TpsForsinkelseTjeneste(TpsForsinkelseKonfig tpsForsinkelseKonfig, HendelseRepository hendelseRepository) {
+        this.tpsForsinkelseKonfig = tpsForsinkelseKonfig;
         this.hendelseRepository = hendelseRepository;
     }
 
     public LocalDateTime finnNesteTidspunktForVurderSortering(LocalDateTime opprettetTid, InngåendeHendelse inngåendeHendelse) {
+        if (!tpsForsinkelseKonfig.skalForsinkeHendelser()) {
+            return LocalDateTime.now();
+        }
         Optional<LocalDateTime> tidspunktBasertPåTidligereHendelse = sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse);
         return tidspunktBasertPåTidligereHendelse.orElseGet(() -> doFinnNesteTidspunktForVurderSortering(opprettetTid));
     }

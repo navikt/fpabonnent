@@ -64,9 +64,10 @@ jobs:
 
       - name: Bygg, tag og push Docker image
         run: |
-          docker build  --tag $IMAGE .
+          docker build --pull --tag ${IMAGE_BASE}:${TAG} --tag ${IMAGE_BASE}:latest .
           echo  $GITHUB_TOKEN | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} --password-stdin
-          docker push $IMAGE_BASE
+          docker push ${IMAGE_BASE}:latest
+          docker push ${IMAGE_BASE}:${TAG}
 
       - name: Lukk gamle bygg-issues
         uses: actions/github-script@v3
@@ -87,24 +88,30 @@ jobs:
                   state: 'closed'
                 });
               });
-            });     
-      
-      - name: Opprett issue, trigg deploy til dev-fss
+            });
+
+      - name: Opprett deployment issue
         if: success()
-        uses: actions/github-script@v3
+        uses: maxkomarychev/oction-create-issue@v0.7.1
+        id: createdeployissue
         with:
-          github-token: ${{secrets.NOTIFICATION}}
-          script: |
-              github.issues.create( {
-                owner: context.issue.owner,
-                repo: context.issue.repo,
-                labels: ['bygg'],
-                title: 'Deploy av ${{ env.TAG }}'})
-              .then(response => {
-                      const issue = { owner: context.issue.owner,
-                      repo: context.issue.repo,
-                      issue_number: response.data.number }
-                     github.issues.createComment({...issue,
-                            title: 'Deploy av ${{ env.TAG }}',
-                            body: '/promote dev-fss '})
-               });
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Deploy av ${{ env.TAG }}
+          labels: deployment
+          body: |
+            Kommenter med <b>/promote cluster namespace</b>, hvor <b>cluster</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
+
+            <table>
+            <tr><th>Cluster</th><th>Namespace</th></tr>
+            <tr><td>dev-fss</td><td>q1</td></tr>
+            <tr><td>prod-fss</td><td>default</td></tr>
+            </table>
+
+      - name: Trigger verdikjedetestene i fpsak-autotest prosjektet
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.NOTIFICATION }}
+          repository: navikt/fpsak-autotest
+          event-type: fpabonnent-verdikjede
+          client-payload: '{ "trigger": "${{ github.repository }}", "version": "${{ env.TAG }}", "issue-number": "${{ steps.createdeployissue.outputs.number }}" }'
