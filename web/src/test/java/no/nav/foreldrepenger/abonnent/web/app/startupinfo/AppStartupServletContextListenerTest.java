@@ -15,9 +15,6 @@ public class AppStartupServletContextListenerTest {
 
     private AppStartupInfoLogger mockAppStartupInfoLogger;
 
-    // @Rule
-    // public final LogSniffer logSniffer = new LogSniffer();
-
     @Before
     public void setup() {
         listener = new AppStartupServletContextListener();
@@ -28,17 +25,13 @@ public class AppStartupServletContextListenerTest {
     @Test
     public void test_contextInitialized_ok() {
         listener.contextInitialized(mock(ServletContextEvent.class));
-
         verify(mockAppStartupInfoLogger).logAppStartupInfo();
     }
 
     @Test
     public void test_contextInitialized_exception() {
         doThrow(new RuntimeException("!")).when(mockAppStartupInfoLogger).logAppStartupInfo();
-
         listener.contextInitialized(mock(ServletContextEvent.class));
-
-        // logSniffer.assertHasErrorMessage("FP-753407");
     }
 
     @Test
