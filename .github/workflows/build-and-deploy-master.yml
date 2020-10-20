@@ -32,7 +32,7 @@ jobs:
           java-version: 1.11
 
       - name: Hent tag
-        run: echo "::set-env name=TAG::$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7)"
+        run: echo "TAG=$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
       - name: Hent og start Oracle image
         env:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Kompiler
         run: |
-          echo "::set-env name=IMAGE::$IMAGE_BASE:$TAG"
+          echo "IMAGE=$IMAGE_BASE:$TAG" >> $GITHUB_ENV
           mvn test -e --batch-mode --settings .github/workflows/.m2/settings.xml
           ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
           cp migreringer/src/main/resources/db/V4_0__baseline.sql.orig  migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
