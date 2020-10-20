@@ -86,6 +86,15 @@ jobs:
             <tr><td>prod-fss</td><td>default</td></tr>
             </table>
 
+      - name: Trigger verdikjedetestene i fpsak-autotest prosjektet
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.NOTIFICATION }}
+          repository: navikt/fpsak-autotest
+          event-type: fpabonnent-verdikjede
+          client-payload: '{ "trigger": "${{ github.repository }}", "version": "${{ env.TAG }}", "issue-number": "${{ steps.createdeployissue.outputs.number }}" }'
+
       - name: Lukk gamle bygg-issues
         if: success()
         uses: actions/github-script@v3
@@ -99,7 +108,7 @@ jobs:
               labels: ['deployment']
             }).then(response => {
               response.data.forEach(issue => {
-                if (issue.number != steps.createdeployissue.outputs.number) {
+                if (issue.number != ${{ steps.createdeployissue.outputs.number }}) {
                   github.issues.update({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
@@ -109,12 +118,3 @@ jobs:
                 }
               });
             });
-
-      - name: Trigger verdikjedetestene i fpsak-autotest prosjektet
-        if: success()
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.NOTIFICATION }}
-          repository: navikt/fpsak-autotest
-          event-type: fpabonnent-verdikjede
-          client-payload: '{ "trigger": "${{ github.repository }}", "version": "${{ env.TAG }}", "issue-number": "${{ steps.createdeployissue.outputs.number }}" }'
