@@ -69,27 +69,6 @@ jobs:
           docker push ${IMAGE_BASE}:latest
           docker push ${IMAGE_BASE}:${TAG}
 
-      - name: Lukk gamle bygg-issues
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: ['bygg']
-            }).then(response => {
-              response.data.forEach(issue => {
-                github.issues.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  state: 'closed'
-                });
-              });
-            });
-
       - name: Opprett deployment issue
         if: success()
         uses: maxkomarychev/oction-create-issue@v0.7.1
@@ -106,6 +85,30 @@ jobs:
             <tr><td>dev-fss</td><td>q1</td></tr>
             <tr><td>prod-fss</td><td>default</td></tr>
             </table>
+
+      - name: Lukk gamle bygg-issues
+        if: success()
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['bygg']
+            }).then(response => {
+              response.data.forEach(issue => {
+                if (issue.number != steps.createdeployissue.outputs.number) {
+                  github.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    state: 'closed'
+                  });
+                }
+              });
+            });
 
       - name: Trigger verdikjedetestene i fpsak-autotest prosjektet
         if: success()
