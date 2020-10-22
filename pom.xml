@@ -50,7 +50,7 @@
         <woodstox.version>6.2.1</woodstox.version>
 
         <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
-        <joda-time.version>2.10.6</joda-time.version>
+        <joda-time.version>2.10.7</joda-time.version>
         <ow2.asm.version>7.3.1</ow2.asm.version>
         <owaspencoder.version>1.2.2</owaspencoder.version>
         <javaslang.version>2.0.6</javaslang.version>
