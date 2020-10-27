@@ -21,9 +21,6 @@ import no.nav.vedtak.felles.jpa.TomtResultatException;
 import no.nav.vedtak.log.mdc.MDCOperations;
 import no.nav.vedtak.log.util.LoggerUtils;
 
-// TODO (tor) Har berre fått denne til å fungera med ApplicationException. Dermed blir denne mapperen heilt
-// generell. (Eigen mapper for ConstraintViolationException.)
-
 @Provider
 public class GeneralRestExceptionMapper implements ExceptionMapper<ApplicationException> {
 

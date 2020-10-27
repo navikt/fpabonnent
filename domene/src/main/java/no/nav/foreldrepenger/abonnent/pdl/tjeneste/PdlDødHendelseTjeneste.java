@@ -80,6 +80,7 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
     public void loggFeiletHendelse(PdlDødHendelsePayload payload) {
         String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
         String årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
+        boolean info = false;
         Optional<LocalDate> dødsdato = payload.getDødsdato();
         Optional<Set<String>> aktørIder = payload.getAktørId();
         if (dødsdato.isEmpty()) {
@@ -97,9 +98,14 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
                 årsak = "Årsaken er at aktørId fortsatt ikke finnes i TPS.";
             } else if (!harRegistrertDødsdato(aktørIder)) {
                 årsak = "Årsaken er at det fortsatt ikke er registrert dødsdato i TPS.";
+                info = true; // Det skjer regelmessig feilregistrering av dødsfall (OPPRETTET+ANNULLERT) og da inntreffer denne på OPPRETTET tilslutt
             }
         }
-        LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+        if (info) {
+            LOGGER.info(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+        } else {
+            LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+        }
     }
 
     private boolean harRegistrertDødsdato(Optional<Set<String>> aktørIder) {
