@@ -51,7 +51,7 @@
 
         <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
         <joda-time.version>2.10.8</joda-time.version>
-        <ow2.asm.version>7.3.1</ow2.asm.version>
+        <ow2.asm.version>9.0</ow2.asm.version>
         <owaspencoder.version>1.2.2</owaspencoder.version>
         <javaslang.version>2.0.6</javaslang.version>
         <swagger.spec-parser.version>1.0.52</swagger.spec-parser.version>
