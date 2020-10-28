@@ -61,7 +61,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         HendelsePayload hendelsePayload = hendelseTjeneste.payloadFraJsonString(inngåendeHendelse.getPayload());
 
         if (hendelseTjeneste.vurderOmHendelseKanForkastes(hendelsePayload)) {
-            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse);
+            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse, true);
             return;
         }
 
@@ -115,7 +115,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
             prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
         } else {
             hendelseTjeneste.loggFeiletHendelse(hendelsePayload);
-            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse);
+            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse, false);
         }
     }
 
@@ -123,10 +123,11 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         return hendelseOpprettetTid.plusDays(7).isAfter(LocalDateTime.now());
     }
 
-    private void ferdigstillHendelseUtenVidereHåndtering(InngåendeHendelse inngåendeHendelse) {
+    private void ferdigstillHendelseUtenVidereHåndtering(InngåendeHendelse inngåendeHendelse, boolean fjernPayload) {
         hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.HÅNDTERT);
-        //TODO(TFP-3680): Kommentere inn slik at vi fjerner payload når vi har sett at det fungerer (+ bestille patch til null på gamle):
-        //hendelseRepository.fjernPayload(inngåendeHendelse);
+        if (fjernPayload) {
+            hendelseRepository.fjernPayload(inngåendeHendelse);
+        }
     }
 
     private HendelseTjeneste<HendelsePayload> getHendelseTjeneste(HendelserDataWrapper dataWrapper, String hendelseType) {

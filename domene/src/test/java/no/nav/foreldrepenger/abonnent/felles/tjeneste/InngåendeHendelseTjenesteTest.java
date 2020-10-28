@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -55,8 +54,6 @@ public class InngåendeHendelseTjenesteTest {
         assertThat(resultat).isInstanceOf(PdlFødselHendelsePayload.class);
     }
     
-    //TODO(TFP-3680): Kommentere inn når payload fjernes igjen:
-    @Ignore
     @Test
     public void skal_markere_hendelse_som_håndtert_og_fjerne_payload() {
         // Arrange

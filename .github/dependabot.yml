@@ -12,10 +12,7 @@ updates:
     - "> 1.4.0, < 2"
   - dependency-name: org.flywaydb:flyway-core
     versions:
-    - ">= 5.a, < 6"
-  - dependency-name: org.flywaydb:flyway-core
-    versions:
-    - ">= 6.a, < 7"
+    - ">= 5.a, <= 7"
   - dependency-name: org.flywaydb:flyway-maven-plugin
     versions:
     - ">= 5.a, < 6"
