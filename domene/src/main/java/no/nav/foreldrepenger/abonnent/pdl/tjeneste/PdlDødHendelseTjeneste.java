@@ -21,6 +21,8 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlDødHendelsePayload;
 import no.nav.foreldrepenger.abonnent.tps.AktørId;
 import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
+import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationScoped
@@ -28,6 +30,7 @@ import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
 public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelsePayload> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdlDødHendelseTjeneste.class);
+    private static final Environment ENV = Environment.current();
 
     private PersonTjeneste personTjeneste;
 
@@ -110,8 +113,16 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
 
     private boolean harRegistrertDødsdato(Optional<Set<String>> aktørIder) {
         for (String aktørId : aktørIder.get()) {
-            if (personTjeneste.harRegistrertDødsdato(new AktørId(aktørId))) {
-                return true;
+            try {
+                if (personTjeneste.harRegistrertDødsdato(new AktørId(aktørId))) {
+                    return true;
+                }
+            } catch (TekniskException e) {
+                if (ENV.isProd()) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Fikk feil ved kall til TPS, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}", ENV.getCluster().clusterName(), e);
+                }
             }
         }
         return false;

@@ -80,9 +80,16 @@ public class TpsForsinkelseTjeneste {
             Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(), inngåendeHendelse.getHendelseKilde());
             if (tidligereHendelse.isPresent() && !HåndtertStatusType.HÅNDTERT.equals(tidligereHendelse.get().getHåndtertStatus())) {
                 LocalDateTime tidspunktBasertPåTidligereHendelse = tidligereHendelse.get().getHåndteresEtterTidspunkt().plusMinutes(2);
-                LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert {} og vil derfor bli behandlet {}",
-                        inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(), tidligereHendelse.get().getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
-                return Optional.of(tidspunktBasertPåTidligereHendelse);
+                if (LocalDateTime.now().isAfter(tidspunktBasertPåTidligereHendelse)) {
+                    LocalDateTime nesteDagEtterRetryAll = LocalDateTime.now().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
+                    LOGGER.info("Hendelse {} har en tidligere hendelse {} som skulle vært håndtert {}, men ikke er det, og vil derfor bli forsøkt behandlet igjen i morgen etter retry all: {}",
+                            inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(), tidligereHendelse.get().getHåndteresEtterTidspunkt(), nesteDagEtterRetryAll);
+                    return Optional.of(nesteDagEtterRetryAll);
+                } else {
+                    LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert {} og vil derfor bli behandlet {}",
+                            inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(), tidligereHendelse.get().getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
+                    return Optional.of(tidspunktBasertPåTidligereHendelse);
+                }
             }
         }
         return Optional.empty();

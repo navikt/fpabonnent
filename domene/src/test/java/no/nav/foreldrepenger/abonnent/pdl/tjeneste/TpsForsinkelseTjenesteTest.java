@@ -255,6 +255,36 @@ public class TpsForsinkelseTjenesteTest {
     }
 
     @Test
+    public void skal_utlede_at_en_hendelse_som_følger_en_tidligere_uhåndtert_hendelse_som_skulle_vært_håndtert_tilbake_i_tid_skal_behandles_etter_retry_all() {
+        // Arrange
+        LocalDateTime tidspunktA = LocalDateTime.now().minusDays(2);
+
+        InngåendeHendelse hendelseA = InngåendeHendelse.builder()
+                .hendelseId("A")
+                .hendelseKilde(HendelseKilde.PDL)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .håndteresEtterTidspunkt(tidspunktA)
+                .build();
+        InngåendeHendelse hendelseB = InngåendeHendelse.builder()
+                .hendelseId("B")
+                .hendelseKilde(HendelseKilde.PDL)
+                .håndtertStatus(HåndtertStatusType.MOTTATT)
+                .tidligereHendelseId("A")
+                .build();
+
+        when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq("A"), eq(HendelseKilde.PDL))).thenReturn(Optional.of(hendelseA));
+
+        // Act
+        LocalDateTime resultat1 = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(LocalDateTime.now(), hendelseB);
+        LocalDateTime resultat2 = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), hendelseB);
+
+        // Assert
+        LocalDateTime nesteDagEtterRetryAll = LocalDateTime.now().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
+        assertThat(resultat1).isEqualTo(nesteDagEtterRetryAll);
+        assertThat(resultat2).isEqualTo(nesteDagEtterRetryAll);
+    }
+
+    @Test
     public void skal_utlede_at_en_hendelse_som_følger_en_tidligere_håndtert_hendelse_skal_behandles_uavhengig() {
         // Arrange
         LocalDateTime tidspunktA = LocalDateTime.now().plusDays(2);

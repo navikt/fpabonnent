@@ -21,12 +21,15 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlDødfødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.tps.AktørId;
 import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
+import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_DØDFØDSEL_HENDELSE)
 public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødfødselHendelsePayload> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdlDødfødselHendelseTjeneste.class);
+    private static final Environment ENV = Environment.current();
 
     private PersonTjeneste personTjeneste;
 
@@ -103,8 +106,16 @@ public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødf
 
     private boolean harRegistrertDødfødsel(Optional<Set<String>> aktørIder, LocalDate dødfødselsdato) {
         for (String aktørId : aktørIder.get()) {
-            if (personTjeneste.harRegistrertDødfødsel(new AktørId(aktørId), dødfødselsdato)) {
-                return true;
+            try {
+                if (personTjeneste.harRegistrertDødfødsel(new AktørId(aktørId), dødfødselsdato)) {
+                    return true;
+                }
+            } catch (TekniskException e) {
+                if (ENV.isProd()) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Fikk feil ved kall til TPS, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}", ENV.getCluster().clusterName(), e);
+                }
             }
         }
         return false;
