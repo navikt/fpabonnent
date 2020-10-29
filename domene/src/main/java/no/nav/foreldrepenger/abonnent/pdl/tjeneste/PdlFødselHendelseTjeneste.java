@@ -23,12 +23,15 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.tps.AktørId;
 import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
+import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_FØDSEL_HENDELSE)
 public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHendelsePayload> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdlFødselHendelseTjeneste.class);
+    private static final Environment ENV = Environment.current();
 
     private PersonTjeneste personTjeneste;
 
@@ -124,7 +127,15 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     private Set<AktørId> getForeldre(PdlFødselHendelsePayload payload) {
         Set<AktørId> foreldre = new HashSet<>();
         for (String aktørId : payload.getAktørIdBarn().get()) {
-            foreldre.addAll(personTjeneste.registrerteForeldre(new AktørId(aktørId)));
+            try {
+                foreldre.addAll(personTjeneste.registrerteForeldre(new AktørId(aktørId)));
+            } catch (TekniskException e) {
+                if (ENV.isProd()) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Fikk feil ved kall til TPS, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}", ENV.getCluster().clusterName(), e);
+                }
+            }
         }
         return foreldre;
     }
