@@ -36,11 +36,9 @@ public class PersonTjenesteImplTest {
     private static final AktørId AKTØR_ID_SØKER = AktørId.dummy();
     private static final AktørId AKTØR_ID_BARN = AktørId.dummy();
 
-    private static final LocalDate FDAT_DATO = LocalDate.now().minusDays(2);
-    private static final String FDAT_DATO_STRING = DateTimeFormatter.ofPattern("ddMMyy").format(FDAT_DATO);
-    private static final PersonIdent FDAT_BARN = new PersonIdent(FDAT_DATO_STRING+"00001");
-    private static final PersonIdent FNR_SØKER = new PersonIdent(DateTimeFormatter.ofPattern("ddMM").format(FDAT_DATO)+"8011111");
-    private static final PersonIdent FNR_BARN = new PersonIdent(DateTimeFormatter.ofPattern("ddMMyy").format(FDAT_DATO)+"11111");
+    private static final LocalDate FØDSELSDATO = LocalDate.now().minusDays(2);
+    private static final PersonIdent FNR_SØKER = new PersonIdent(DateTimeFormatter.ofPattern("ddMM").format(FØDSELSDATO)+"8011111");
+    private static final PersonIdent FNR_BARN = new PersonIdent(DateTimeFormatter.ofPattern("ddMMyy").format(FØDSELSDATO)+"11111");
 
     @Before
     public void setup() {
@@ -107,36 +105,16 @@ public class PersonTjenesteImplTest {
     }
 
     @Test
-    public void skal_svare_nei_før_dødfødsel_registrert() throws Exception {
-        when(personServiceMock.hentPersonResponse(any())).thenReturn(responseMedBarn(FNR_SØKER.getIdent(), FNR_BARN.getIdent()));
-
-        boolean svar = tjeneste.harRegistrertDødfødsel(AKTØR_ID_SØKER, FDAT_DATO);
-
-        assertThat(svar).isFalse();
-    }
-
-    @Test
-    public void skal_svare_ja_når_dødfødsel_registrert() throws Exception {
-        when(personServiceMock.hentPersonResponse(any())).thenReturn(responseMedBarn(FNR_SØKER.getIdent(), FDAT_BARN.getIdent()));
-
-        boolean svar = tjeneste.harRegistrertDødfødsel(AKTØR_ID_SØKER, FDAT_DATO);
-
-        assertThat(svar).isTrue();
-    }
-
-    @Test
     public void skal_svare_nei_og_tomt_når_aktør_register_gir_tomt_svar() {
         when(aktørConsumerMock.hentPersonIdentForAktørId(anyString())).thenReturn(Optional.empty());
 
         Set<AktørId> svar1 = tjeneste.registrerteForeldre(AKTØR_ID_BARN);
         boolean svar2 = tjeneste.erRegistrert(AKTØR_ID_BARN);
         boolean svar3 = tjeneste.harRegistrertDødsdato(AKTØR_ID_SØKER);
-        boolean svar4 = tjeneste.harRegistrertDødfødsel(AKTØR_ID_SØKER, FDAT_DATO);
 
         assertThat(svar1).isEmpty();
         assertThat(svar2).isFalse();
         assertThat(svar3).isFalse();
-        assertThat(svar4).isFalse();
     }
 
     private HentPersonResponse responseMedDødsdato(String ident, LocalDate dødsdato) {
@@ -158,15 +136,6 @@ public class PersonTjenesteImplTest {
                 .withAktoer(new no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent().withIdent(new NorskIdent().withIdent(ident)))
             .withHarFraRolleI(new Familierelasjon().withTilRolle(new Familierelasjoner().withValue("MORA"))
                 .withTilPerson(new Person().withAktoer(new no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent().withIdent(new NorskIdent().withIdent(identMor)))))
-            );
-    }
-
-    private HentPersonResponse responseMedBarn(String ident, String identBarn) {
-        return new HentPersonResponse()
-            .withPerson(new Person()
-                .withAktoer(new no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent().withIdent(new NorskIdent().withIdent(ident)))
-                .withHarFraRolleI(new Familierelasjon().withTilRolle(new Familierelasjoner().withValue("BARN"))
-                    .withTilPerson(new Person().withAktoer(new no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent().withIdent(new NorskIdent().withIdent(identBarn)))))
             );
     }
 }
