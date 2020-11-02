@@ -69,7 +69,8 @@ public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødf
     public KlarForSorteringResultat vurderOmKlarForSortering(PdlDødfødselHendelsePayload payload) {
         Optional<Set<String>> aktørIder = payload.getAktørId();
         if (aktørIder.isPresent() && payload.getDødfødselsdato().isPresent()) {
-            if (harRegistrertDødfødsel(aktørIder, payload.getDødfødselsdato().get())) {
+            if (aktørErRegistrertITps(aktørIder.get())) {
+                // Vi kan ikke lengre sjekke om dødfødselen finnes i TPS da det ikke blir oppdatert med dette lengre
                 return new KlarForSorteringResultat(true);
             }
         } else if (aktørIder.isPresent() && payload.getDødfødselsdato().isEmpty() && PdlEndringstype.ANNULLERT.name().equals(payload.getEndringstype())) {
@@ -88,26 +89,16 @@ public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødf
             årsak = "Årsaken er at dødfødselsdato mangler på hendelsen.";
         } else if (aktørIder.isEmpty()) {
             årsak = "Årsaken er at aktørId mangler på hendelsen.";
-        } else {
-            boolean aktørIkkeFunnetITPS = true;
-            for (String aktørId : aktørIder.get()) {
-                if (personTjeneste.erRegistrert(new AktørId(aktørId))) {
-                    aktørIkkeFunnetITPS = false;
-                }
-            }
-            if (aktørIkkeFunnetITPS) {
-                årsak = "Årsaken er at aktørId fortsatt ikke finnes i TPS.";
-            } else if (!harRegistrertDødfødsel(aktørIder, dødfødselsdato.get())) {
-                årsak = "Årsaken er at dødfødselen fortsatt ikke er registrert i TPS.";
-            }
+        } else if (!aktørErRegistrertITps(aktørIder.get())) {
+            årsak = "Årsaken er at aktørId fortsatt ikke finnes i TPS.";
         }
         LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
     }
 
-    private boolean harRegistrertDødfødsel(Optional<Set<String>> aktørIder, LocalDate dødfødselsdato) {
-        for (String aktørId : aktørIder.get()) {
+    private boolean aktørErRegistrertITps(Set<String> aktørIder) {
+        for (String aktørId : aktørIder) {
             try {
-                if (personTjeneste.harRegistrertDødfødsel(new AktørId(aktørId), dødfødselsdato)) {
+                if (personTjeneste.erRegistrert(new AktørId(aktørId))) {
                     return true;
                 }
             } catch (TekniskException e) {

@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.abonnent.tps;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 public interface PersonTjeneste {
@@ -10,6 +9,4 @@ public interface PersonTjeneste {
     boolean erRegistrert(AktørId aktørId);
 
     boolean harRegistrertDødsdato(AktørId aktørId);
-
-    boolean harRegistrertDødfødsel(AktørId aktørId, LocalDate hendelseDato);
 }
