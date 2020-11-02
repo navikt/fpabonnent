@@ -78,12 +78,12 @@ jobs:
           title: Deploy av ${{ env.TAG }}
           labels: deployment
           body: |
-            Kommenter med <b>/promote cluster namespace</b>, hvor <b>cluster</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
+            Kommenter med <b>/promote cluster</b>, hvor <b>cluster</b> er et gyldig clusternavn.
 
             <table>
-            <tr><th>Cluster</th><th>Namespace</th></tr>
-            <tr><td>dev-fss</td><td>q1</td></tr>
-            <tr><td>prod-fss</td><td>default</td></tr>
+            <tr><th>Cluster</th></tr>
+            <tr><td>dev-fss</td></tr>
+            <tr><td>prod-fss</td></tr>
             </table>
 
       - name: Trigger verdikjedetestene i fpsak-autotest prosjektet
