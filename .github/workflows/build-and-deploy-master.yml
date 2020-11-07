@@ -9,6 +9,7 @@ env:
   ORACLE_IMAGE: docker.pkg.github.com/navikt/fpsak-autotest/oracle-flattened
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fpabonnent
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TZ: "Europe/Oslo"
 
 jobs:
   build:
