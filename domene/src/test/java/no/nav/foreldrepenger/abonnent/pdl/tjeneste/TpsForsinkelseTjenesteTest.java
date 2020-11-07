@@ -2,31 +2,36 @@ package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 
+@ExtendWith(MockitoExtension.class)
 public class TpsForsinkelseTjenesteTest {
 
-    private HendelseRepository hendelseRepository = mock(HendelseRepository.class);
-
+    @Mock
+    private HendelseRepository hendelseRepository;
+    @Mock
     private TpsForsinkelseKonfig tpsForsinkelseKonfig;
     private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
 
-    @Before
+    @BeforeEach
     public void before() {
-        tpsForsinkelseKonfig = mock(TpsForsinkelseKonfig.class);
-        when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
+        lenient().when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
         tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste(tpsForsinkelseKonfig, hendelseRepository);
     }
 

@@ -6,7 +6,7 @@ import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.FØDSEL
 import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.HENDELSE_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;

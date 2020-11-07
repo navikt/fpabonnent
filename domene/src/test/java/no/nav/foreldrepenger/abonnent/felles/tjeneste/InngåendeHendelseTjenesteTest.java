@@ -11,8 +11,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
@@ -31,7 +31,7 @@ public class InngåendeHendelseTjenesteTest {
 
     private HendelseRepository hendelseRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
         hendelseRepository = mock(HendelseRepository.class);
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);

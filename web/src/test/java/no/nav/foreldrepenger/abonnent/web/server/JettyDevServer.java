@@ -22,7 +22,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-import no.nav.foreldrepenger.abonnent.web.server.JettyDevDbKonfigurasjon.ConnectionHandler;
+import no.nav.foreldrepenger.abonnent.dbstøtte.Databaseskjemainitialisering;
 
 /**
  * Setter opp jetty automatisk lokalt med riktig konfig verdier.
@@ -120,13 +120,13 @@ public class JettyDevServer extends JettyServer {
     }
 
     @Override
-    protected void konfigurerJndi() throws Exception {
-        ConnectionHandler.settOppJndiDataSource(PropertiesUtils.getDBConnectionProperties());
+    protected void konfigurerJndi() {
+        Databaseskjemainitialisering.settJdniOppslag();
     }
 
     @Override
-    protected void migrerDatabaser() throws IOException {
-        JettyDevDbKonfigurasjon.kjørMigreringFor(PropertiesUtils.getDBConnectionProperties());
+    protected void migrerDatabaser() {
+        Databaseskjemainitialisering.migrer();
     }
 
     @SuppressWarnings("resource")

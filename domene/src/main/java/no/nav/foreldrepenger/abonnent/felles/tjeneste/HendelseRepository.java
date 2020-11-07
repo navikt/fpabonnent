@@ -86,6 +86,11 @@ public class HendelseRepository {
         entityManager.persist(inngåendeHendelse);
     }
 
+    public void lagreFlushInngåendeHendelse(InngåendeHendelse inngåendeHendelse) {
+        entityManager.persist(inngåendeHendelse);
+        entityManager.flush();
+    }
+
     public void oppdaterHåndtertStatus(InngåendeHendelse inngåendeHendelse, HåndtertStatusType håndtertStatus) {
         inngåendeHendelse.setHåndtertStatus(håndtertStatus);
     }

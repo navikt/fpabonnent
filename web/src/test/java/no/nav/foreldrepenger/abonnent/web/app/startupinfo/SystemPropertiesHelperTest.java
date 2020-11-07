@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.SortedMap;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class SystemPropertiesHelperTest {
 
     private SystemPropertiesHelper helper; // objektet som testes
 
-    @Before
+    @BeforeEach
     public void setup() {
         helper = SystemPropertiesHelper.getInstance();
     }

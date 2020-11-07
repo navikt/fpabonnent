@@ -6,33 +6,32 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Inject;
 
-import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
+import org.junit.jupiter.api.Test;
+
+import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
 import no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 
+@CdiDbAwareTest
 public class HendelseRepositoryTest {
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"));
     }
     private static final String HENDELSE_ID = "1000";
 
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    private HendelseRepository hendelseRepository = new HendelseRepository(repoRule.getEntityManager());
+    @Inject
+    private HendelseRepository hendelseRepository;
 
     @Test
     public void skal_returnere_hendelse_som_er_sendt_til_sortering() {
         // Arrange
         InngåendeHendelse hendelse = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID, HåndtertStatusType.SENDT_TIL_SORTERING);
-        hendelseRepository.lagreInngåendeHendelse(hendelse);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
 
         // Act
         Optional<InngåendeHendelse> resultat = hendelseRepository.finnHendelseSomErSendtTilSortering(HENDELSE_ID);
@@ -48,8 +47,7 @@ public class HendelseRepositoryTest {
         InngåendeHendelse hendelse1 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID + "1", HåndtertStatusType.MOTTATT);
         hendelseRepository.lagreInngåendeHendelse(hendelse1);
         InngåendeHendelse hendelse2 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID + "2", HåndtertStatusType.MOTTATT);
-        hendelseRepository.lagreInngåendeHendelse(hendelse2);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelse2);
 
         // Act
         Optional<InngåendeHendelse> resultat = hendelseRepository.finnHendelseFraIdHvisFinnes(HENDELSE_ID + "1", HendelseKilde.PDL);
@@ -97,8 +95,7 @@ public class HendelseRepositoryTest {
         hendelseRepository.lagreInngåendeHendelse(hendelse1);
         hendelseRepository.lagreInngåendeHendelse(hendelse2);
         hendelseRepository.lagreInngåendeHendelse(hendelse3);
-        hendelseRepository.lagreInngåendeHendelse(hendelse4);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelse4);
 
         // Act
         Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(HendelseKilde.PDL, HENDELSE_ID);

@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,7 @@ public class SelftestsJsonSerializerModuleTest {
 
     private ObjectMapper objectMapper;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         objectMapper = (new ObjectMapper()).registerModule(new SelftestsJsonSerializerModule());
     }

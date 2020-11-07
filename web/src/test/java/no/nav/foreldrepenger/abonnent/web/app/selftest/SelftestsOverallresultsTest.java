@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.codahale.metrics.health.HealthCheck;
 
@@ -14,7 +14,7 @@ public class SelftestsOverallresultsTest {
 
     private SelftestResultat samletResultat;
 
-    @Before
+    @BeforeEach
     public void setup() {
         samletResultat = new SelftestResultat();
     }

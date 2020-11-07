@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.abonnent.felles.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -12,10 +13,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
@@ -42,8 +41,6 @@ public class SendHendelseTaskTest {
     private static final String HENDELSE_ID = "1";
     private static final long INNGÅENDE_HENDELSE_ID = 1L;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private HendelseConsumer mockHendelseConsumer;
     private ProsessTaskData prosessTaskData;
@@ -52,7 +49,7 @@ public class SendHendelseTaskTest {
 
     private SendHendelseTask sendHendelseTask;
 
-    @Before
+    @BeforeEach
     public void setup() {
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         HendelseTjeneste fødselHendelseTjeneste = new PdlFødselHendelseTjeneste();
@@ -123,11 +120,7 @@ public class SendHendelseTaskTest {
         dataWrapper.setHendelseId(HENDELSE_ID);
         dataWrapper.setInngåendeHendelseId(null);
 
-        // Assert
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FP-144656");
-
         // Act
-        sendHendelseTask.doTask(dataWrapper.getProsessTaskData());
+        assertThrows(TekniskException.class, () -> sendHendelseTask.doTask(dataWrapper.getProsessTaskData()));
     }
 }

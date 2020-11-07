@@ -3,9 +3,10 @@ package no.nav.foreldrepenger.abonnent.felles.task;
 import static java.util.Set.of;
 import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.lagFødselsmelding;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,16 +18,15 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 
-import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
+import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
@@ -39,9 +39,8 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class SorterHendelseTaskTest {
 
     static {
@@ -58,27 +57,24 @@ public class SorterHendelseTaskTest {
     private static final String FORELDER2 = "1312345678909";
     private static final PdlFødsel FMELDING = lagFødselsmelding(HENDELSE_ID, of(BARNET), of(FORELDER1, FORELDER2), FØDSELSDATO);
 
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
+    @Inject
+    private EntityManager entityManager;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private HendelseRepository hendelseRepository = new HendelseRepository(repoRule.getEntityManager());
+    @Inject
+    private HendelseRepository hendelseRepository;
     private SorterHendelseTask sorterHendelseTask;
     private ProsessTaskData prosessTaskData;
 
     @Inject
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
+    @Mock
     private HendelseConsumer mockHendelseConsumer;
+    @Mock
     private ProsessTaskRepository mockProsessTaskRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        mockHendelseConsumer = mock(HendelseConsumer.class);
-        mockProsessTaskRepository = mock(ProsessTaskRepository.class);
-
         sorterHendelseTask = new SorterHendelseTask(mockProsessTaskRepository, inngåendeHendelseTjeneste,
                 mockHendelseConsumer);
 
@@ -88,19 +84,16 @@ public class SorterHendelseTaskTest {
 
     @Test
     public void skal_kaste_teknisk_exception_hvis_påkreved_parameter_mangler() {
-        // Arrange
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FP-690327");
 
         // Act
-        sorterHendelseTask.doTask(prosessTaskData);
+        assertThrows(TekniskException.class, () -> sorterHendelseTask.doTask(prosessTaskData));
     }
 
     @Test
     public void skal_ikke_opprette_task_når_ingen_hendelser_kommer_inn() {
         // Arrange
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
-        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
+        lenient().when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
 
         // Act
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
@@ -115,8 +108,8 @@ public class SorterHendelseTaskTest {
         when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
-        hendelseRepository.lagreInngåendeHendelse(hendelse);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
+
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
@@ -135,8 +128,8 @@ public class SorterHendelseTaskTest {
         List<String> eksisterendeAktørIder = Arrays.asList(FORELDER1, FORELDER2);
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
-        hendelseRepository.lagreInngåendeHendelse(hendelse);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
+
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
@@ -164,8 +157,8 @@ public class SorterHendelseTaskTest {
         when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
-        hendelseRepository.lagreInngåendeHendelse(hendelse);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
+
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
@@ -195,7 +188,7 @@ public class SorterHendelseTaskTest {
     }
 
     public InngåendeHendelse finnHendelseMedHendelseId(String hendelseId) {
-        TypedQuery<InngåendeHendelse> query = repoRule.getEntityManager().createQuery(
+        TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
                 "from InngåendeHendelse where hendelseId = :hendelseId ", InngåendeHendelse.class); //$NON-NLS-1$
         query.setParameter("hendelseId", hendelseId);
         return query.getSingleResult();

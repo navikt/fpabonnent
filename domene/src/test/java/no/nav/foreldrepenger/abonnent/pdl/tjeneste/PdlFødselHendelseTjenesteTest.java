@@ -8,14 +8,13 @@ import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.FØDSEL
 import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.HENDELSE_ID;
 import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.MELDINGSTYPE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
@@ -27,12 +26,10 @@ import no.nav.vedtak.exception.TekniskException;
 
 public class PdlFødselHendelseTjenesteTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private HendelseTjeneste hendelseTjeneste;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         hendelseTjeneste = new PdlFødselHendelseTjeneste();
     }
@@ -130,8 +127,7 @@ public class PdlFødselHendelseTjenesteTest {
 
     @Test
     public void skal_få_IO_exception_ved_konvertering_av_payload_med_syntaksfeil_i_payload() {
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("Fikk IO exception ved parsing av JSON");
-        hendelseTjeneste.payloadFraJsonString("{{\"foo\":\"bar\"}");
+
+        assertThrows(TekniskException.class, () -> hendelseTjeneste.payloadFraJsonString("{{\"foo\":\"bar\"}"));
     }
 }

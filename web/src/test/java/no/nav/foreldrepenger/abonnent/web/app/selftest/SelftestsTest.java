@@ -9,18 +9,17 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 
+import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.checks.ExtHealthCheck;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class SelftestsTest {
 
     @Inject
@@ -29,7 +28,7 @@ public class SelftestsTest {
 
     private Selftests selftests;
 
-    @Before
+    @BeforeEach
     public void setup() {
         HealthCheckRegistry registry = Mockito.mock(HealthCheckRegistry.class);
 
