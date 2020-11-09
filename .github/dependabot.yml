@@ -16,9 +16,6 @@ updates:
   - dependency-name: org.flywaydb:flyway-maven-plugin
     versions:
     - ">= 5.a, <= 8"
-  - dependency-name: org.jboss.resteasy:resteasy-validator-provider
-    versions:
-    - ">= 4.a, < 5"
   - dependency-name: org.ow2.asm:asm
     versions:
     - ">= 8.a, <= 9"
