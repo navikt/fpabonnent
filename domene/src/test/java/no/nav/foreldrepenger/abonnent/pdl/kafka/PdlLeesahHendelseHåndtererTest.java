@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
@@ -41,7 +41,7 @@ public class PdlLeesahHendelseHåndtererTest {
     private static final LocalDateTime OPPRETTET_TID = LocalDateTime.now();
     private static final LocalDate DØDSDATO = LocalDate.now().minusDays(1);
 
-    @Before
+    @BeforeEach
     public void before() {
         hendelseRepository = mock(HendelseRepository.class);
         prosessTaskRepository = mock(ProsessTaskRepository.class);

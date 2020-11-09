@@ -9,9 +9,12 @@ import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import no.nav.vedtak.konfig.PropertyUtil;
+import no.nav.vedtak.util.env.Environment;
+
 
 class DataSourceKonfig {
+
+    private static final Environment ENV = Environment.current();
 
     private static final String location = "classpath:/db/migration/";
     private DBConnProp defaultDatasource;
@@ -25,12 +28,12 @@ class DataSourceKonfig {
 
     private DataSource createDatasource(String dataSourceName) {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(PropertyUtil.getProperty(dataSourceName + ".url"));
-        config.setUsername(PropertyUtil.getProperty(dataSourceName + ".username"));
-        config.setPassword(PropertyUtil.getProperty(dataSourceName + ".password")); // NOSONAR false positive
+        config.setJdbcUrl(ENV.getProperty(dataSourceName + ".url"));
+        config.setUsername(ENV.getProperty(dataSourceName + ".username"));
+        config.setPassword(ENV.getProperty(dataSourceName + ".password")); // NOSONAR false positive
 
         config.setConnectionTimeout(1000);
-        config.setMinimumIdle(5);
+        config.setMinimumIdle(1);
         config.setMaximumPoolSize(30);
         config.setConnectionTestQuery("select 1 from dual");
         config.setDriverClassName("oracle.jdbc.OracleDriver");

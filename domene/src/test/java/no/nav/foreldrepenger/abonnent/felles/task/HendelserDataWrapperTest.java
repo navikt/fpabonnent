@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.abonnent.felles.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
@@ -15,7 +15,7 @@ public class HendelserDataWrapperTest {
     private ProsessTaskData eksisterendeData;
     private HendelserDataWrapper wrapper;
 
-    @Before
+    @BeforeEach
     public void setup() {
         eksisterendeData = new ProsessTaskData(PROSESSTASK_STEG1);
         eksisterendeData.setSekvens("1");

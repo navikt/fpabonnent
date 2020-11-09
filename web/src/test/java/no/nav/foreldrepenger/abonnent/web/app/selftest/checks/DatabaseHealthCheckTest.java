@@ -6,10 +6,9 @@ import java.util.TimeZone;
 
 import javax.naming.NameNotFoundException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
+import no.nav.foreldrepenger.abonnent.dbstøtte.Databaseskjemainitialisering;
 import no.nav.foreldrepenger.abonnent.web.app.selftest.checks.ExtHealthCheck.InternalResult;
 
 public class DatabaseHealthCheckTest {
@@ -18,11 +17,10 @@ public class DatabaseHealthCheckTest {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"));
     }
 
-    @Rule
-    public final UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
     @Test
     public void test_check_healthy() {
+        Databaseskjemainitialisering.settJdniOppslag();
         DatabaseHealthCheck dbCheck = new DatabaseHealthCheck();
 
         InternalResult result = dbCheck.performCheck();

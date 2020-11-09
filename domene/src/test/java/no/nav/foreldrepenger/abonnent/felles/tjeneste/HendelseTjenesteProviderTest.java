@@ -1,25 +1,21 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import javax.inject.Inject;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
+import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class HendelseTjenesteProviderTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Inject
     private HendelseTjenesteProvider hendelseTjenesteProvider;
@@ -36,11 +32,8 @@ public class HendelseTjenesteProviderTest {
 
     @Test
     public void skal_kaste_feil_for_ukjent_hendelse() {
-        // Assert
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FP-309345");
 
         // Act
-        hendelseTjenesteProvider.finnTjeneste(HendelseType.fraKode("-"), "1");
+        assertThrows(TekniskException.class, () -> hendelseTjenesteProvider.finnTjeneste(HendelseType.fraKode("-"), "1"));
     }
 }

@@ -6,8 +6,9 @@ import static org.mockito.Mockito.verify;
 
 import javax.servlet.ServletContextEvent;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 public class AppStartupServletContextListenerTest {
 
@@ -15,7 +16,7 @@ public class AppStartupServletContextListenerTest {
 
     private AppStartupInfoLogger mockAppStartupInfoLogger;
 
-    @Before
+    @BeforeEach
     public void setup() {
         listener = new AppStartupServletContextListener();
         mockAppStartupInfoLogger = mock(AppStartupInfoLogger.class);

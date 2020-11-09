@@ -10,8 +10,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
@@ -40,7 +40,7 @@ public class PersonTjenesteImplTest {
     private static final PersonIdent FNR_SØKER = new PersonIdent(DateTimeFormatter.ofPattern("ddMM").format(FØDSELSDATO)+"8011111");
     private static final PersonIdent FNR_BARN = new PersonIdent(DateTimeFormatter.ofPattern("ddMMyy").format(FØDSELSDATO)+"11111");
 
-    @Before
+    @BeforeEach
     public void setup() {
         when(aktørConsumerMock.hentAktørIdForPersonIdent(FNR_BARN.getIdent())).thenReturn(Optional.of(AKTØR_ID_BARN.getId()));
         when(aktørConsumerMock.hentAktørIdForPersonIdent(FNR_SØKER.getIdent())).thenReturn(Optional.of(AKTØR_ID_SØKER.getId()));

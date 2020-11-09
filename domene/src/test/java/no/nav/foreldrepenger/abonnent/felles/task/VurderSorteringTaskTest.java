@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,13 +17,12 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 
-import no.nav.foreldrepenger.abonnent.dbstøtte.UnittestRepositoryRule;
+import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
@@ -42,9 +42,8 @@ import no.nav.foreldrepenger.abonnent.tps.AktørId;
 import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class VurderSorteringTaskTest {
 
     private static final String AKTØR_ID_BARN = "1111111111111";
@@ -52,10 +51,8 @@ public class VurderSorteringTaskTest {
     private static final String AKTØR_ID_FAR = "3333333333333";
     private static final String HENDELSE_ID = "1";
 
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    private ProsessTaskRepository prosessTaskRepository = mock(ProsessTaskRepository.class);
+    @Mock
+    private ProsessTaskRepository prosessTaskRepository;
 
     private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
 
@@ -64,19 +61,20 @@ public class VurderSorteringTaskTest {
 
     private PersonTjeneste personTjeneste = mock(PersonTjeneste.class);
 
-    private HendelseRepository hendelseRepository = new HendelseRepository(repoRule.getEntityManager());
+    @Inject
+    private HendelseRepository hendelseRepository;
 
     private VurderSorteringTask vurderSorteringTask;
 
-    @Before
+    @BeforeEach
     public void before() {
         TpsForsinkelseKonfig tpsForsinkelseKonfig = mock(TpsForsinkelseKonfig.class);
-        when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
+        lenient().when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
         tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste(tpsForsinkelseKonfig, hendelseRepository);
 
         HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(personTjeneste, hendelseTjenesteHjelper);
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
-        when(hendelseTjenesteProvider.finnTjeneste(any(HendelseType.class), anyString())).thenReturn(hendelseTjeneste);
+        lenient().when(hendelseTjenesteProvider.finnTjeneste(any(HendelseType.class), anyString())).thenReturn(hendelseTjeneste);
 
         vurderSorteringTask = new VurderSorteringTask(prosessTaskRepository, tpsForsinkelseTjeneste, hendelseTjenesteProvider, hendelseRepository);
     }
@@ -163,7 +161,7 @@ public class VurderSorteringTaskTest {
         hendelserDataWrapper.setHendelseId(HENDELSE_ID);
 
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        lenient().doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
         vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
@@ -186,8 +184,7 @@ public class VurderSorteringTaskTest {
                 .sendtTidspunkt(LocalDateTime.now())
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusYears(10), PdlEndringstype.OPPRETTET, "A", null).build()))
                 .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseOpprettet);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
         hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
@@ -195,7 +192,7 @@ public class VurderSorteringTaskTest {
         hendelserDataWrapper.setHendelseId("A");
 
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        lenient().doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
         vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
@@ -242,8 +239,7 @@ public class VurderSorteringTaskTest {
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.KORRIGERT, "C", "B").build()))
                 .tidligereHendelseId("B")
                 .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert2);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert2);
 
         ProsessTaskData vurderSorteringTask = new ProsessTaskData(VurderSorteringTask.TASKNAME);
         vurderSorteringTask.setSekvens("1");
@@ -292,8 +288,7 @@ public class VurderSorteringTaskTest {
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
         hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
@@ -301,7 +296,7 @@ public class VurderSorteringTaskTest {
         hendelserDataWrapper.setHendelseId("B");
 
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        lenient().doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
         vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
@@ -346,8 +341,7 @@ public class VurderSorteringTaskTest {
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "C", "B").build()))
                 .tidligereHendelseId("B")
                 .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert2);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert2);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
         hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert2.getId());
@@ -355,7 +349,7 @@ public class VurderSorteringTaskTest {
         hendelserDataWrapper.setHendelseId("C");
 
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        lenient().doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
         vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
@@ -381,8 +375,7 @@ public class VurderSorteringTaskTest {
                 .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
         hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
@@ -390,7 +383,7 @@ public class VurderSorteringTaskTest {
         hendelserDataWrapper.setHendelseId("B");
 
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        lenient().doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
         vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
@@ -416,8 +409,7 @@ public class VurderSorteringTaskTest {
                 .payload(JsonMapper.toJson(opprettDødAnnullert(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.ANNULLERT, "B", "A").build()))
                 .tidligereHendelseId("A")
                 .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
         hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
@@ -425,7 +417,7 @@ public class VurderSorteringTaskTest {
         hendelserDataWrapper.setHendelseId("B");
 
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        lenient().doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
 
         // Act
         vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
@@ -461,8 +453,7 @@ public class VurderSorteringTaskTest {
                 .tidligereHendelseId("A")
                 .håndteresEtterTidspunkt(håndteresTidspunktA.minusMinutes(2))
                 .build();
-        hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert);
-        repoRule.getEntityManager().flush();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
         hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());

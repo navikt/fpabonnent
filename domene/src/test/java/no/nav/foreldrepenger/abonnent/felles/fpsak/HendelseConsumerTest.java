@@ -11,15 +11,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
@@ -28,13 +26,10 @@ import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.FødselHendelseDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
+@ExtendWith(MockitoExtension.class)
 public class HendelseConsumerTest {
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().silent();
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private OidcRestClient oidcRestClient;
@@ -45,7 +40,7 @@ public class HendelseConsumerTest {
     private URI hendelseEndpoint;
     private URI grovsorterEndpoint;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         baseEndpoint = new URI("/test");
         hendelseEndpoint = baseEndpoint.resolve("motta");
