@@ -9,7 +9,7 @@
         "https://fpabonnent-q1.dev.adeo.no/"
 	],
 	"env": {
-      "ABAC_PDP_ENDPOINT_URL": "https://wasapp-q1.adeo.no/asm-pdp/authorize",
+      "ABAC_PDP_ENDPOINT_URL": "http://abac-foreldrepenger.default/application/authorize",
       "ABAC_ATTRIBUTT_DRIFT": "no.nav.abac.attributter.foreldrepenger.drift",
       "FPSAKHENDELSER_V1_URL": "http://fpsak/fpsak/api/hendelser/",
       "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
