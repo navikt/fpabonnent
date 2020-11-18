@@ -7,7 +7,6 @@ import javax.ws.rs.core.Application;
 
 import no.nav.foreldrepenger.abonnent.web.app.metrics.PrometheusRestService;
 import no.nav.foreldrepenger.abonnent.web.app.tjenester.NaisRestTjeneste;
-import no.nav.foreldrepenger.abonnent.web.app.tjenester.SelftestRestTjeneste;
 
 @ApplicationPath(InternalApplication.API_URL)
 public class InternalApplication extends Application {
@@ -20,7 +19,7 @@ public class InternalApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        return Set.of(NaisRestTjeneste.class, SelftestRestTjeneste.class, PrometheusRestService.class);
+        return Set.of(NaisRestTjeneste.class, PrometheusRestService.class);
     }
 
 }

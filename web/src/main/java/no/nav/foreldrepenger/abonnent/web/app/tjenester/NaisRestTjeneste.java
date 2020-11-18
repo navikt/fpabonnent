@@ -10,7 +10,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Operation;
-import no.nav.foreldrepenger.abonnent.web.app.selftest.checks.DatabaseHealthCheck;
 
 @Path("/health")
 @Produces(TEXT_PLAIN)
