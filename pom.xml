@@ -23,12 +23,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <felles.version>2.4.0-20201103095947-cd9cca7</felles.version>
+        <felles.version>2.4.0-20201117140559-27e1887</felles.version>
         <prosesstask.version>2.4.4-20201105215118-94e3e21</prosesstask.version>
-        <fp-kontrakter.version>5.1-20200810151031-853914b</fp-kontrakter.version>
+        <fp-kontrakter.version>5.1-20201112050232-45aa18d</fp-kontrakter.version>
 
         <!-- Eksterne -->
-        <assertj.version>3.18.0</assertj.version>
+        <assertj.version>3.18.1</assertj.version>
         <flyway.version>4.2.0</flyway.version>
         <hamcrest.version>1.3</hamcrest.version>
         <junit.version>5.7.0</junit.version>
@@ -37,7 +37,7 @@
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
         <logstash.version>6.4</logstash.version>
-        <metrics.version>4.1.14</metrics.version>
+        <metrics.version>4.1.15</metrics.version>
         <prometheus.version>0.9.0</prometheus.version>
         <resteasy.version>4.5.8.Final</resteasy.version>
         <weld-web.version>3.1.5.Final</weld-web.version>

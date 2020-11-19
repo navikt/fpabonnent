@@ -80,10 +80,6 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
         LOG.info("Starter konsumering av topic={}, tilstand={}", getTopicName(), stream.state());
     }
 
-    public KafkaStreams.State getTilstand() {
-        return stream.state();
-    }
-
     public String getTopicName() {
         return topic.getTopic();
     }

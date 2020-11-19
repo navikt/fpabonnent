@@ -1,15 +1,12 @@
-package no.nav.foreldrepenger.abonnent.web.app.selftest.checks;
+package no.nav.foreldrepenger.abonnent.web.app.tjenester;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.TimeZone;
 
-import javax.naming.NameNotFoundException;
-
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.dbstøtte.Databaseskjemainitialisering;
-import no.nav.foreldrepenger.abonnent.web.app.selftest.checks.ExtHealthCheck.InternalResult;
 
 public class DatabaseHealthCheckTest {
 
@@ -17,27 +14,19 @@ public class DatabaseHealthCheckTest {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"));
     }
 
-
     @Test
     public void test_check_healthy() {
         Databaseskjemainitialisering.settJdniOppslag();
         DatabaseHealthCheck dbCheck = new DatabaseHealthCheck();
 
-        InternalResult result = dbCheck.performCheck();
-
-        assertThat(result.isOk()).isTrue();
-        assertThat(result.getResponseTimeMs()).isNotNull();
+        assertThat(dbCheck.isReady()).isTrue();
     }
 
     @Test
     public void skal_feile_pga_ukjent_jndi_name() {
         DatabaseHealthCheck dbCheck = new DatabaseHealthCheck("jndi/ukjent");
 
-        InternalResult result = dbCheck.performCheck();
-
-        assertThat(result.isOk()).isFalse();
-        assertThat(result.getMessage()).contains("Feil ved JNDI-oppslag for jndi/ukjent");
-        assertThat(result.getException()).isInstanceOf(NameNotFoundException.class);
+        assertThat(dbCheck.isReady()).isFalse();
     }
 
 }
