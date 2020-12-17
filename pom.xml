@@ -40,7 +40,7 @@
         <metrics.version>4.1.15</metrics.version>
         <prometheus.version>0.9.0</prometheus.version>
         <resteasy.version>4.5.8.Final</resteasy.version>
-        <weld-web.version>3.1.5.Final</weld-web.version>
+        <weld-web.version>4.0.0.Final</weld-web.version>
         <javax.el.version>3.0.1-b12</javax.el.version>
         <swagger.version>2.1.5</swagger.version>
         <swagger-ui.version>3.37.0</swagger-ui.version>
