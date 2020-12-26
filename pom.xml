@@ -42,7 +42,7 @@
         <resteasy.version>4.5.8.Final</resteasy.version>
         <weld-web.version>3.1.5.Final</weld-web.version>
         <javax.el.version>3.0.1-b12</javax.el.version>
-        <swagger.version>2.1.5</swagger.version>
+        <swagger.version>2.1.6</swagger.version>
         <swagger-ui.version>3.38.0</swagger-ui.version>
         <kafka.version>2.6.0</kafka.version>
         <avro.version>1.10.0</avro.version>
