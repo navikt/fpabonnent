@@ -10,7 +10,7 @@ import no.nav.vedtak.util.env.Environment;
  * både ved manuell testing og automatisert igjennom Autotest.
  */
 @ApplicationScoped
-public class TpsForsinkelseKonfig {
+public class ForsinkelseKonfig {
     private static final Environment ENV = Environment.current();
 
     public boolean skalForsinkeHendelser() {

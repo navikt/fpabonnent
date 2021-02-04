@@ -11,11 +11,11 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
-import no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
+import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
 
 @CdiDbAwareTest
 public class HendelseRepositoryTest {

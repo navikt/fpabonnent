@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.abonnent.felles;
+package no.nav.foreldrepenger.abonnent.testutilities;
 
 import static java.util.Collections.singletonList;
 

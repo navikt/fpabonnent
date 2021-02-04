@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo "Kjører  $0"
-
 if test -f /config/oracle/jdbc_url;
 then
    export  DEFAULTDS_URL=$(cat /config/oracle/jdbc_url)

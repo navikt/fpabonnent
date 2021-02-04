@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.abonnent.felles.task;
 
 import static java.util.Set.of;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.lagFødselsmelding;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.lagFødselsmelding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

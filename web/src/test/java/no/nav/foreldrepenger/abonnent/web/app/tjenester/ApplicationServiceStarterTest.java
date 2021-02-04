@@ -12,18 +12,21 @@ import javax.enterprise.inject.Instance;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
-import no.nav.vedtak.felles.testutilities.cdi.UnitTestInstanceImpl;
+import no.nav.vedtak.felles.testutilities.cdi.UnitTestLookupInstanceImpl;
 
 @CdiDbAwareTest
+@ExtendWith(MockitoExtension.class)
 public class ApplicationServiceStarterTest {
 
     private ApplicationServiceStarter serviceStarter;
 
     private AppServiceHandler serviceMock = mock(AppServiceHandler.class);
-    private Instance<AppServiceHandler> testInstance = new UnitTestInstanceImpl<>(serviceMock);
+    private Instance<AppServiceHandler> testInstance = new UnitTestLookupInstanceImpl<>(serviceMock);
     private Instance<AppServiceHandler> instanceSpied = spy(testInstance);
 
     private Iterator<AppServiceHandler> iteratorMock = mock(Iterator.class);

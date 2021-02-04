@@ -8,10 +8,6 @@ ENV APPDYNAMICS_CONTROLLER_SSL_ENABLED=true
 RUN mkdir /app/lib
 RUN mkdir /app/conf
 
-# Export vault properties
-COPY export-vault.sh /init-scripts/export-vault.sh
-RUN chmod +x /init-scripts/*
-
 # Config
 COPY web/target/classes/logback.xml /app/conf/
 COPY web/target/classes/jetty/jaspi-conf.xml /app/conf/
@@ -20,8 +16,7 @@ COPY web/target/classes/jetty/jaspi-conf.xml /app/conf/
 COPY web/target/app.jar /app/
 COPY web/target/lib/*.jar /app/lib/
 
+# Export vault properties
+COPY export-vault.sh /init-scripts/export-vault.sh
 
-# Application Start Command
-COPY run-java.sh /
-RUN chmod +x /run-java.sh
-
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -Duser.timezone=Europe/Oslo -Dapplication.name=FPABONNENT "

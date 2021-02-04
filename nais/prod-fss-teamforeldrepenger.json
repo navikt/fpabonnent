@@ -22,7 +22,6 @@
 		"OPENIDCONNECT_ISSOHOST": "https://isso.adeo.no:443/isso/oauth2",
 		"SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
 		"FPSAKHENDELSER_V1_URL": "http://fpsak/fpsak/api/hendelser/",
-		"AKTOER_V2_URL": "https://app.adeo.no/aktoerregister/ws/Aktoer/v2",
-		"PERSON_V3_URL": "https://wasapp.adeo.no/tpsws/ws/Person/v3"
+		"PDL_BASE_URL" : "http://pdl-api.default/graphql"
 	}
 }

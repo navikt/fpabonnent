@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.abonnent.felles.task;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -31,21 +30,24 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
+import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
+import no.nav.foreldrepenger.abonnent.pdl.oppslag.ForeldreTjeneste;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseKonfig;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
-import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseKonfig;
-import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseTjeneste;
-import no.nav.foreldrepenger.abonnent.tps.AktørId;
-import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
+import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @CdiDbAwareTest
 public class VurderSorteringTaskTest {
 
+    private static final String FNR_BARN = new FiktiveFnr().nesteBarnFnr();
     private static final String AKTØR_ID_BARN = "1111111111111";
     private static final String AKTØR_ID_MOR = "2222222222222";
     private static final String AKTØR_ID_FAR = "3333333333333";
@@ -54,12 +56,13 @@ public class VurderSorteringTaskTest {
     @Mock
     private ProsessTaskRepository prosessTaskRepository;
 
-    private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
+    private ForsinkelseTjeneste forsinkelseTjeneste;
 
     @Inject
     private HendelseTjenesteHjelper hendelseTjenesteHjelper;
 
-    private PersonTjeneste personTjeneste = mock(PersonTjeneste.class);
+    @Mock
+    private ForeldreTjeneste foreldreTjeneste;
 
     @Inject
     private HendelseRepository hendelseRepository;
@@ -68,22 +71,21 @@ public class VurderSorteringTaskTest {
 
     @BeforeEach
     public void before() {
-        TpsForsinkelseKonfig tpsForsinkelseKonfig = mock(TpsForsinkelseKonfig.class);
-        lenient().when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
-        tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste(tpsForsinkelseKonfig, hendelseRepository);
+        ForsinkelseKonfig forsinkelseKonfig = mock(ForsinkelseKonfig.class);
+        lenient().when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
+        forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
 
-        HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(personTjeneste, hendelseTjenesteHjelper);
+        HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(hendelseTjenesteHjelper, foreldreTjeneste);
         HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         lenient().when(hendelseTjenesteProvider.finnTjeneste(any(HendelseType.class), anyString())).thenReturn(hendelseTjeneste);
 
-        vurderSorteringTask = new VurderSorteringTask(prosessTaskRepository, tpsForsinkelseTjeneste, hendelseTjenesteProvider, hendelseRepository);
+        vurderSorteringTask = new VurderSorteringTask(prosessTaskRepository, forsinkelseTjeneste, hendelseTjenesteProvider, hendelseRepository);
     }
 
     @Test
     public void skal_berike_og_grovsortere_fødselshendelse_som_er_klar() {
         // Arrange
-        when(personTjeneste.erRegistrert(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(true);
-        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
+        when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
 
         InngåendeHendelse inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now());
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
@@ -117,9 +119,8 @@ public class VurderSorteringTaskTest {
     @Test
     public void skal_opprette_ny_vurder_sortering_task_for_fødselshendelse_som_ikke_er_klar() {
         // Arrange
-        // Barn og relasjon til foreldre finnes ikke i TPS:
-        when(personTjeneste.erRegistrert(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(false);
-        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of());
+        // Relasjon til foreldre finnes ikke i PDL:
+        when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of());
 
         InngåendeHendelse inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now());
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
@@ -140,7 +141,7 @@ public class VurderSorteringTaskTest {
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
-        assertThat(vurderSorteringTask.getNesteKjøringEtter().toLocalDate()).isEqualTo(tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse).toLocalDate());
+        assertThat(vurderSorteringTask.getNesteKjøringEtter().toLocalDate()).isEqualTo(forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse).toLocalDate());
 
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelse.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
@@ -149,9 +150,8 @@ public class VurderSorteringTaskTest {
     @Test
     public void skal_ikke_opprette_ny_vurder_sortering_task_for_fødselshendelse_som_ikke_er_klar_når_hendelsen_er_gammel() {
         // Arrange
-        // Barn og relasjon til foreldre finnes ikke i TPS:
-        when(personTjeneste.erRegistrert(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(false);
-        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of());
+        // Relasjon til foreldre finnes ikke i PDL:
+        when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of());
 
         InngåendeHendelse inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now().minusDays(8));
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
@@ -201,16 +201,14 @@ public class VurderSorteringTaskTest {
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseOpprettet.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
 
-        verify(personTjeneste, times(0)).erRegistrert(any());
-        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
         verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
     }
 
     @Test
     public void skal_grovsortere_korrigering_da_en_tidligere_sendt_fødselshendelse_hadde_forskjellig_fødselsdato() {
         // Arrange
-        when(personTjeneste.erRegistrert(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(true);
-        when(personTjeneste.registrerteForeldre(eq(new AktørId(AKTØR_ID_BARN)))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
+        when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
 
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
                 .hendelseId("A")
@@ -305,8 +303,7 @@ public class VurderSorteringTaskTest {
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
 
-        verify(personTjeneste, times(0)).erRegistrert(any());
-        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
         verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
     }
 
@@ -358,8 +355,7 @@ public class VurderSorteringTaskTest {
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert2.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
 
-        verify(personTjeneste, times(0)).erRegistrert(any());
-        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
         verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
     }
 
@@ -392,8 +388,7 @@ public class VurderSorteringTaskTest {
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
 
-        verify(personTjeneste, times(0)).erRegistrert(any());
-        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
         verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
     }
 
@@ -426,8 +421,7 @@ public class VurderSorteringTaskTest {
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
 
-        verify(personTjeneste, times(0)).erRegistrert(any());
-        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
         verify(prosessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
     }
 
@@ -477,8 +471,7 @@ public class VurderSorteringTaskTest {
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
         assertThat(vurderSorteringTask.getNesteKjøringEtter()).isEqualTo(håndteresTidspunktA.plusMinutes(2));
 
-        verify(personTjeneste, times(0)).erRegistrert(any());
-        verify(personTjeneste, times(0)).registrerteForeldre(any());
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
     }
 
     private InngåendeHendelse opprettInngåendeHendelse(LocalDateTime opprettetTid) {
@@ -495,6 +488,7 @@ public class VurderSorteringTaskTest {
         pdlFødsel.medHendelseId(hendelseId);
         pdlFødsel.medHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET);
         pdlFødsel.medEndringstype(endringstype);
+        pdlFødsel.leggTilPersonident(FNR_BARN);
         pdlFødsel.leggTilPersonident(AKTØR_ID_BARN);
         pdlFødsel.medFødselsdato(fødselsdato);
         pdlFødsel.medOpprettet(opprettetTid);

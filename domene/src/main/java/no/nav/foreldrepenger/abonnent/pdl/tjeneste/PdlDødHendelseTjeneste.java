@@ -2,10 +2,6 @@ package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
 import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper.hentUtAktørIderFraString;
 
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.Set;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -19,10 +15,6 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlDødHendelsePayload;
-import no.nav.foreldrepenger.abonnent.tps.AktørId;
-import no.nav.foreldrepenger.abonnent.tps.PersonTjeneste;
-import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationScoped
@@ -30,9 +22,6 @@ import no.nav.vedtak.util.env.Environment;
 public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelsePayload> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdlDødHendelseTjeneste.class);
-    private static final Environment ENV = Environment.current();
-
-    private PersonTjeneste personTjeneste;
 
     private HendelseTjenesteHjelper hendelseTjenesteHjelper;
 
@@ -41,8 +30,7 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
     }
 
     @Inject
-    public PdlDødHendelseTjeneste(PersonTjeneste personTjeneste, HendelseTjenesteHjelper hendelseTjenesteHjelper) {
-        this.personTjeneste = personTjeneste;
+    public PdlDødHendelseTjeneste(HendelseTjenesteHjelper hendelseTjenesteHjelper) {
         this.hendelseTjenesteHjelper = hendelseTjenesteHjelper;
     }
 
@@ -68,12 +56,8 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
 
     @Override
     public KlarForSorteringResultat vurderOmKlarForSortering(PdlDødHendelsePayload payload) {
-        Optional<Set<String>> aktørIder = payload.getAktørId();
-        if (aktørIder.isPresent() && payload.getDødsdato().isPresent()) {
-            if (harRegistrertDødsdato(aktørIder)) {
-                return new KlarForSorteringResultat(true);
-            }
-        } else if (aktørIder.isPresent() && payload.getDødsdato().isEmpty() && PdlEndringstype.ANNULLERT.name().equals(payload.getEndringstype())) {
+        if (payload.getAktørId().isPresent() && (payload.getDødsdato().isPresent()
+                || payload.getDødsdato().isEmpty() && PdlEndringstype.ANNULLERT.name().equals(payload.getEndringstype()))) {
             return new KlarForSorteringResultat(true);
         }
         return new KlarForSorteringResultat(false);
@@ -83,48 +67,11 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
     public void loggFeiletHendelse(PdlDødHendelsePayload payload) {
         String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
         String årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
-        boolean info = false;
-        Optional<LocalDate> dødsdato = payload.getDødsdato();
-        Optional<Set<String>> aktørIder = payload.getAktørId();
-        if (dødsdato.isEmpty()) {
+        if (payload.getDødsdato().isEmpty()) {
             årsak = "Årsaken er at dødsdato mangler på hendelsen.";
-        } else if (aktørIder.isEmpty()) {
+        } else if (payload.getAktørId().isEmpty()) {
             årsak = "Årsaken er at aktørId mangler på hendelsen.";
-        } else {
-            boolean aktørIkkeFunnetITPS = true;
-            for (String aktørId : aktørIder.get()) {
-                if (personTjeneste.erRegistrert(new AktørId(aktørId))) {
-                    aktørIkkeFunnetITPS = false;
-                }
-            }
-            if (aktørIkkeFunnetITPS) {
-                årsak = "Årsaken er at aktørId fortsatt ikke finnes i TPS.";
-            } else if (!harRegistrertDødsdato(aktørIder)) {
-                årsak = "Årsaken er at det fortsatt ikke er registrert dødsdato i TPS.";
-                info = true; // Det skjer regelmessig feilregistrering av dødsfall (OPPRETTET+ANNULLERT) og da inntreffer denne på OPPRETTET tilslutt
-            }
         }
-        if (info) {
-            LOGGER.info(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
-        } else {
-            LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
-        }
-    }
-
-    private boolean harRegistrertDødsdato(Optional<Set<String>> aktørIder) {
-        for (String aktørId : aktørIder.get()) {
-            try {
-                if (personTjeneste.harRegistrertDødsdato(new AktørId(aktørId))) {
-                    return true;
-                }
-            } catch (TekniskException e) {
-                if (ENV.isProd()) {
-                    throw e;
-                } else {
-                    LOGGER.warn("Fikk feil ved kall til TPS, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}", ENV.getCluster().clusterName(), e);
-                }
-            }
-        }
-        return false;
+        LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
     }
 }

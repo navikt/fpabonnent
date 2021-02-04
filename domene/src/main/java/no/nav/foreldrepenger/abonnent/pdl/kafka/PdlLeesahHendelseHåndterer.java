@@ -28,7 +28,7 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDødfødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
-import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseTjeneste;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedfoedtbarn.DoedfoedtBarn;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
@@ -48,7 +48,7 @@ public class PdlLeesahHendelseHåndterer {
     private HendelseRepository hendelseRepository;
     private PdlLeesahOversetter oversetter;
     private ProsessTaskRepository prosessTaskRepository;
-    private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
+    private ForsinkelseTjeneste forsinkelseTjeneste;
 
     PdlLeesahHendelseHåndterer() {
         // CDI
@@ -58,11 +58,11 @@ public class PdlLeesahHendelseHåndterer {
     public PdlLeesahHendelseHåndterer(HendelseRepository hendelseRepository,
                                       PdlLeesahOversetter pdlLeesahOversetter,
                                       ProsessTaskRepository prosessTaskRepository,
-                                      TpsForsinkelseTjeneste tpsForsinkelseTjeneste) {
+                                      ForsinkelseTjeneste forsinkelseTjeneste) {
         this.hendelseRepository = hendelseRepository;
         this.oversetter = pdlLeesahOversetter;
         this.prosessTaskRepository = prosessTaskRepository;
-        this.tpsForsinkelseTjeneste = tpsForsinkelseTjeneste;
+        this.forsinkelseTjeneste = forsinkelseTjeneste;
     }
 
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
@@ -151,7 +151,7 @@ public class PdlLeesahHendelseHåndterer {
     private void prosesserHendelseVidereHvisRelevant(PdlPersonhendelse personhendelse) {
         if (personhendelse.erRelevantForFpsak()) {
             InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
-            LocalDateTime håndteresEtterTidspunkt = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(personhendelse.getOpprettet(), inngåendeHendelse);
+            LocalDateTime håndteresEtterTidspunkt = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse);
             hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, håndteresEtterTidspunkt);
             opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId(), håndteresEtterTidspunkt);
         } else {

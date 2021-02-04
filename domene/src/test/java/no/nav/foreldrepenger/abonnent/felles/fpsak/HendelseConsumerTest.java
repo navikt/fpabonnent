@@ -1,8 +1,8 @@
 package no.nav.foreldrepenger.abonnent.felles.fpsak;
 
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.AKTØR_ID_FAR;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.AKTØR_ID_MOR;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.FØDSELSDATO;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.AKTØR_ID_FAR;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.AKTØR_ID_MOR;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.FØDSELSDATO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil;
+import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;

@@ -9,12 +9,15 @@ import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.FødselHendelseDto;
 
 public class PdlFødselHendelsePayload extends HendelsePayload {
+
+    private Set<PersonIdent> fnrBarn;
 
     private Set<String> aktørIdBarn;
 
@@ -31,6 +34,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
         this.hendelseType = builder.hendelseType;
         this.endringstype = builder.endringstype;
         this.hendelseOpprettetTid = builder.hendelseOpprettetTid;
+        this.fnrBarn = builder.fnrBarn;
         this.aktørIdBarn = builder.aktørIdBarn;
         this.aktørIdForeldre = builder.aktørIdForeldre;
         this.fødselsdato = builder.fødselsdato;
@@ -44,6 +48,10 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
         this.getFødselsdato().ifPresent(dto::setFødselsdato);
         this.getAktørIdForeldre().ifPresent(foreldre -> dto.setAktørIdForeldre(foreldre.stream().map(AktørIdDto::new).collect(Collectors.toList())));
         return new HendelseWrapperDto(dto);
+    }
+
+    public Set<PersonIdent> getFnrBarn() {
+        return fnrBarn;
     }
 
     public Optional<Set<String>> getAktørIdBarn() {
@@ -95,6 +103,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
         if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) return false;
         if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
         if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) return false;
+        if (fnrBarn != null ? !fnrBarn.equals(payload.fnrBarn) : payload.fnrBarn != null) return false;
         if (aktørIdBarn != null ? !aktørIdBarn.equals(payload.aktørIdBarn) : payload.aktørIdBarn != null) return false;
         if (aktørIdForeldre != null ? !aktørIdForeldre.equals(payload.aktørIdForeldre) : payload.aktørIdForeldre != null) return false;
         return fødselsdato != null ? fødselsdato.equals(payload.fødselsdato) : payload.fødselsdato == null;
@@ -107,6 +116,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
         result = 31 * result + (hendelseType != null ? hendelseType.hashCode() : 0);
         result = 31 * result + (endringstype != null ? endringstype.hashCode() : 0);
         result = 31 * result + (hendelseOpprettetTid != null ? hendelseOpprettetTid.hashCode() : 0);
+        result = 31 * result + (fnrBarn != null ? fnrBarn.hashCode() : 0);
         result = 31 * result + (aktørIdBarn != null ? aktørIdBarn.hashCode() : 0);
         result = 31 * result + (aktørIdForeldre != null ? aktørIdForeldre.hashCode() : 0);
         result = 31 * result + (fødselsdato != null ? fødselsdato.hashCode() : 0);
@@ -119,6 +129,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
         private String hendelseType;
         private String endringstype;
         private LocalDateTime hendelseOpprettetTid;
+        private Set<PersonIdent> fnrBarn = new HashSet<>();
         private Set<String> aktørIdBarn;
         private Set<String> aktørIdForeldre;
         private LocalDate fødselsdato;
@@ -145,6 +156,11 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
 
         public Builder hendelseOpprettetTid(LocalDateTime hendelseOpprettetTid) {
             this.hendelseOpprettetTid = hendelseOpprettetTid;
+            return this;
+        }
+
+        public Builder fnrBarn(Set<PersonIdent> fnrBarn) {
+            this.fnrBarn.addAll(fnrBarn);
             return this;
         }
 

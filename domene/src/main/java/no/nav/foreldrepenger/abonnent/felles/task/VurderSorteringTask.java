@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
-import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseTjeneste;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -33,17 +33,17 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(VurderSorteringTask.class);
 
     private ProsessTaskRepository prosessTaskRepository;
-    private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
+    private ForsinkelseTjeneste forsinkelseTjeneste;
     private HendelseTjenesteProvider hendelseTjenesteProvider;
     private HendelseRepository hendelseRepository;
 
     @Inject
     public VurderSorteringTask(ProsessTaskRepository prosessTaskRepository,
-                               TpsForsinkelseTjeneste tpsForsinkelseTjeneste,
+                               ForsinkelseTjeneste forsinkelseTjeneste,
                                HendelseTjenesteProvider hendelseTjenesteProvider,
                                HendelseRepository hendelseRepository) {
         this.prosessTaskRepository = prosessTaskRepository;
-        this.tpsForsinkelseTjeneste = tpsForsinkelseTjeneste;
+        this.forsinkelseTjeneste = forsinkelseTjeneste;
         this.hendelseTjenesteProvider = hendelseTjenesteProvider;
         this.hendelseRepository = hendelseRepository;
     }
@@ -66,7 +66,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         }
 
         if (enTidligereHendelseLiggerUbehandlet(inngåendeHendelse)) {
-            opprettVurderSorteringTaskHvisIkkeHendelsenErForGammel(hendelsePayload, inngåendeHendelse, hendelseTjeneste);
+            opprettVurderSorteringTask(hendelsePayload, inngåendeHendelse);
             return;
         }
 
@@ -74,8 +74,11 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         if (klarForSorteringResultat.hendelseKlarForSortering()) {
             hendelseTjeneste.berikHendelseHvisNødvendig(inngåendeHendelse, klarForSorteringResultat);
             opprettSorteringTask(hendelsePayload.getHendelseId(), inngåendeHendelse, dataWrapper);
+        } else if (klarForSorteringResultat.skalPrøveIgjen() && hendelsenErUnderEnUkeGammel(hendelsePayload.getHendelseOpprettetTid())) {
+            opprettVurderSorteringTask(hendelsePayload, inngåendeHendelse);
         } else {
-            opprettVurderSorteringTaskHvisIkkeHendelsenErForGammel(hendelsePayload, inngåendeHendelse, hendelseTjeneste);
+            hendelseTjeneste.loggFeiletHendelse(hendelsePayload);
+            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse, false);
         }
     }
 
@@ -101,22 +104,17 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.SENDT_TIL_SORTERING);
     }
 
-    private void opprettVurderSorteringTaskHvisIkkeHendelsenErForGammel(HendelsePayload hendelsePayload, InngåendeHendelse inngåendeHendelse, HendelseTjeneste<HendelsePayload> hendelseTjeneste) {
-        if (hendelsenErUnderEnUkeGammel(hendelsePayload.getHendelseOpprettetTid())) {
-            LocalDateTime nesteKjøringEtter = tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse);
-            LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}",
-                    hendelsePayload.getHendelseId(), inngåendeHendelse.getHendelseType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
-            hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, nesteKjøringEtter);
-            HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
-            vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
-            vurderSorteringTask.setHendelseId(hendelsePayload.getHendelseId());
-            vurderSorteringTask.setNesteKjøringEtter(nesteKjøringEtter);
-            vurderSorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
-            prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
-        } else {
-            hendelseTjeneste.loggFeiletHendelse(hendelsePayload);
-            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse, false);
-        }
+    private void opprettVurderSorteringTask(HendelsePayload hendelsePayload, InngåendeHendelse inngåendeHendelse) {
+        LocalDateTime nesteKjøringEtter = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse);
+        LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}",
+                hendelsePayload.getHendelseId(), inngåendeHendelse.getHendelseType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
+        hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, nesteKjøringEtter);
+        HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
+        vurderSorteringTask.setHendelseId(hendelsePayload.getHendelseId());
+        vurderSorteringTask.setNesteKjøringEtter(nesteKjøringEtter);
+        vurderSorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
+        prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
     }
 
     private boolean hendelsenErUnderEnUkeGammel(LocalDateTime hendelseOpprettetTid) {
