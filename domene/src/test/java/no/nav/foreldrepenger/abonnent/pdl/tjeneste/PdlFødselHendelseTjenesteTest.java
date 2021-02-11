@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
 import static java.util.Set.of;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.AKTØR_ID_BARN;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.AKTØR_ID_FAR;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.AKTØR_ID_MOR;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.FØDSELSDATO;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.HENDELSE_ID;
-import static no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil.MELDINGSTYPE;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.AKTØR_ID_BARN;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.AKTØR_ID_FAR;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.AKTØR_ID_MOR;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.FØDSELSDATO;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.HENDELSE_ID;
+import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.MELDINGSTYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -16,16 +16,15 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import no.nav.foreldrepenger.abonnent.felles.HendelseTestDataUtil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
+import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
 import no.nav.vedtak.exception.TekniskException;
 
 
 public class PdlFødselHendelseTjenesteTest {
-
 
     private HendelseTjeneste hendelseTjeneste;
 

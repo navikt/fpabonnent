@@ -22,8 +22,8 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.task.VurderSorteringTask;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseKonfig;
-import no.nav.foreldrepenger.abonnent.pdl.tjeneste.TpsForsinkelseTjeneste;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseKonfig;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
@@ -34,7 +34,7 @@ public class PdlLeesahHendelseHåndtererTest {
 
     private HendelseRepository hendelseRepository;
     private ProsessTaskRepository prosessTaskRepository;
-    private TpsForsinkelseTjeneste tpsForsinkelseTjeneste;
+    private ForsinkelseTjeneste forsinkelseTjeneste;
 
     private PdlLeesahHendelseHåndterer hendelseHåndterer;
 
@@ -45,11 +45,11 @@ public class PdlLeesahHendelseHåndtererTest {
     public void before() {
         hendelseRepository = mock(HendelseRepository.class);
         prosessTaskRepository = mock(ProsessTaskRepository.class);
-        TpsForsinkelseKonfig tpsForsinkelseKonfig = mock(TpsForsinkelseKonfig.class);
-        when(tpsForsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
-        tpsForsinkelseTjeneste = new TpsForsinkelseTjeneste(tpsForsinkelseKonfig, hendelseRepository);
+        ForsinkelseKonfig forsinkelseKonfig = mock(ForsinkelseKonfig.class);
+        when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
+        forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
 
-        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskRepository, tpsForsinkelseTjeneste);
+        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskRepository, forsinkelseTjeneste);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
-                tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(OPPRETTET_TID, inngåendeHendelse).toLocalDate());
+                forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_DØD_OPPRETTET.getKode());
     }
 
@@ -121,7 +121,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
-                tpsForsinkelseTjeneste.finnNesteTidspunktForVurderSortering(OPPRETTET_TID, inngåendeHendelse).toLocalDate());
+                forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT.getKode());
     }
 

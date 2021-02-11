@@ -19,6 +19,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 
 @ApplicationScoped
@@ -85,6 +86,26 @@ public class HendelseTjenesteHjelper {
         return tidligereHendelseId != null ?
                 hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, HendelseKilde.PDL) :
                 Optional.empty();
+    }
+
+    /**
+     * Identer inneholder flere identer for en person. fnr/dnr, aktørid osv.
+     * Vi må hente ut det som er fnr fra dette settet.
+     *
+     * En person kan ha flere fødselsnumre, gjerne der en av dem er et D-nummer.
+     *
+     * @param identer liste av forskjellige identer for en person(fnr, dnr, aktørid).
+     * @return Liste av fødselsnumre, normalt bare en
+     */
+    public static Set<PersonIdent> hentUtFødselsnumreFraString(Set<String> identer) {
+        if (Objects.isNull(identer)) {
+            return null; // NOSONAR - ønsker ikke å returnere tomt Set, for da må man sjekke !isEmpty() i tillegg til isPresent()
+        }
+
+        return identer.stream()
+                .filter(PersonIdent::erGyldigFnr)
+                .map(PersonIdent::new)
+                .collect(Collectors.toSet());
     }
 
     /**
