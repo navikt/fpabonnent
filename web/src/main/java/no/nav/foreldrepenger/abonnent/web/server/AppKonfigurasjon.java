@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.abonnent.web.server;
 
 public interface AppKonfigurasjon {
-    int DEFAULT_SERVER_PORT = 8060;
+    int DEFAULT_SERVER_PORT = 8080;
 
     default int getServerPort() {
         return DEFAULT_SERVER_PORT;
