@@ -63,6 +63,19 @@ public class ForsinkelseTjenesteTest {
     }
 
     @Test
+    public void skal_utlede_at_hendelsen_kan_prosesseres_etter_06_30_gitt_at_klokka_er_01_30() {
+        // Arrange
+        settTid(LocalDateTime.of(2020, 1, 6, 1, 30));
+
+        // Act
+        LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
+
+        // Assert
+        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 6, 6, 30),
+                LocalDateTime.of(2020, 1, 6, 6, 59));
+    }
+
+    @Test
     public void skal_utlede_at_hendelsen_kan_prosesseres_torsdag_etter_06_30_gitt_at_klokka_er_23_45_på_onsdag() {
         // Arrange
         settTid(LocalDateTime.of(2020, 1, 8, 23, 45));

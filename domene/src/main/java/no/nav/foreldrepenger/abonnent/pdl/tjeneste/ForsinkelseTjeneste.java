@@ -91,7 +91,9 @@ public class ForsinkelseTjeneste {
 
     private LocalDateTime doFinnNesteTidspunktForVurderSortering() {
         LocalDate dagensDato = DateUtil.now().toLocalDate();
-        if (stengtTidNå() || erStengtDag(dagensDato)) {
+        if (stengtTidEtterMidnattNå()) {
+            return finnNesteÅpningsdag(dagensDato);
+        } else if (stengtTidFørMidnattNå() || erStengtDag(dagensDato)) {
             return finnNesteÅpningsdag(dagensDato.plusDays(1));
         } else {
             return DateUtil.now().plusHours(1);
@@ -106,9 +108,12 @@ public class ForsinkelseTjeneste {
         }
     }
 
-    private boolean stengtTidNå() {
-        return DateUtil.now().isAfter(DateUtil.now().withHour(23).withMinute(30))
-                || DateUtil.now().isBefore(DateUtil.now().withHour(6).withMinute(30));
+    private boolean stengtTidFørMidnattNå() {
+        return DateUtil.now().isAfter(DateUtil.now().withHour(23).withMinute(30));
+    }
+
+    private boolean stengtTidEtterMidnattNå() {
+        return DateUtil.now().isBefore(DateUtil.now().withHour(6).withMinute(30));
     }
 
     private boolean erStengtDag(LocalDate dato) {
