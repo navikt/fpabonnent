@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <felles.version>3.0.87</felles.version>
+        <felles.version>3.0.91</felles.version>
         <prosesstask.version>2.5.15</prosesstask.version>
         <fp-kontrakter.version>5.1-20210125085553-1b2683d</fp-kontrakter.version>
 
@@ -42,14 +42,13 @@
         <resteasy.version>4.6.0.Final</resteasy.version>
         <javax.el.version>3.0.1-b12</javax.el.version>
         <swagger.version>2.1.6</swagger.version>
-        <swagger-ui.version>3.42.0</swagger-ui.version>
+        <swagger-ui.version>3.43.0</swagger-ui.version>
         <kafka.version>2.7.0</kafka.version>
         <avro.version>1.10.1</avro.version>
         <confluent.version>5.5.0</confluent.version>
-        <woodstox.version>6.2.3</woodstox.version>
+        <woodstox.version>6.2.4</woodstox.version>
 
         <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
-        <joda-time.version>2.10.10</joda-time.version>
         <ow2.asm.version>9.1</ow2.asm.version>
         <owaspencoder.version>1.2.3</owaspencoder.version>
         <javaslang.version>2.0.6</javaslang.version>
@@ -226,11 +225,6 @@
                 <version>${resteasy.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.glassfish</groupId>
-                <artifactId>javax.el</artifactId>
-                <version>${javax.el.version}</version>
-            </dependency>
-            <dependency>
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv -->
                 <groupId>com.sun.activation</groupId>
                 <artifactId>jakarta.activation</artifactId>
@@ -257,12 +251,6 @@
             </dependency>
 
             <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
-            <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>${joda-time.version}</version>
-            </dependency>
             <dependency>
                 <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
                 <groupId>com.fasterxml.woodstox</groupId>
