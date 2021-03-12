@@ -49,7 +49,7 @@ public class SendHendelseTask implements ProsessTaskHandler {
 
     private HendelsePayload getHendelsePayload(HendelserDataWrapper dataWrapper) {
         Long inngåendeHendelseId = dataWrapper.getInngåendeHendelseId()
-                .orElseThrow(() -> AbonnentHendelserFeil.FACTORY.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(), dataWrapper.getProsessTaskData().getId()).toException());
+                .orElseThrow(() -> AbonnentHendelserFeil.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(), dataWrapper.getProsessTaskData().getId()));
         InngåendeHendelse inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId);
         return inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
     }

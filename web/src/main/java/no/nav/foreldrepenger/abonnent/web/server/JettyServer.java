@@ -10,17 +10,11 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.MetaData;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.web.app.konfig.ApplicationConfig;
 import no.nav.foreldrepenger.abonnent.web.server.DataSourceKonfig.DBConnProp;
 import no.nav.vedtak.isso.IssoApplication;
-import no.nav.vedtak.isso.config.ServerInfo;
 public class JettyServer extends AbstractJettyServer {
-
-
-    private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
     private DataSourceKonfig dataSourceKonfig;
 
@@ -81,7 +75,7 @@ public class JettyServer extends AbstractJettyServer {
                 .distinct()
                 .collect(Collectors.toList());
 
-        metaData.setWebInfClassesDirs(resources);
+        metaData.setWebInfClassesResources(resources);
     }
 
     protected List<Class<?>> getWebInfClasses() {

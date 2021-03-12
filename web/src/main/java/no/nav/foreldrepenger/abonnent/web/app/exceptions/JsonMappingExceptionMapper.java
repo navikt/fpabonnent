@@ -9,11 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 
 public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingException> {
 
@@ -21,22 +17,12 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
 
     @Override
     public Response toResponse(JsonMappingException exception) {
-        Feil feil = JsonMappingFeil.FACTORY.jsonMappingFeil(exception);
-        feil.log(log);
+        TekniskException tekniskException = new TekniskException("FP-252294", "JSON-mapping feil", exception);
+        log.warn(tekniskException.getMessage());
         return Response
                 .status(Response.Status.BAD_REQUEST)
-                .entity(new FeilDto(feil.getFeilmelding()))
+                .entity(new FeilDto(tekniskException.getMessage()))
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
-
-
-    interface JsonMappingFeil extends DeklarerteFeil {
-
-        JsonMappingFeil FACTORY = FeilFactory.create(JsonMappingFeil.class);
-
-        @TekniskFeil(feilkode = "FP-252294", feilmelding = "JSON-mapping feil", logLevel = LogLevel.WARN)
-        Feil jsonMappingFeil(JsonMappingException cause);
-    }
-
 }

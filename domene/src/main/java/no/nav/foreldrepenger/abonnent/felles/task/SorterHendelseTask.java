@@ -73,7 +73,7 @@ public class SorterHendelseTask implements ProsessTaskHandler {
 
     private String getHendelseId(HendelserDataWrapper dataWrapper) {
         if (dataWrapper.getHendelseId().isEmpty()) {
-            throw AbonnentHendelserFeil.FACTORY.prosesstaskPreconditionManglerProperty(TASKNAME, HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId()).toException();
+            throw AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(TASKNAME, HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId());
         } else {
             return dataWrapper.getHendelseId().get();
         }
