@@ -84,7 +84,7 @@ public class FlywayKonfig {
             flyway.migrate();
             return true;
         } catch (FlywayException flywayException) {
-            FeilFactory.create(DbMigreringFeil.class).flywayMigreringFeilet(flywayException).log(LOGGER);
+            LOGGER.error(FeilFactory.create(DbMigreringFeil.class).flywayMigreringFeilet(flywayException).getFeilmelding(), flywayException); //Må endres etter felles 3.2 som har skrevet om DbMigreringFeil...
             return false;
         }
     }

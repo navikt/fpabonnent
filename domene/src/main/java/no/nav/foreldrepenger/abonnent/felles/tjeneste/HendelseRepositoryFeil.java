@@ -1,23 +1,20 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 
-public interface HendelseRepositoryFeil extends DeklarerteFeil {
+public class HendelseRepositoryFeil {
 
-    HendelseRepositoryFeil FACTORY = FeilFactory.create(HendelseRepositoryFeil.class);
+    public static TekniskException fantMerEnnEnHendelseMedStatus(String hendelseKilde, String hendelseId, HåndtertStatusType håndtertStatusType) {
+        return new TekniskException("FP-164339", String.format("Fant mer enn en InngåendeHendelse med hendelseKilde=%s, hendelseId=%s og håndtertStatus=%s.", hendelseKilde, hendelseId, håndtertStatusType));
+    }
 
-    @TekniskFeil(feilkode = "FP-164339", feilmelding = "Fant mer enn en InngåendeHendelse med hendelseKilde=%s, hendelseId=%s og håndtertStatus=%s.", logLevel = LogLevel.WARN)
-    Feil fantMerEnnEnHendelseMedStatus(String hendelseKilde, String hendelseId, HåndtertStatusType håndtertStatusType);
+    public static TekniskException fantMerEnnEnHendelse(String hendelseId) {
+        return new TekniskException("FP-164340", String.format("Fant mer enn en InngåendeHendelse med hendelseId=%s.", hendelseId));
+    }
 
-    @TekniskFeil(feilkode = "FP-164340", feilmelding = "Fant mer enn en InngåendeHendelse med hendelseId=%s.", logLevel = LogLevel.WARN)
-    Feil fantMerEnnEnHendelse(String hendelseId);
-
-    @TekniskFeil(feilkode = "FP-264339", feilmelding = "Fant ikke InngåendeHendelse med hendelseKilde=%s, hendelseId=%s og håndtertStatus=%s.", logLevel = LogLevel.WARN)
-    Feil fantIkkeHendelse(String hendelseKilde, String hendelseId, HåndtertStatusType håndtertStatusType);
+    public static TekniskException fantIkkeHendelse(String hendelseKilde, String hendelseId, HåndtertStatusType håndtertStatusType) {
+        return new TekniskException("FP-264339", String.format("Fant ikke InngåendeHendelse med hendelseKilde=%s, hendelseId=%s og håndtertStatus=%s.", hendelseKilde, hendelseId, håndtertStatusType));
+    }
 
 }

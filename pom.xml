@@ -23,53 +23,33 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <felles.version>3.0.91</felles.version>
-        <prosesstask.version>2.5.15</prosesstask.version>
+        <felles.version>3.1.11</felles.version>
+        <prosesstask.version>2.5.16</prosesstask.version>
         <fp-kontrakter.version>5.1-20210125085553-1b2683d</fp-kontrakter.version>
 
         <!-- Eksterne -->
-        <assertj.version>3.19.0</assertj.version>
         <flyway.version>4.2.0</flyway.version>
-        <hamcrest.version>1.3</hamcrest.version>
-        <junit.version>5.7.1</junit.version>
-        <mockito.version>3.8.0</mockito.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
+        <hikari.version>4.0.1</hikari.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
-        <logstash.version>6.6</logstash.version>
-        <metrics.version>4.1.18</metrics.version>
-        <prometheus.version>0.10.0</prometheus.version>
+        <owaspencoder.version>1.2.3</owaspencoder.version>
         <resteasy.version>4.6.0.Final</resteasy.version>
-        <javax.el.version>3.0.1-b12</javax.el.version>
         <swagger.version>2.1.7</swagger.version>
         <swagger-ui.version>3.45.0</swagger-ui.version>
         <kafka.version>2.7.0</kafka.version>
         <avro.version>1.10.1</avro.version>
         <confluent.version>5.5.0</confluent.version>
-        <woodstox.version>6.2.4</woodstox.version>
-
-        <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
-        <ow2.asm.version>9.1</ow2.asm.version>
-        <owaspencoder.version>1.2.3</owaspencoder.version>
-        <javaslang.version>2.0.6</javaslang.version>
-        <swagger.spec-parser.version>1.0.54</swagger.spec-parser.version>
+        <metrics.version>4.1.18</metrics.version>
+        <prometheus.version>0.10.0</prometheus.version>
+        <logback.version>1.2.3</logback.version>
+        <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
+        <logstash.version>6.6</logstash.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <assertj.version>3.19.0</assertj.version>
+        <junit.version>5.7.1</junit.version>
+        <mockito.version>3.8.0</mockito.version>
     </properties>
-
-    <dependencies>
-        <!-- Avhengigeter som fjernes fra JDK11 som er del av JavaSE. Legger til her framfor med add-modules. -->
-        <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-        </dependency>
-    </dependencies>
 
     <dependencyManagement>
         <dependencies>
@@ -102,7 +82,13 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Foreldrepengeprosjektet -->
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles</groupId>
+                <artifactId>felles-root</artifactId>
+                <version>${felles.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>felles</artifactId>
@@ -125,54 +111,18 @@
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-                <artifactId>felles-integrasjon-bom</artifactId>
-                <version>${felles.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>felles-db</artifactId>
                 <version>${felles.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles</groupId>
-                <artifactId>felles-testutilities</artifactId>
-                <version>${felles.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.woodstox</groupId>
-                        <artifactId>woodstox-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>woodstox-core-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>no.nav.foreldrepenger.felles</groupId>
-                        <artifactId>felles-sikkerhet-testutilities</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>abonnent-v2</artifactId>
                 <version>${fp-kontrakter.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hibernate.validator</groupId>
-                        <artifactId>hibernate-validator</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
-            <!-- Eksterne -->
+            <!-- Test -->
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
@@ -208,34 +158,77 @@
                 <artifactId>mockito-junit-jupiter</artifactId>
                 <version>${mockito.version}</version>
             </dependency>
-            
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.papertrailapp</groupId>
+                <artifactId>logback-syslog4j</artifactId>
+                <version>${logback-syslog4j.version}</version>
+            </dependency>
             <dependency>
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.oracle.ojdbc</groupId>
                 <artifactId>ojdbc8</artifactId>
                 <version>${ojdbc.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikari.version}</version>
+            </dependency>
+
+            <!-- Resteasy -->
+            <dependency>
                 <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-validator-provider</artifactId>
+                <artifactId>resteasy-servlet-initializer</artifactId>
+                <version>${resteasy.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.spec.javax.ws.rs</groupId>
+                        <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.jboss.spec.javax.servlet</groupId>
+                        <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-bom</artifactId>
+                <version>${resteasy.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-core</artifactId>
                 <version>${resteasy.version}</version>
             </dependency>
             <dependency>
-                <!-- velger en transitiv avhengighet - felles ikke enig med seg selv -->
-                <groupId>com.sun.activation</groupId>
-                <artifactId>jakarta.activation</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-
-            <!-- Java 11 -->
-            <dependency>
-                <groupId>javax.json</groupId>
-                <artifactId>javax.json-api</artifactId>
-                <version>1.1.4</version>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-validator-provider</artifactId>
+                <version>${resteasy.version}</version>
             </dependency>
 
             <!-- Sikkerhet: Geronimo -->
@@ -250,42 +243,39 @@
                 <version>${geronimo.osgi.version}</version>
             </dependency>
 
-            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
             <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
-                <groupId>com.fasterxml.woodstox</groupId>
-                <artifactId>woodstox-core</artifactId>
-                <version>${woodstox.version}</version>
-            </dependency>
-            <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>${ow2.asm.version}</version>
-            </dependency>
-            <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm-tree</artifactId>
-                <version>${ow2.asm.version}</version>
-            </dependency>
-            <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm-analysis</artifactId>
-                <version>${ow2.asm.version}</version>
-            </dependency>
-            <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
                 <groupId>org.owasp.encoder</groupId>
                 <artifactId>encoder</artifactId>
                 <version>${owaspencoder.version}</version>
             </dependency>
+
+            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-compat-spec-parser</artifactId>
-                <version>${swagger.spec-parser.version}</version>
+                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>9.1</version>
             </dependency>
+            <dependency>
+                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
+                <groupId>com.fasterxml</groupId>
+                <artifactId>classmate</artifactId>
+                <version>1.5.1</version>
+            </dependency>
+            <dependency>
+                <!-- Skal kunne fjernes med felles 3.2 -->
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.10.22</version>
+            </dependency>
+            <dependency>
+                <!-- Skal kunne fjernes med felles 3.2 -->
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.27.0-GA</version>
+            </dependency>
+
+            <!-- Swagger -->
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-jaxrs2</artifactId>
@@ -297,40 +287,9 @@
                 <version>${swagger.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.swagger2markup</groupId>
-                <artifactId>markup-document-builder</artifactId>
-                <version>1.1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.javaslang</groupId>
-                <artifactId>javaslang</artifactId>
-                <version>${javaslang.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.papertrailapp</groupId>
-                <artifactId>logback-syslog4j</artifactId>
-                <version>1.0.0</version>
-            </dependency>
-
-
-            <!-- Generelle clashes -->
-            <dependency>
-                <!-- clasher med javax.annotations-api -->
-                <groupId>org.jboss.spec.javax.annotation</groupId>
-                <artifactId>jboss-annotations-api_1.2_spec</artifactId>
-                <version>1.0.2.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.spec.javax.ws.rs</groupId>
-                <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-                <version>1.0.1.Final</version>
-                <scope>provided</scope>
+                <groupId>org.webjars</groupId>
+                <artifactId>swagger-ui</artifactId>
+                <version>${swagger-ui.version}</version>
             </dependency>
 
             <!-- Metrics -->
@@ -365,7 +324,7 @@
                 <version>${prometheus.version}</version>
             </dependency>
 
-            <!-- kafka -->
+            <!-- Kafka -->
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
@@ -533,7 +492,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
-                    <version>1.2.5</version>
+                    <version>1.2.7</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -617,9 +576,6 @@
                                     <version>[3.5.3,)</version>
                                 </requireMavenVersion>
                                 <bannedDependencies>
-                                    <excludes>
-                                        <exclude>commons-logging:commons-logging</exclude>
-                                    </excludes>
                                 </bannedDependencies>
                                 <dependencyConvergence />
                                 <!-- Ikke kommenter inn denne. Det brekker muligheten til å bygge bare deler av prosjektet
@@ -639,77 +595,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>runSonar</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <!-- maven.root bør overstyres fra cmdline -->
-                <maven.root>${project.basedir}</maven.root>
-
-                <sonar.language />
-                <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
-                <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-                <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
-                <sonar.java.source>1.10</sonar.java.source>
-                <sonar.exclusions>**/test/**,**/testutilities/**,**/fitnesse/**, **/swagger/**, **/docs/**</sonar.exclusions>
-                <sonar.coverage.exclusions>${sonar.exclusions}</sonar.coverage.exclusions>
-                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-                <sonar.jacoco.itReportPath>${maven.root}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
-                <sonar.jacoco.reportPath>${maven.root}/target/jacoco.exec</sonar.jacoco.reportPath>
-                <sonar.javascript.lcov.reportPath>${maven.root}/web/klient/coverage/lcov.info
-                </sonar.javascript.lcov.reportPath>
-                <sonar.javascript.file.suffixes>.js,.jsx</sonar.javascript.file.suffixes>
-            </properties>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>agent</id>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                                <configuration>
-                                    <propertyName>jacoco.agent.argLine</propertyName>
-                                    <destFile>${sonar.jacoco.reportPath}</destFile>
-                                    <append>true</append>
-                                    <excludes>${sonar.coverage.exclusions}</excludes>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>agent-it</id>
-                                <goals>
-                                    <goal>prepare-agent-integration</goal>
-                                </goals>
-                                <configuration>
-                                    <propertyName>jacoco.agent.itArgLine</propertyName>
-                                    <destFile>${sonar.jacoco.itReportPath}</destFile>
-                                    <append>true</append>
-                                    <excludes>${sonar.coverage.exclusions}</excludes>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>${jacoco.agent.argLine} -Xms384M -Dfile.encoding=UTF-8</argLine>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <scm>
         <connection>scm:git:https://github.com/navikt/fpabonnent.git</connection>

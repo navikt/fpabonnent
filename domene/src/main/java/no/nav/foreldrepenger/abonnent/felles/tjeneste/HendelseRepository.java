@@ -75,7 +75,7 @@ public class HendelseRepository {
     private Optional<InngåendeHendelse> queryTilOptional(String hendelseId, TypedQuery<InngåendeHendelse> query) {
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelse(hendelseId).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.fantMerEnnEnHendelse(hendelseId).getMessage());
         } else if (resultater.isEmpty()) {
             return Optional.empty();
         }
@@ -119,9 +119,9 @@ public class HendelseRepository {
 
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantMerEnnEnHendelseMedStatus(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.fantMerEnnEnHendelseMedStatus(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getMessage());
         } else if (resultater.isEmpty()) {
-            LOGGER.warn(HendelseRepositoryFeil.FACTORY.fantIkkeHendelse(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getFeilmelding());
+            LOGGER.warn(HendelseRepositoryFeil.fantIkkeHendelse(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getMessage());
             return Optional.empty();
         }
         return Optional.of(resultater.get(0));

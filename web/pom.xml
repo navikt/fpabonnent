@@ -12,46 +12,7 @@
     <packaging>jar</packaging>
     <name>fpabonnent :: Webapp</name>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-servlet-initializer</artifactId>
-                <version>${resteasy.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.spec.javax.ws.rs</groupId>
-                        <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.spec.javax.servlet</groupId>
-                        <artifactId>jboss-servlet-api_3.1_spec</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-bom</artifactId>
-                <version>${resteasy.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-core</artifactId>
-                <version>${resteasy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.webjars</groupId>
-                <artifactId>swagger-ui</artifactId>
-                <version>${swagger-ui.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
-        <!-- Foreldrepengeprosjektet -->
         <dependency>
             <groupId>no.nav.foreldrepenger.abonnent</groupId>
             <artifactId>domene</artifactId>
@@ -68,6 +29,13 @@
             <groupId>no.nav.vedtak.prosesstask</groupId>
             <artifactId>prosesstask-rest-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
+            <artifactId>felles-sikkerhet</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Resteasy -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-servlet-initializer</artifactId>
@@ -98,17 +66,6 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-cdi</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
-            <artifactId>felles-sikkerhet</artifactId>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.json</groupId>
-                    <artifactId>javax.json-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <!-- Database -->
         <dependency>
@@ -120,16 +77,6 @@
             <artifactId>flyway-core</artifactId>
         </dependency>
         
-        <!-- For Status side -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-        </dependency>
-
         <!-- Metrics, helse- og selftest -->
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
@@ -155,10 +102,8 @@
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient_common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.owasp.encoder</groupId>
-            <artifactId>encoder</artifactId>
-        </dependency>
+
+        <!-- Swagger -->
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-core</artifactId>
@@ -201,12 +146,6 @@
         <dependency>
             <groupId>org.jboss.weld.servlet</groupId>
             <artifactId>weld-servlet-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId> org.jboss.spec.javax.el</groupId>
-                    <artifactId>jboss-el-api_3.0_spec</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.components</groupId>
@@ -216,7 +155,10 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-osgi-locator</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+        </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
@@ -224,14 +166,15 @@
         <dependency>
             <groupId>com.papertrailapp</groupId>
             <artifactId>logback-syslog4j</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <!-- Andre JEE api'er -->
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-        </dependency>
-
+        <!-- Test -->
         <dependency>
             <groupId>no.nav.foreldrepenger.abonnent</groupId>
             <artifactId>migreringer</artifactId>
@@ -251,6 +194,16 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -281,19 +234,6 @@
                     <rules>
                         <bannedDependencies>
                             <searchTransitive>true</searchTransitive>
-                            <excludes>
-                                <exclude>org.eclipse.jetty:*:*:jar:compile</exclude>
-                                <exclude>org.slf4j:*:*:jar:compile</exclude>
-                                <exclude>ch.qos.logback:*:*:jar:compile</exclude>
-                                <exclude>org.apache.cxf:*:*:jar:compile</exclude>
-                                <exclude>commons-logging:commons-logging</exclude>
-                                <exclude>com.fasterxml.jackson.core:*:*:jar:compile</exclude>
-                                <exclude>org.opensaml:*:*:jar:compile</exclude>
-                                <exclude>org.apache.wss4j:*:*:jar:compile</exclude>
-                            </excludes>
-                            <includes>
-                                <include>org.eclipse.jetty:*:*:*:test</include>
-                            </includes>
                         </bannedDependencies>
                     </rules>
                 </configuration>

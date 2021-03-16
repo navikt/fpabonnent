@@ -12,11 +12,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 
 public class JsonMapper {
     private static final ObjectMapper MAPPER = getObjectMapper();
@@ -37,7 +33,7 @@ public class JsonMapper {
         try {
             return MAPPER.readerFor(clazz).readValue(json);
         } catch (IOException e) {
-            throw JsonMapperFeil.FACTORY.ioExceptionVedLesing(e).toException();
+            throw JsonMapperFeil.ioExceptionVedLesing(e);
         }
     }
 
@@ -45,19 +41,18 @@ public class JsonMapper {
         try {
             return MAPPER.writeValueAsString(dto);
         } catch (JsonProcessingException e) {
-            throw JsonMapperFeil.FACTORY.kunneIkkeSerialisereJson(e).toException();
+            throw JsonMapperFeil.kunneIkkeSerialisereJson(e);
         }
     }
 
-    interface JsonMapperFeil extends DeklarerteFeil {
+    static class JsonMapperFeil {
 
-        JsonMapperFeil FACTORY = FeilFactory.create(JsonMapperFeil.class);
+        static TekniskException kunneIkkeSerialisereJson(JsonProcessingException cause) {
+            return new TekniskException("FP-528313", "Kunne ikke serialisere objekt til JSON", cause);
+        }
 
-        @TekniskFeil(feilkode = "F-528313", feilmelding = "Kunne ikke serialisere objekt til JSON", logLevel = LogLevel.WARN)
-        Feil kunneIkkeSerialisereJson(JsonProcessingException cause);
-
-        @TekniskFeil(feilkode = "F-213628", feilmelding = "Fikk IO exception ved parsing av JSON", logLevel = LogLevel.WARN)
-        Feil ioExceptionVedLesing(IOException cause);
-
+        static TekniskException ioExceptionVedLesing(IOException cause) {
+            return new TekniskException("FP-213628", "Fikk IO exception ved parsing av JSON", cause);
+        }
     }
 }

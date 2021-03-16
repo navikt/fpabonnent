@@ -137,10 +137,10 @@ public class HendelseTjenesteHjelper {
 
     private static void validerResultat(String hendelseId, Set<String> aktørIder) {
         if (aktørIder.isEmpty()) {
-            AbonnentHendelserFeil.FACTORY.finnerIngenAktørId(hendelseId).log(LOGGER);
+            LOGGER.warn(AbonnentHendelserFeil.finnerIngenAktørId(hendelseId).getMessage());
         }
         if (aktørIder.size() > 1) {
-            AbonnentHendelserFeil.FACTORY.merEnnEnAktørId(aktørIder.size(), hendelseId).log(LOGGER);
+            LOGGER.info(AbonnentHendelserFeil.merEnnEnAktørId(aktørIder.size(), hendelseId).getMessage());
         }
     }
 }

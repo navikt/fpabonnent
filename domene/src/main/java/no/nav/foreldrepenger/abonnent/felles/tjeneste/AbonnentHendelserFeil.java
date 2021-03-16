@@ -1,35 +1,34 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
-import static no.nav.vedtak.feil.LogLevel.WARN;
+import no.nav.vedtak.exception.TekniskException;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+public class AbonnentHendelserFeil {
 
-public interface AbonnentHendelserFeil extends DeklarerteFeil {
+    public static TekniskException prosesstaskPreconditionManglerProperty(String taskname, String property, Long taskId) {
+        return new TekniskException("FP-690327", String.format("Prosessering av preconditions for %s mangler %s. TaskId: %s", taskname, property, taskId));
+    }
 
-    AbonnentHendelserFeil FACTORY = FeilFactory.create(AbonnentHendelserFeil.class);
+    public static TekniskException ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(String hendelseType, String hendelseId) {
+        return new TekniskException("FP-309345", String.format("Ukjent hendelsestype - kan ikke finne hendelsestjeneste. hendelseType=%s, hendelseId=%s", hendelseType, hendelseId));
+    }
 
-    @TekniskFeil(feilkode = "FP-690327", feilmelding = "Prosessering av preconditions for %s mangler %s. TaskId: %s", logLevel = WARN)
-    Feil prosesstaskPreconditionManglerProperty(String taskname, String property, Long taskId);
-    
-    @TekniskFeil(feilkode = "FP-309345", feilmelding = "Ukjent hendelsestype - kan ikke finne hendelsestjeneste. hendelseType=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
-    Feil ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(String hendelseType, String hendelseId);
+    public static TekniskException merEnnEnHendelseTjenesteFunnet(String hendelseType, String hendelseId) {
+        return new TekniskException("FP-125639", String.format("Mer enn en hendelsestjeneste funnet. hendelseType=%s, hendelseId=%s", hendelseType, hendelseId));
+    }
 
-    @TekniskFeil(feilkode = "FP-125639", feilmelding = "Mer enn en hendelsestjeneste funnet. hendelseType=%s, hendelseId=%s", logLevel = LogLevel.ERROR)
-    Feil merEnnEnHendelseTjenesteFunnet(String hendelseType, String hendelseId);
+    public static TekniskException ukjentHendelseType() {
+        return new TekniskException("FP-846675", "Ukjent hendelsestype");
+    }
 
-    @TekniskFeil(feilkode = "FP-846675", feilmelding = "Ukjent Hendelse Type <%s>", logLevel = LogLevel.WARN)
-    Feil ukjentHendelseType(String hendelseType);
+    public static TekniskException finnerIngenAktørId(String hendelseId) {
+        return new TekniskException("FP-195374", String.format("Finner ingen aktørId på hendelseId=%s", hendelseId));
+    }
 
-    @TekniskFeil(feilkode = "FP-195374", feilmelding = "Finner ingen aktørId på hendelseId=%s", logLevel = LogLevel.WARN)
-    Feil finnerIngenAktørId(String hendelseId);
+    public static TekniskException merEnnEnAktørId(int antall, String hendelseId) {
+        return new TekniskException("FP-295374", String.format("Finner ikke unik aktørId. Fant %s aktørId på hendelseId=%s", antall, hendelseId));
+    }
 
-    @TekniskFeil(feilkode = "FP-295374", feilmelding = "Finner ikke unik aktørId. Fant %s aktørId på hendelseId=%s", logLevel = LogLevel.INFO)
-    Feil merEnnEnAktørId(int antall, String hendelseId);
-
-    @TekniskFeil(feilkode = "FP-144656", feilmelding = "InngåendeHendelse ID mangler på prosess task %s med TaskId=%s", logLevel = LogLevel.WARN)
-    Feil manglerInngåendeHendelseIdPåProsesstask(String prosesstaskType, Long taskId);
+    public static TekniskException manglerInngåendeHendelseIdPåProsesstask(String prosesstaskType, Long taskId) {
+        return new TekniskException("FP-144656", String.format("InngåendeHendelse ID mangler på prosess task %s med TaskId=%s", prosesstaskType, taskId));
+    }
 }

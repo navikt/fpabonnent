@@ -28,9 +28,9 @@ public class HendelseTjenesteProvider {
         Instance<HendelseTjeneste<? extends HendelsePayload>> selected = tjenester.select(new HendelseTypeRef.HendelseTypeRefLiteral(hendelseType));
 
         if (selected.isAmbiguous()) {
-            throw AbonnentHendelserFeil.FACTORY.merEnnEnHendelseTjenesteFunnet(hendelseType.getKode(), hendelseId).toException();
+            throw AbonnentHendelserFeil.merEnnEnHendelseTjenesteFunnet(hendelseType.getKode(), hendelseId);
         } else if (selected.isUnsatisfied()) {
-            throw AbonnentHendelserFeil.FACTORY.ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(hendelseType.getKode(), hendelseId).toException();
+            throw AbonnentHendelserFeil.ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(hendelseType.getKode(), hendelseId);
         }
         HendelseTjeneste<? extends HendelsePayload> minInstans = selected.get();
         if (minInstans.getClass().isAnnotationPresent(Dependent.class)) {

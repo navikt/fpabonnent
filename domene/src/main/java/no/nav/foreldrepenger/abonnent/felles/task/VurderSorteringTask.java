@@ -52,7 +52,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
         String hendelseType = dataWrapper.getHendelseType()
-                .orElseThrow(() -> AbonnentHendelserFeil.FACTORY.ukjentHendelseType(null).toException());
+                .orElseThrow(() -> AbonnentHendelserFeil.ukjentHendelseType());
         HendelseTjeneste<HendelsePayload> hendelseTjeneste = getHendelseTjeneste(dataWrapper, hendelseType);
 
         Optional<Long> inngåendeHendelseId = dataWrapper.getInngåendeHendelseId();
