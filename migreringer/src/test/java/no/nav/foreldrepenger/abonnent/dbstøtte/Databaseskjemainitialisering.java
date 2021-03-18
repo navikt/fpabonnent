@@ -40,7 +40,7 @@ public final class Databaseskjemainitialisering {
     }
 
     private static DBProperties dbProperties(String dsName, String schema) {
-        return new DBProperties(dsName, schema, ds(dsName, schema), getScriptLocation(dsName, schema));
+        return new DBProperties(dsName, schema, ds(dsName, schema), getScriptLocation(dsName));
     }
 
     public static void settJdniOppslag() {
@@ -66,15 +66,15 @@ public final class Databaseskjemainitialisering {
         flyway.migrate();
     }
 
-    private static String getScriptLocation(String dsName, String schema) {
+    private static String getScriptLocation(String dsName) {
         if (DBTestUtil.kjøresAvMaven()) {
-            return classpathScriptLocation(schema);
+            return classpathScriptLocation(dsName);
         }
         return fileScriptLocation(dsName);
     }
 
-    private static String classpathScriptLocation(String schema) {
-        return "classpath:/db/migration/" + schema;
+    private static String classpathScriptLocation(String dsName) {
+        return "classpath:/db/migration/" + dsName;
     }
 
     private static String fileScriptLocation(String dsName) {
