@@ -51,11 +51,7 @@ jobs:
       - name: Kompiler
         run: |
           echo "IMAGE=$IMAGE_BASE:$TAG" >> $GITHUB_ENV
-          mvn test -e --batch-mode --settings .github/workflows/.m2/settings.xml
-          ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
-          cp migreringer/src/main/resources/db/V4_0__baseline.sql.orig  migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
-          mvn install -Dmaven.test.skip=false  -e --batch-mode --settings .github/workflows/.m2/settings.xml
-          ls -l migreringer/target/classes/db/migration/defaultDS/V4_0__baseline.sql
+          mvn install -e --batch-mode --settings .github/workflows/.m2/settings.xml
 
         env:
           TZ: Europe/Oslo
