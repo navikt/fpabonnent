@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.abonnent.validering;
+package no.nav.foreldrepenger.db.validering;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.dbstøtte.Databaseskjemainitialisering;
+
 
 /**
  * Tester at alle migreringer følger standarder for navn og god praksis.
@@ -32,9 +33,9 @@ public class SjekkDbStrukturTest {
 
     @BeforeAll
     public static void setup() {
-        var dbconp = Databaseskjemainitialisering.defaultProperties();
-        ds = Databaseskjemainitialisering.ds(dbconp);
-        schema = dbconp.getSchema();
+        var dbconp = Databaseskjemainitialisering.DEFAULT_DS_PROPERTIES;
+        ds = dbconp.dataSource();
+        schema = dbconp.schema();
     }
 
     @Test
@@ -131,7 +132,7 @@ public class SjekkDbStrukturTest {
 
         }
         int sz = avvik.size();
-        String manglerIndeks = "Kolonner som inngår i Foreign Keys skal ha indekser .\nMangler indekser for ";
+        String manglerIndeks = "Kolonner som inngår i Foreign Keys skal ha indekser (ikke KL_ kolonner).\nMangler indekser for ";
 
         assertThat(avvik).withFailMessage(manglerIndeks + sz + " foreign keys\n" + tekst).isEmpty();
 
