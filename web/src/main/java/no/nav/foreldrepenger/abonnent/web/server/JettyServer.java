@@ -40,7 +40,6 @@ public class JettyServer extends AbstractJettyServer {
         new EnvEntry("jdbc/defaultDS", dataSourceKonfig.defaultDS());
     }
 
-
     @Override
     protected void migrerDatabaser() {
         for (var cfg : dataSourceKonfig.getDataSources()) {
