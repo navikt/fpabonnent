@@ -25,6 +25,21 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
 
+      - name: Image-cache
+        uses: actions/cache@v2
+        with:
+          path: oracle.tar
+          key: image-cache-${{ runner.os }}
+
+      - if: steps.image-cache.outputs.cache-hit != 'true'
+        run: |
+          echo  $GH_ACCESS_TOKEN | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
+          docker-compose -f oracle/docker-compose.yml pull oracle
+          docker save docker.pkg.github.com/navikt/fpsak-autotest/oracle-flattened > oracle.tar
+
+      - if: steps.image-cache.outputs.cache-hit == 'true'
+        run: docker load < oracle.tar
+
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
