@@ -36,7 +36,7 @@
         <owaspencoder.version>1.2.3</owaspencoder.version>
         <resteasy.version>4.6.0.Final</resteasy.version>
         <swagger.version>2.1.7</swagger.version>
-        <swagger-ui.version>3.45.0</swagger-ui.version>
+        <swagger-ui.version>3.46.0</swagger-ui.version>
         <kafka.version>2.7.0</kafka.version>
         <avro.version>1.10.1</avro.version>
         <confluent.version>5.5.0</confluent.version>
