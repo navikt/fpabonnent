@@ -6,6 +6,7 @@ on:
       - master
 env:
   IMAGE_BASE: ghcr.io/${{ github.repository }}
+  TZ: "Europe/Oslo"
 
 jobs:
   build:
