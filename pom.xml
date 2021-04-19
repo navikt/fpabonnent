@@ -266,7 +266,7 @@
                 <!-- Skal kunne fjernes med felles 3.2 -->
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.10.22</version>
+                <version>1.11.0</version>
             </dependency>
             <dependency>
                 <!-- Skal kunne fjernes med felles 3.2 -->
