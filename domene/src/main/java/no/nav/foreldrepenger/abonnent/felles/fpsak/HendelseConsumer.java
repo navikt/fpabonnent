@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.abonnent.felles.fpsak;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -59,6 +58,6 @@ public class HendelseConsumer extends AbstractJerseyOidcRestClient {
                     .invoke(Response.class)
                     .readEntity(new GenericType<List<String>>(){});
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }
