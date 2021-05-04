@@ -23,12 +23,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- default argLine for surefire-plugin -->
-        <argLine>-Xms256m -Dlog.level.no.nav=WARN -Dfile.encoding=${project.build.sourceEncoding}
-            --illegal-access=permit</argLine>
+        <argLine>-Xms256m -Dlog.level.no.nav=WARN -Dfile.encoding=${project.build.sourceEncoding}</argLine>
 
-        <felles.version>3.1.11</felles.version>
-        <prosesstask.version>2.5.16</prosesstask.version>
-        <fp-kontrakter.version>5.1-20210125085553-1b2683d</fp-kontrakter.version>
+        <felles.version>3.2.41</felles.version>
+        <prosesstask.version>2.5.18</prosesstask.version>
+        <fp-kontrakter.version>5.2.3</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <flyway.version>4.2.0</flyway.version>
@@ -37,7 +36,7 @@
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
         <owaspencoder.version>1.2.3</owaspencoder.version>
-        <resteasy.version>4.6.0.Final</resteasy.version>
+        <jersey.version>2.34</jersey.version>
         <swagger.version>2.1.9</swagger.version>
         <swagger-ui.version>3.47.1</swagger-ui.version>
         <kafka.version>2.8.0</kafka.version>
@@ -200,38 +199,13 @@
                 <version>${hikari.version}</version>
             </dependency>
 
-            <!-- Resteasy -->
+            <!-- Jersey -->
             <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-servlet-initializer</artifactId>
-                <version>${resteasy.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.spec.javax.ws.rs</groupId>
-                        <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.spec.javax.servlet</groupId>
-                        <artifactId>jboss-servlet-api_3.1_spec</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-bom</artifactId>
-                <version>${resteasy.version}</version>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${jersey.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-core</artifactId>
-                <version>${resteasy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-validator-provider</artifactId>
-                <version>${resteasy.version}</version>
             </dependency>
 
             <!-- Sikkerhet: Geronimo -->
