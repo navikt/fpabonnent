@@ -93,7 +93,7 @@ public class SorterHendelseTaskTest {
     public void skal_ikke_opprette_task_når_ingen_hendelser_kommer_inn() {
         // Arrange
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
-        lenient().when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
+        lenient().when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(List.of());
 
         // Act
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
@@ -105,7 +105,7 @@ public class SorterHendelseTaskTest {
     @Test
     public void skal_ikke_opprette_SendHendelseTask_når_grovsortering_returnerer_tom_liste() {
         // Arrange
-        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
+        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(List.of());
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);

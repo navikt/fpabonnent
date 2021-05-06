@@ -3,12 +3,12 @@ package no.nav.foreldrepenger.abonnent.web.app.exceptions;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.jboss.resteasy.spi.ApplicationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -21,25 +21,25 @@ import no.nav.vedtak.log.mdc.MDCOperations;
 import no.nav.vedtak.log.util.LoggerUtils;
 
 @Provider
-public class GeneralRestExceptionMapper implements ExceptionMapper<ApplicationException> {
+public class GeneralRestExceptionMapper implements ExceptionMapper<WebApplicationException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneralRestExceptionMapper.class);
 
     @Override
-    public Response toResponse(ApplicationException exception) {
+    public Response toResponse(WebApplicationException exception) {
         Throwable cause = exception.getCause();
 
-        if (cause instanceof Valideringsfeil) {
-            return handleValideringsfeil((Valideringsfeil) cause);
-        } else if (cause instanceof TomtResultatException) {
-            return handleTomtResultatFeil((TomtResultatException) cause);
+        if (cause instanceof Valideringsfeil valideringsfeil) {
+            return handleValideringsfeil(valideringsfeil);
+        } else if (cause instanceof TomtResultatException tomtResultatException) {
+            return handleTomtResultatFeil(tomtResultatException);
         }
 
         loggTilApplikasjonslogg(cause);
         String callId = MDCOperations.getCallId();
 
-        if (cause instanceof VLException) {
-            return handleVLException((VLException) cause, callId);
+        if (cause instanceof VLException vlException) {
+            return handleVLException(vlException, callId);
         }
 
         return handleGenerellFeil(cause, callId);
@@ -91,8 +91,8 @@ public class GeneralRestExceptionMapper implements ExceptionMapper<ApplicationEx
 
     private String getVLExceptionFeilmelding(String callId, VLException exception) {
         String feilbeskrivelse = exception.getMessage();
-        if (exception instanceof FunksjonellException) {
-            String løsningsforslag = ((FunksjonellException) exception).getLøsningsforslag();
+        if (exception instanceof FunksjonellException funksjonellException) {
+            String løsningsforslag = funksjonellException.getLøsningsforslag();
             return "Det oppstod en feil: " //$NON-NLS-1$
                     + avsluttMedPunktum(feilbeskrivelse)
                     + avsluttMedPunktum(løsningsforslag)
