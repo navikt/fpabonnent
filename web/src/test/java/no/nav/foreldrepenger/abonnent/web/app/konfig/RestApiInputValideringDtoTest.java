@@ -1,5 +1,9 @@
 package no.nav.foreldrepenger.abonnent.web.app.konfig;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -15,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,15 +76,15 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     private static final Map<Class, List<List<Class<? extends Annotation>>>> UNNTATT_FRA_VALIDERING = new HashMap<>() {
         {
 
-            put(boolean.class, List.of(List.of()));
-            put(Boolean.class, List.of(List.of()));
+            put(boolean.class, singletonList(emptyList()));
+            put(Boolean.class, singletonList(emptyList()));
 
             // LocalDate og LocalDateTime har egne deserializers
-            put(LocalDate.class, List.of(List.of()));
-            put(LocalDateTime.class, List.of(List.of()));
+            put(LocalDate.class, singletonList(emptyList()));
+            put(LocalDateTime.class, singletonList(emptyList()));
 
             // Enforces av UUID selv
-            put(UUID.class, List.of(List.of()));
+            put(UUID.class, singletonList(emptyList()));
         }
     };
 
@@ -87,13 +92,13 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     private static final Map<Class, List<List<Class<? extends Annotation>>>> VALIDERINGSALTERNATIVER = new HashMap<>() {
         {
             put(String.class,
-                    List.of(List.of(Pattern.class, Size.class), List.of(Pattern.class), List.of(Digits.class)));
-            put(Long.class, List.of(List.of(Min.class, Max.class), List.of(Digits.class)));
-            put(long.class, List.of(List.of(Min.class, Max.class), List.of(Digits.class)));
-            put(Integer.class, List.of(List.of(Min.class, Max.class)));
-            put(int.class, List.of(List.of(Min.class, Max.class)));
-            put(BigDecimal.class, List.of(List.of(Min.class, Max.class, Digits.class),
-                    List.of(DecimalMin.class, DecimalMax.class, Digits.class)));
+                    asList(asList(Pattern.class, Size.class), asList(Pattern.class), singletonList(Digits.class)));
+            put(Long.class, asList(asList(Min.class, Max.class), asList(Digits.class)));
+            put(long.class, asList(asList(Min.class, Max.class), asList(Digits.class)));
+            put(Integer.class, singletonList(asList(Min.class, Max.class)));
+            put(int.class, singletonList(asList(Min.class, Max.class)));
+            put(BigDecimal.class, asList(asList(Min.class, Max.class, Digits.class),
+                    asList(DecimalMin.class, DecimalMax.class, Digits.class)));
 
             putAll(UNNTATT_FRA_VALIDERING);
         }
@@ -102,18 +107,18 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     private static List<List<Class<? extends Annotation>>> getVurderingsalternativer(Field field) {
         Class<?> type = field.getType();
         if (field.getType().isEnum()) {
-            return List.of(List.of(Valid.class));
+            return Collections.singletonList(Collections.singletonList(Valid.class));
         } else if (Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
             if (brukerGenerics(field)) {
                 Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
                 if (Arrays.stream(args).allMatch(UNNTATT_FRA_VALIDERING::containsKey)) {
-                    return List.of(List.of(Size.class));
+                    return Collections.singletonList(List.of(Size.class));
                 } else if (args.length == 1 && erKodeverk(args)) {
-                    return List.of(List.of(Valid.class, Size.class));
+                    return Collections.singletonList(List.of(Valid.class, Size.class));
                 }
 
             }
-            return List.of(List.of(Valid.class, Size.class));
+            return singletonList(List.of(Valid.class, Size.class));
 
         }
         return VALIDERINGSALTERNATIVER.get(type);
@@ -128,7 +133,8 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
         for (Method method : finnAlleRestMetoder()) {
             parametre.addAll(List.of(method.getParameterTypes()));
             for (Type type : method.getGenericParameterTypes()) {
-                if (type instanceof ParameterizedType genericTypes) {
+                if (type instanceof ParameterizedType) {
+                    ParameterizedType genericTypes = (ParameterizedType) type;
                     for (Type gen : genericTypes.getActualTypeArguments()) {
                         parametre.add((Class<?>) gen);
                     }

@@ -49,7 +49,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
         if (payload.getAktørId().isPresent()) {
             return payload.getAktørId().get().stream().map(AktørIdDto::new).collect(Collectors.toList());
         }
-        return List.of();
+        return Collections.emptyList();
     }
 
     public Optional<Set<String>> getAktørId() {

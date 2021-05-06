@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.abonnent.web.server;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Alternative;
 
 import no.nav.vedtak.sikkerhet.abac.NavAbacCommonAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
@@ -9,6 +11,8 @@ import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlAttributeSet;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlRequestBuilder;
 
 @Dependent
+@Alternative
+@Priority(2)
 public class AppXacmlRequestBuilderTjenesteImpl implements XacmlRequestBuilderTjeneste {
 
     @Override
