@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.abonnent.felles.fpsak;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -51,6 +50,6 @@ public class HendelseConsumer {
             List<AktørIdDto> dtoList = aktørIdList.stream().map(AktørIdDto::new).collect(Collectors.toList());
             return oidcRestClient.post(grovsorterEndpoint, dtoList, List.class);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

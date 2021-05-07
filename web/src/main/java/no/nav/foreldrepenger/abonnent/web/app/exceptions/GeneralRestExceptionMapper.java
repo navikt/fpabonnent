@@ -91,8 +91,8 @@ public class GeneralRestExceptionMapper implements ExceptionMapper<ApplicationEx
 
     private String getVLExceptionFeilmelding(String callId, VLException exception) {
         String feilbeskrivelse = exception.getMessage();
-        if (exception instanceof FunksjonellException) {
-            String løsningsforslag = ((FunksjonellException) exception).getLøsningsforslag();
+        if (exception instanceof FunksjonellException funksjonellException) {
+            String løsningsforslag = funksjonellException.getLøsningsforslag();
             return "Det oppstod en feil: " //$NON-NLS-1$
                     + avsluttMedPunktum(feilbeskrivelse)
                     + avsluttMedPunktum(løsningsforslag)

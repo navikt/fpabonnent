@@ -12,8 +12,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -93,7 +91,7 @@ public class SorterHendelseTaskTest {
     public void skal_ikke_opprette_task_når_ingen_hendelser_kommer_inn() {
         // Arrange
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
-        lenient().when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
+        lenient().when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(List.of());
 
         // Act
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
@@ -105,7 +103,7 @@ public class SorterHendelseTaskTest {
     @Test
     public void skal_ikke_opprette_SendHendelseTask_når_grovsortering_returnerer_tom_liste() {
         // Arrange
-        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(Collections.emptyList());
+        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(List.of());
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
@@ -125,7 +123,7 @@ public class SorterHendelseTaskTest {
     @Test
     public void skal_opprette_SendHendelseTask() {
         // Arrange
-        List<String> eksisterendeAktørIder = Arrays.asList(FORELDER1, FORELDER2);
+        List<String> eksisterendeAktørIder = List.of(FORELDER1, FORELDER2);
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
@@ -153,7 +151,7 @@ public class SorterHendelseTaskTest {
     @Test
     public void skal_ikke_opprette_SendHendelseTask_for_ikke_relevant_aktørid() {
         // Arrange
-        List<String> eksisterendeAktørIder = Arrays.asList("12", "13");
+        List<String> eksisterendeAktørIder = List.of("12", "13");
         when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
