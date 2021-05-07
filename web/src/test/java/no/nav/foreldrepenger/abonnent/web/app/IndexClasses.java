@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -95,7 +94,7 @@ public class IndexClasses {
 
     private URL getJandexIndexUrl(URI location) {
         String uriString = location.toString();
-        List<ClassLoader> classLoaders = Arrays.asList(getClass().getClassLoader(), Thread.currentThread().getContextClassLoader());
+        List<ClassLoader> classLoaders = List.of(getClass().getClassLoader(), Thread.currentThread().getContextClassLoader());
 
         return classLoaders
             .stream()

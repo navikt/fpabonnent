@@ -1,8 +1,6 @@
 package no.nav.foreldrepenger.abonnent.dbstøtte;
 
 import java.io.File;
-import java.util.List;
-import java.util.Optional;
 
 import javax.sql.DataSource;
 
@@ -109,33 +107,6 @@ public final class Databaseskjemainitialisering {
         return cfg;
     }
 
-    public static class DBProperties {
-        private final String schema;
-        private final DataSource dataSource;
-        private final String scriptLocation;
-        private final String dsName;
-
-        private DBProperties(String dsName, String schema, DataSource dataSource, String scriptLocation) {
-            this.dsName = dsName;
-            this.schema = schema;
-            this.dataSource = dataSource;
-            this.scriptLocation = scriptLocation;
-        }
-
-        public String dsName() {
-            return dsName;
-        }
-
-        public String schema() {
-            return schema;
-        }
-
-        public DataSource dataSource() {
-            return dataSource;
-        }
-
-        public String scriptLocation() {
-            return scriptLocation;
-        }
+    public static record DBProperties(String dsName, String schema, DataSource dataSource, String scriptLocation) {
     }
 }

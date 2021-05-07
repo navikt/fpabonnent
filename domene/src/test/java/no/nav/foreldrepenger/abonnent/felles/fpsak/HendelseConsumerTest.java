@@ -7,8 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -58,8 +56,7 @@ public class HendelseConsumerTest {
         assertThat(capturedDto).isNotNull();
 
         HendelseDto hendelseDto = capturedDto.getHendelse();
-        if (hendelseDto instanceof FødselHendelseDto) {
-            FødselHendelseDto fødselHendelseDto = (FødselHendelseDto) hendelseDto;
+        if (hendelseDto instanceof FødselHendelseDto fødselHendelseDto) {
             assertThat(fødselHendelseDto.getFødselsdato()).isEqualTo(FØDSELSDATO);
             assertThat(fødselHendelseDto.getHendelsetype()).isEqualTo(FødselHendelseDto.HENDELSE_TYPE);
             assertThat(fødselHendelseDto.getAktørIdForeldre()).containsExactlyInAnyOrder(new AktørIdDto(AKTØR_ID_FAR), new AktørIdDto(AKTØR_ID_MOR));
@@ -68,7 +65,7 @@ public class HendelseConsumerTest {
 
     @Test
     public void skal_returnere_tom_liste() {
-        List<String> resultat = consumer.grovsorterAktørIder(Collections.emptyList());
+        List<String> resultat = consumer.grovsorterAktørIder(List.of());
         assertThat(resultat).isEmpty();
     }
 
@@ -76,7 +73,7 @@ public class HendelseConsumerTest {
     public void skal_videresende_aktørId_som_dto() {
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
 
-        List<String> idList = Arrays.asList("1", "2", "3");
+        List<String> idList = List.of("1", "2", "3");
 
         consumer.grovsorterAktørIder(idList);
 

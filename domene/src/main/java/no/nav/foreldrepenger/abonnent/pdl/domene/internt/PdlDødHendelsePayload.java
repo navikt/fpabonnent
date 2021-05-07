@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.abonnent.pdl.domene.internt;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +48,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
         if (payload.getAktørId().isPresent()) {
             return payload.getAktørId().get().stream().map(AktørIdDto::new).collect(Collectors.toList());
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     public Optional<Set<String>> getAktørId() {

@@ -1,9 +1,8 @@
 package no.nav.foreldrepenger.abonnent.testutilities;
 
-import static java.util.Collections.singletonList;
-
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,7 +61,7 @@ public class HendelseTestDataUtil {
                 .hendelseId(HENDELSE_ID)
                 .hendelseType(MELDINGSTYPE.getKode())
                 .endringstype("OPPRETTET")
-                .aktørIdBarn(new HashSet<>(singletonList(AKTØR_ID_BARN)))
+                .aktørIdBarn(new HashSet<>(List.of(AKTØR_ID_BARN)))
                 .aktørIdForeldre(Set.of(AKTØR_ID_MOR, AKTØR_ID_FAR))
                 .fødselsdato(FØDSELSDATO)
                 .build();
