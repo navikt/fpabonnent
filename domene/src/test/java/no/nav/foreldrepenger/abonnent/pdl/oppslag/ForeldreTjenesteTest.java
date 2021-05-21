@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
-import no.nav.pdl.Familierelasjon;
 import no.nav.pdl.Familierelasjonsrolle;
+import no.nav.pdl.ForelderBarnRelasjon;
 import no.nav.pdl.Person;
 import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
 
@@ -37,9 +37,9 @@ public class ForeldreTjenesteTest {
     public void skal_hente_foreldre_for_fnr() {
         // Arrange
         Person person = new Person();
-        Familierelasjon familierelasjonMor = new Familierelasjon(MOR_FNR.getIdent(), Familierelasjonsrolle.MOR, Familierelasjonsrolle.BARN, null, null);
-        Familierelasjon familierelasjonFar = new Familierelasjon(FAR_FNR.getIdent(), Familierelasjonsrolle.FAR, Familierelasjonsrolle.BARN, null, null);
-        person.setFamilierelasjoner(List.of(familierelasjonMor, familierelasjonFar));
+        ForelderBarnRelasjon familierelasjonMor = new ForelderBarnRelasjon(MOR_FNR.getIdent(), Familierelasjonsrolle.MOR, Familierelasjonsrolle.BARN, null, null);
+        ForelderBarnRelasjon familierelasjonFar = new ForelderBarnRelasjon(FAR_FNR.getIdent(), Familierelasjonsrolle.FAR, Familierelasjonsrolle.BARN, null, null);
+        person.setForelderBarnRelasjon(List.of(familierelasjonMor, familierelasjonFar));
         when(pdlMock.hentPerson(any(), any())).thenReturn(person);
 
         // Act

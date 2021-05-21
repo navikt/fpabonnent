@@ -2,12 +2,10 @@ package no.nav.foreldrepenger.abonnent.pdl.kafka;
 
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØD;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØDFØDSEL;
-import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FAMILIERELASJON;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FØDSEL;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
@@ -32,7 +30,6 @@ import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedfoedtbarn.DoedfoedtBarn;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
-import no.nav.person.pdl.leesah.familierelasjon.Familierelasjon;
 import no.nav.person.pdl.leesah.foedsel.Foedsel;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -81,8 +78,6 @@ public class PdlLeesahHendelseHåndterer {
             håndterDødsfall(payload);
         } else if (DØDFØDSEL.contentEquals(payload.getOpplysningstype())) {
             håndterDødfødtBarn(payload);
-        } else if (FAMILIERELASJON.contentEquals(payload.getOpplysningstype())) {
-            håndterFamilierelasjon(payload);
         } else {
             LOG.info("FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
@@ -128,21 +123,10 @@ public class PdlLeesahHendelseHåndterer {
         prosesserHendelseVidereHvisRelevant(pdlDødfødsel);
     }
 
-    private void håndterFamilierelasjon(Personhendelse payload) {
-        Familierelasjon familierelasjon = payload.getFamilierelasjon();
-        if (familierelasjon != null) {
-            LOG.info("FPABONNENT mottok familierelasjon som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} relatertPersonsRolle={} minRolleForPerson={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), familierelasjon.getRelatertPersonsRolle(), familierelasjon.getMinRolleForPerson());
-        } else {
-            LOG.info("FPABONNENT mottok familierelasjon som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
-        }
-    }
-
     private void setCallIdForHendelse(Personhendelse payload) {
         var hendelsesId = payload.getHendelseId();
         if (hendelsesId == null || hendelsesId.toString().isEmpty()) {
-            MDCOperations.putCallId(UUID.randomUUID().toString());
+            MDCOperations.putCallId();
         } else {
             MDCOperations.putCallId(hendelsesId.toString());
         }

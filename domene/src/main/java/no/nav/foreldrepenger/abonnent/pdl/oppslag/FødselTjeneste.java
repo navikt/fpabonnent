@@ -7,9 +7,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
-import no.nav.pdl.Familierelasjon;
-import no.nav.pdl.FamilierelasjonResponseProjection;
 import no.nav.pdl.Familierelasjonsrolle;
+import no.nav.pdl.ForelderBarnRelasjon;
+import no.nav.pdl.ForelderBarnRelasjonResponseProjection;
 import no.nav.pdl.HentPersonQueryRequest;
 import no.nav.pdl.PersonResponseProjection;
 import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
@@ -33,13 +33,13 @@ public class FødselTjeneste {
         var request = new HentPersonQueryRequest();
         request.setIdent(barn.getIdent());
         var projection = new PersonResponseProjection()
-                .familierelasjoner(new FamilierelasjonResponseProjection().relatertPersonsIdent().relatertPersonsRolle());
+                .forelderBarnRelasjon(new ForelderBarnRelasjonResponseProjection().relatertPersonsIdent().relatertPersonsRolle());
 
         var person = pdlKlient.hentPerson(request, projection);
 
-        return person.getFamilierelasjoner().stream()
+        return person.getForelderBarnRelasjon().stream()
                 .filter(f -> !Familierelasjonsrolle.BARN.equals(f.getRelatertPersonsRolle()))
-                .map(Familierelasjon::getRelatertPersonsIdent)
+                .map(ForelderBarnRelasjon::getRelatertPersonsIdent)
                 .map(PersonIdent::fra)
                 .collect(Collectors.toList());
     }
