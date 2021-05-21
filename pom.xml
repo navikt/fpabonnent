@@ -44,10 +44,8 @@
         <confluent.version>5.5.0</confluent.version>
         <metrics.version>4.2.0</metrics.version>
         <prometheus.version>0.10.0</prometheus.version>
-        <logback.version>1.2.3</logback.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash.version>6.6</logstash.version>
-        <slf4j.version>1.7.30</slf4j.version>
         <mockito.version>3.9.0</mockito.version>
     </properties>
 
@@ -131,11 +129,6 @@
 
             <!-- Logging -->
             <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.papertrailapp</groupId>
                 <artifactId>logback-syslog4j</artifactId>
                 <version>${logback-syslog4j.version}</version>
@@ -144,11 +137,6 @@
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jul-to-slf4j</artifactId>
-                <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
@@ -231,18 +219,6 @@
                 <groupId>com.fasterxml</groupId>
                 <artifactId>classmate</artifactId>
                 <version>1.5.1</version>
-            </dependency>
-            <dependency>
-                <!-- Skal kunne fjernes med felles 3.2 -->
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy</artifactId>
-                <version>1.10.22</version>
-            </dependency>
-            <dependency>
-                <!-- Skal kunne fjernes med felles 3.2 -->
-                <groupId>org.javassist</groupId>
-                <artifactId>javassist</artifactId>
-                <version>3.28.0-GA</version>
             </dependency>
 
             <!-- Swagger -->
