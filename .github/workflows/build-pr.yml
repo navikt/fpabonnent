@@ -16,8 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Sjekk ut kode
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+         with:
+           ref: ${{github.event.pull_request.head.ref}}
       - run:  git fetch --prune --unshallow
 
       - name: Cache maven repository
