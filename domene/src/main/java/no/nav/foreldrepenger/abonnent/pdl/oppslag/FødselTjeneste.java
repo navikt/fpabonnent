@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
@@ -15,14 +15,10 @@ import no.nav.pdl.PersonResponseProjection;
 import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
 import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 
-@ApplicationScoped
+@Dependent
 public class FødselTjeneste {
 
-    private Pdl pdlKlient;
-
-    FødselTjeneste() {
-        // CDI
-    }
+    private final Pdl pdlKlient;
 
     @Inject
     public FødselTjeneste(@Jersey Pdl pdlKlient) {
@@ -42,5 +38,10 @@ public class FødselTjeneste {
                 .map(ForelderBarnRelasjon::getRelatertPersonsIdent)
                 .map(PersonIdent::fra)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " [pdlKlient=" + pdlKlient + "]";
     }
 }
