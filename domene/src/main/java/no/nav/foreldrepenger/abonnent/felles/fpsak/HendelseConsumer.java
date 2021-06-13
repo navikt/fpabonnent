@@ -15,7 +15,13 @@ import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
-public class HendelseConsumer {
+/**
+ *
+ * @see JerseyHendelser
+ *
+ */
+@Deprecated
+public class HendelseConsumer implements Hendelser {
     private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
     // URI append paths
     private static final String SEND_HENDELSE_PATH = "motta";
@@ -38,13 +44,15 @@ public class HendelseConsumer {
         grovsorterEndpoint = this.baseEndpoint.resolve(GROVSORTER_HENDELSE_PATH);
     }
 
+    @Override
     public void sendHendelse(HendelsePayload hendelsePayload) {
-        Objects.requireNonNull(hendelsePayload, SEND_HENDELSE_PATH); //$NON-NLS-1$
+        Objects.requireNonNull(hendelsePayload, SEND_HENDELSE_PATH); // $NON-NLS-1$
         HendelseWrapperDto hendelseWrapperDto = hendelsePayload.mapPayloadTilDto();
         oidcRestClient.post(sendHendelseEndpoint, hendelseWrapperDto);
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<String> grovsorterAktørIder(List<String> aktørIdList) {
         if (!aktørIdList.isEmpty()) {
             List<AktørIdDto> dtoList = aktørIdList.stream().map(AktørIdDto::new).collect(Collectors.toList());
