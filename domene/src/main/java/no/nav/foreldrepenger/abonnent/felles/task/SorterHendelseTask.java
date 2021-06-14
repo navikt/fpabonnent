@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
+import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -33,15 +33,15 @@ public class SorterHendelseTask implements ProsessTaskHandler {
 
     private ProsessTaskRepository prosessTaskRepository;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
-    private Hendelser hendelser;
+    private HendelseConsumer hendelseConsumer;
 
     @Inject
     public SorterHendelseTask(ProsessTaskRepository prosessTaskRepository,
-            InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
-            Hendelser hendelser) {
+                              InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
+                              HendelseConsumer hendelseConsumer) {
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.prosessTaskRepository = prosessTaskRepository;
-        this.hendelser = hendelser;
+        this.hendelseConsumer = hendelseConsumer;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class SorterHendelseTask implements ProsessTaskHandler {
 
         HendelsePayload hendelsePayload = inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse.get());
         List<String> aktørIderForSortering = getAktørIderForSortering(hendelsePayload);
-        List<String> filtrertAktørIdList = hendelser.grovsorterAktørIder(aktørIderForSortering);
+        List<String> filtrertAktørIdList = hendelseConsumer.grovsorterAktørIder(aktørIderForSortering);
 
         if (!hendelseErRelevant(filtrertAktørIdList, hendelsePayload)) {
             LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK",
