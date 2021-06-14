@@ -4,7 +4,7 @@ registries: # Define access for private registries
     type: maven-repository
     url: https://maven.pkg.github.com/navikt/fp-felles
     username: x-access-token
-    password: ${{ secrets.GITHUB_TOKEN }}
+    password: ${{ secrets.PAT }}
 
 updates:
 - package-ecosystem: "maven"
