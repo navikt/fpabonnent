@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.abonnent.validering;
+package no.nav.foreldrepenger.db.validering;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
