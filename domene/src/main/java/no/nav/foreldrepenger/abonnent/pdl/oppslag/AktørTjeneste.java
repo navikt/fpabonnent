@@ -35,7 +35,7 @@ public class AktørTjeneste {
     }
 
     @Inject
-    public AktørTjeneste(/*@Jersey*/ Pdl pdlKlient) {
+    public AktørTjeneste(@Jersey Pdl pdlKlient) {
         this.pdlKlient = pdlKlient;
         this.cacheIdentTilAktørId = new LRUCache<>(DEFAULT_CACHE_SIZE, DEFAULT_CACHE_TIMEOUT);
     }

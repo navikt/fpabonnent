@@ -11,10 +11,6 @@
     <name>fpabonnent :: Domene</name>
 
     <dependencies>
-      <dependency>
-            <groupId>jakarta.el</groupId>
-            <artifactId>jakarta.el-api</artifactId>
-        </dependency>
         <dependency>
             <groupId>no.nav.vedtak.prosesstask</groupId>
             <artifactId>prosesstask-legacy</artifactId>

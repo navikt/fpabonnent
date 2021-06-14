@@ -3,17 +3,21 @@ package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.Dependent;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 
-@Dependent
+@ApplicationScoped
 public class ForeldreTjeneste {
 
-    private final FødselTjeneste fødselTjeneste;
-    private final AktørTjeneste aktørTjeneste;
+    private FødselTjeneste fødselTjeneste;
+    private AktørTjeneste aktørTjeneste;
+
+    ForeldreTjeneste() {
+        //CDI
+    }
 
     @Inject
     public ForeldreTjeneste(FødselTjeneste fødselTjeneste, AktørTjeneste aktørTjeneste) {
@@ -25,10 +29,5 @@ public class ForeldreTjeneste {
         return fødselTjeneste.hentForeldreTil(barn).stream()
                 .flatMap(f -> aktørTjeneste.hentAktørIdForPersonIdent(f).stream())
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " [fødselTjeneste=" + fødselTjeneste + ", aktørTjeneste=" + aktørTjeneste + "]";
     }
 }
