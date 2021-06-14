@@ -7,6 +7,12 @@ registries: # Define access for private registries
     password: ${{ secrets.GITHUB_TOKEN }}
 
 updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    registries: # Allow version updates for dependencies in this registry
+      - fp-felles
+    schedule:
+      interval: "daily"
 - package-ecosystem: maven
   directory: "/"
   schedule:
