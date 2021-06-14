@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
-import no.nav.pdl.Familierelasjonsrolle;
 import no.nav.pdl.ForelderBarnRelasjon;
+import no.nav.pdl.ForelderBarnRelasjonRolle;
 import no.nav.pdl.Person;
 import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
 
@@ -37,8 +37,10 @@ public class ForeldreTjenesteTest {
     public void skal_hente_foreldre_for_fnr() {
         // Arrange
         Person person = new Person();
-        ForelderBarnRelasjon familierelasjonMor = new ForelderBarnRelasjon(MOR_FNR.getIdent(), Familierelasjonsrolle.MOR, Familierelasjonsrolle.BARN, null, null);
-        ForelderBarnRelasjon familierelasjonFar = new ForelderBarnRelasjon(FAR_FNR.getIdent(), Familierelasjonsrolle.FAR, Familierelasjonsrolle.BARN, null, null);
+        ForelderBarnRelasjon familierelasjonMor = new ForelderBarnRelasjon(MOR_FNR.getIdent(), ForelderBarnRelasjonRolle.MOR,
+                ForelderBarnRelasjonRolle.BARN, null, null);
+        ForelderBarnRelasjon familierelasjonFar = new ForelderBarnRelasjon(FAR_FNR.getIdent(), ForelderBarnRelasjonRolle.FAR,
+                ForelderBarnRelasjonRolle.BARN, null, null);
         person.setForelderBarnRelasjon(List.of(familierelasjonMor, familierelasjonFar));
         when(pdlMock.hentPerson(any(), any())).thenReturn(person);
 
@@ -46,6 +48,7 @@ public class ForeldreTjenesteTest {
         List<PersonIdent> foreldre = fødselTjeneste.hentForeldreTil(BARN_FNR);
 
         // Assert
-        assertThat(foreldre.stream().map(PersonIdent::getIdent).collect(Collectors.toSet())).containsAll(Set.of(MOR_FNR.getIdent(), FAR_FNR.getIdent()));
+        assertThat(foreldre.stream().map(PersonIdent::getIdent).collect(Collectors.toSet()))
+                .containsAll(Set.of(MOR_FNR.getIdent(), FAR_FNR.getIdent()));
     }
 }
