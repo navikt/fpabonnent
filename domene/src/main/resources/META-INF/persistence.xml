@@ -11,6 +11,7 @@
         <mapping-file>META-INF/hendelser-orm.xml</mapping-file>
 
         <properties>
+            <property name="hibernate.generate_statistics" value="true" />
             <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle12cDialect"/>
             <property name="hibernate.connection.autocommit" value="false"/>
             <property name="hibernate.jdbc.use_get_generated_keys" value="true"/>

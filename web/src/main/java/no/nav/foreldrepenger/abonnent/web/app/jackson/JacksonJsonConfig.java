@@ -47,7 +47,6 @@ public class JacksonJsonConfig implements ContextResolver<ObjectMapper> {
     private static void addSerializers(SimpleModule module) {
         module.addSerializer(new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME));
         module.addSerializer(new LocalDateSerializer(DateTimeFormatter.ISO_DATE));
-        module.addSerializer(new StringSerializer());
     }
 
     private static void addDeserializers(SimpleModule module) {
