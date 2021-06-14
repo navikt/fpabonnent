@@ -11,10 +11,6 @@ updates:
     directory: "/"
     registries: # Allow version updates for dependencies in this registry
       - fp-felles
-    schedule:
-      interval: "daily"
-- package-ecosystem: maven
-  directory: "/"
   schedule:
     interval: daily
     time: "04:00"
