@@ -21,7 +21,7 @@ public class FødselTjeneste {
     private final Pdl pdlKlient;
 
     @Inject
-    public FødselTjeneste(@Jersey Pdl pdlKlient) {
+    public FødselTjeneste(/*@Jersey */Pdl pdlKlient) {
         this.pdlKlient = pdlKlient;
     }
 
