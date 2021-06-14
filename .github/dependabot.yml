@@ -3,6 +3,8 @@ registries: # Define access for private registries
   fp-felles:
     type: maven-repository
     url: https://maven.pkg.github.com/navikt/fp-felles
+    username: x-access-token
+    token: ${{ secrets.GITHUB_TOKEN }}
 
 updates:
 - package-ecosystem: maven
