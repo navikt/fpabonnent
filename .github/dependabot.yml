@@ -7,13 +7,13 @@ registries: # Define access for private registries
     password: ${{ secrets.GITHUB_TOKEN }}
 
 updates:
-  - package-ecosystem: "maven"
-    directory: "/"
-    registries: # Allow version updates for dependencies in this registry
-      - fp-felles
-    schedule:
-      interval: daily
-      time: "04:00"
+- package-ecosystem: "maven"
+  directory: "/"
+  registries: # Allow version updates for dependencies in this registry
+    - fp-felles
+  schedule:
+    interval: daily
+    time: "04:00"
   open-pull-requests-limit: 20
   ignore:
   - dependency-name: io.astefanutti.metrics.cdi:metrics-cdi
