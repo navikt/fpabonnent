@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.person.pdl.leesah.Personhendelse;
+import no.nav.vedtak.konfig.KonfigVerdi;
 
 @Dependent
 public class PdlLeesahHendelseProperties {
@@ -38,14 +38,14 @@ public class PdlLeesahHendelseProperties {
 
     @Inject
     public PdlLeesahHendelseProperties(@KonfigVerdi("kafka.bootstrap.servers") String bootstrapServers,
-            @KonfigVerdi("kafka.schema.registry.url") String schemaRegistry,
-            @KonfigVerdi("systembruker.username") String username,
-            @KonfigVerdi("systembruker.password") String password,
-            @KonfigVerdi(value = "javax.net.ssl.trustStore") String trustStorePath,
-            @KonfigVerdi(value = "javax.net.ssl.trustStorePassword") String trustStorePassword,
-            @KonfigVerdi("kafka.pdl.leesah.application.id") String applicationId,
-            @KonfigVerdi("kafka.pdl.leesah.topic") String topic,
-            @KonfigVerdi(value = KAFKA_AVRO_SERDE_CLASS, defaultVerdi = "io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde") String kafkaAvroSerdeClass) {
+                                       @KonfigVerdi("kafka.schema.registry.url") String schemaRegistry,
+                                       @KonfigVerdi("systembruker.username") String username,
+                                       @KonfigVerdi("systembruker.password") String password,
+                                       @KonfigVerdi(value = "javax.net.ssl.trustStore") String trustStorePath,
+                                       @KonfigVerdi(value = "javax.net.ssl.trustStorePassword") String trustStorePassword,
+                                       @KonfigVerdi("kafka.pdl.leesah.application.id") String applicationId,
+                                       @KonfigVerdi("kafka.pdl.leesah.topic") String topic,
+                                       @KonfigVerdi(value = KAFKA_AVRO_SERDE_CLASS, defaultVerdi = "io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde") String kafkaAvroSerdeClass) {
         this.bootstrapServers = bootstrapServers;
         this.schemaRegistryUrl = schemaRegistry;
         this.username = username;
@@ -101,9 +101,9 @@ public class PdlLeesahHendelseProperties {
         final Properties props = new Properties();
 
         /*
-         * Application ID må være unik per strøm for å unngå en feilsituasjon der man
-         * enkelte ganger får feil partition (dvs partitions fra annen topic enn den man
-         * skal ha).
+         * Application ID må være unik per strøm for å unngå en feilsituasjon der
+         * man enkelte ganger får feil partition (dvs partitions fra annen topic
+         * enn den man skal ha).
          */
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, getApplicationId());
         LOG.info("Stream APPLICATION_ID_CONFIG: {}", props.getProperty(StreamsConfig.APPLICATION_ID_CONFIG));
@@ -142,10 +142,9 @@ public class PdlLeesahHendelseProperties {
         Serde serde = new SpecificAvroSerde<>();
         if (kafkaAvroSerdeClass != null && !kafkaAvroSerdeClass.isBlank()) {
             try {
-                serde = (Serde) Class.forName(kafkaAvroSerdeClass).getDeclaredConstructor().newInstance();
+                serde = (Serde)Class.forName(kafkaAvroSerdeClass).getDeclaredConstructor().newInstance();
             } catch (Exception e) {
-                LOG.warn(String.format("Utvikler-feil: Konfigurasjonsverdien '%s' peker på klasse '%s' som ikke kunne brukes. Benytter default.",
-                        KAFKA_AVRO_SERDE_CLASS, kafkaAvroSerdeClass), e);
+                LOG.warn(String.format("Utvikler-feil: Konfigurasjonsverdien '%s' peker på klasse '%s' som ikke kunne brukes. Benytter default.", KAFKA_AVRO_SERDE_CLASS, kafkaAvroSerdeClass), e);
             }
         }
         return serde;
