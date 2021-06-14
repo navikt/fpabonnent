@@ -24,8 +24,8 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.pdl.oppslag.ForeldreTjeneste;
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_FØDSEL_HENDELSE)
@@ -94,7 +94,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     @Override
     public void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {
         PdlFødsel pdlFødsel = JsonMapper.fromJson(inngåendeHendelse.getPayload(), PdlFødsel.class);
-        pdlFødsel.setAktørIdForeldre(((FødselKlarForSorteringResultat)klarForSorteringResultat).getForeldre());
+        pdlFødsel.setAktørIdForeldre(((FødselKlarForSorteringResultat) klarForSorteringResultat).getForeldre());
         inngåendeHendelse.setPayload(JsonMapper.toJson(pdlFødsel));
     }
 
@@ -107,7 +107,8 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
             årsak = "Årsaken er at barnets fødselsnummer mangler på hendelsen.";
         } else if (getForeldre(payload.getFnrBarn()).isEmpty()) {
             årsak = "Årsaken er at barnet fortsatt ikke har registrerte foreldre i PDL.";
-            info = true; // Innvandring blir varslet som fødsel OPPRETTET, men mangler ofte foreldreopplysninger (gjelder primært voksne)
+            info = true; // Innvandring blir varslet som fødsel OPPRETTET, men mangler ofte
+                         // foreldreopplysninger (gjelder primært voksne)
         }
         if (info) {
             LOGGER.info(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
@@ -125,7 +126,8 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 if (ENV.isProd()) {
                     throw e;
                 } else {
-                    LOGGER.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}", ENV.getCluster().clusterName(), e);
+                    LOGGER.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}",
+                            ENV.getCluster().clusterName(), e);
                 }
             }
         }

@@ -1,16 +1,7 @@
 version: 2
-registries: # Define access for private registries
-  fp-felles:
-    type: maven-repository
-    url: https://maven.pkg.github.com/navikt/fp-felles
-    username: x-access-token
-    password: ${{ secrets.PAT }}
-
 updates:
-- package-ecosystem: "maven"
+- package-ecosystem: maven
   directory: "/"
-  registries: # Allow version updates for dependencies in this registry
-    - fp-felles
   schedule:
     interval: daily
     time: "04:00"
