@@ -27,9 +27,6 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDødfødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
-import no.nav.pdl.DoedfoedtBarn;
-import no.nav.pdl.Doedsfall;
-import no.nav.pdl.Foedsel;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -90,7 +87,7 @@ public class PdlLeesahHendelseHåndterer {
     }
 
     private void håndterFødsel(Personhendelse payload) {
-        Foedsel foedsel = payload.getFoedsel();
+        var foedsel = payload.getFoedsel();
         if (foedsel != null) {
             LOG.info(
                     "FPABONNENT mottok fødsel: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} fødselsdato={} fødselsår={} fødested={} fødeKommune={} fødeland={}",
@@ -107,7 +104,7 @@ public class PdlLeesahHendelseHåndterer {
     }
 
     private void håndterDødsfall(Personhendelse payload) {
-        Doedsfall doedsfall = payload.getDoedsfall();
+        var doedsfall = payload.getDoedsfall();
         if (doedsfall != null) {
             LOG.info(
                     "FPABONNENT mottok dødsfall: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dødsdato={}",
@@ -123,7 +120,7 @@ public class PdlLeesahHendelseHåndterer {
     }
 
     private void håndterDødfødtBarn(Personhendelse payload) {
-        DoedfoedtBarn doedfoedtBarn = payload.getDoedfoedtBarn();
+        var doedfoedtBarn = payload.getDoedfoedtBarn();
         if (doedfoedtBarn != null) {
             LOG.info(
                     "FPABONNENT mottok dødfødtBarn: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dato={}",
