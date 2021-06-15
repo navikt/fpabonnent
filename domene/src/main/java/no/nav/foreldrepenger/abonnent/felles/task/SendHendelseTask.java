@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer;
+import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
@@ -24,14 +24,14 @@ public class SendHendelseTask implements ProsessTaskHandler {
 
     public static final String TASKNAME = "hendelser.sendHendelse";
 
-    private HendelseConsumer hendelseConsumer;
+    private Hendelser hendelseConsumer;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
     private HendelseRepository hendelseRepository;
 
     @Inject
-    public SendHendelseTask(HendelseConsumer hendelseConsumer,
-                            InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
-                            HendelseRepository hendelseRepository) {
+    public SendHendelseTask(Hendelser hendelseConsumer,
+            InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
+            HendelseRepository hendelseRepository) {
         this.hendelseConsumer = hendelseConsumer;
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.hendelseRepository = hendelseRepository;
@@ -49,7 +49,8 @@ public class SendHendelseTask implements ProsessTaskHandler {
 
     private HendelsePayload getHendelsePayload(HendelserDataWrapper dataWrapper) {
         Long inngåendeHendelseId = dataWrapper.getInngåendeHendelseId()
-                .orElseThrow(() -> AbonnentHendelserFeil.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(), dataWrapper.getProsessTaskData().getId()));
+                .orElseThrow(() -> AbonnentHendelserFeil.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(),
+                        dataWrapper.getProsessTaskData().getId()));
         InngåendeHendelse inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId);
         return inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
     }

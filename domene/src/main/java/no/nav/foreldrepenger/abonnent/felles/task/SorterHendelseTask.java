@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer;
+import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -33,12 +33,12 @@ public class SorterHendelseTask implements ProsessTaskHandler {
 
     private ProsessTaskRepository prosessTaskRepository;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
-    private HendelseConsumer hendelseConsumer;
+    private Hendelser hendelseConsumer;
 
     @Inject
     public SorterHendelseTask(ProsessTaskRepository prosessTaskRepository,
-                              InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
-                              HendelseConsumer hendelseConsumer) {
+            InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
+            Hendelser hendelseConsumer) {
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.prosessTaskRepository = prosessTaskRepository;
         this.hendelseConsumer = hendelseConsumer;
