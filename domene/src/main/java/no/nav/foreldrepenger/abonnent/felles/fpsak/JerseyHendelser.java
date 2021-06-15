@@ -7,15 +7,17 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import java.net.URI;
 import java.util.List;
 
+import javax.enterprise.context.Dependent;
 import javax.ws.rs.core.GenericType;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.vedtak.felles.integrasjon.rest.jersey.AbstractJerseyOidcRestClient;
+import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 
-//@Dependent
-//@Jersey
+@Dependent
+@Jersey
 public class JerseyHendelser extends AbstractJerseyOidcRestClient implements Hendelser {
     private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
     private static final String SEND_HENDELSE_PATH = "motta";
