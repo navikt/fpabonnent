@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
+import static no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType.HÅNDTERT;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -13,7 +15,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 @ApplicationScoped
 public class InngåendeHendelseTjeneste {
 
-    private HendelseRepository hendelseRepository;
+    private HendelseRepository repo;
     private HendelseTjenesteProvider hendelseTjenesteProvider;
 
     InngåendeHendelseTjeneste() {
@@ -21,35 +23,33 @@ public class InngåendeHendelseTjeneste {
     }
 
     @Inject
-    public InngåendeHendelseTjeneste(HendelseRepository hendelseRepository, HendelseTjenesteProvider hendelseTjenesteProvider) {
-        this.hendelseRepository = hendelseRepository;
+    public InngåendeHendelseTjeneste(HendelseRepository repo, HendelseTjenesteProvider hendelseTjenesteProvider) {
+        this.repo = repo;
         this.hendelseTjenesteProvider = hendelseTjenesteProvider;
     }
 
     public Optional<InngåendeHendelse> finnHendelseSomErSendtTilSortering(String hendelseId) {
-        Objects.requireNonNull(hendelseId, "mangler hendelseId for inngående hendelse");  //$NON-NLS-1$
-        return hendelseRepository.finnHendelseSomErSendtTilSortering(hendelseId);
+        Objects.requireNonNull(hendelseId, "mangler hendelseId for inngående hendelse");
+        return repo.finnHendelseSomErSendtTilSortering(hendelseId);
     }
 
-    public void oppdaterHåndtertStatus(InngåendeHendelse inngåendeHendelse, HåndtertStatusType håndtertStatusType) {
-        hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, håndtertStatusType);
+    public void oppdaterHåndtertStatus(InngåendeHendelse h, HåndtertStatusType type) {
+        repo.oppdaterHåndtertStatus(h, type);
     }
 
     public void oppdaterHendelseSomSendtNå(HendelsePayload hendelsePayload) {
-        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(hendelsePayload.getHendelseKilde(), hendelsePayload.getHendelseId());
-        if (hendelse.isPresent()) {
-            hendelseRepository.markerHendelseSomSendtNå(hendelse.get());
-            hendelseRepository.oppdaterHåndtertStatus(hendelse.get(), HåndtertStatusType.HÅNDTERT);
-        }
+        repo.finnGrovsortertHendelse(hendelsePayload.getHendelseKilde(), hendelsePayload.getHendelseId()).ifPresent(h -> {
+            repo.markerHendelseSomSendtNå(h);
+            repo.oppdaterHåndtertStatus(h, HÅNDTERT);
+        });
     }
 
-    public void markerHendelseSomHåndtertOgFjernPayload(InngåendeHendelse inngåendeHendelse) {
-        hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.HÅNDTERT);
-        hendelseRepository.fjernPayload(inngåendeHendelse);
+    public void markerHendelseSomHåndtertOgFjernPayload(InngåendeHendelse h) {
+        repo.oppdaterHåndtertStatus(h, HÅNDTERT);
+        repo.fjernPayload(h);
     }
 
-    public HendelsePayload hentUtPayloadFraInngåendeHendelse(InngåendeHendelse inngåendeHendelse) {
-        return hendelseTjenesteProvider.finnTjeneste(inngåendeHendelse.getHendelseType(), inngåendeHendelse.getHendelseId())
-                .payloadFraJsonString(inngåendeHendelse.getPayload());
+    public HendelsePayload hentUtPayloadFraInngåendeHendelse(InngåendeHendelse h) {
+        return hendelseTjenesteProvider.finnTjeneste(h.getHendelseType(), h.getHendelseId()).payloadFraJsonString(h.getPayload());
     }
 }

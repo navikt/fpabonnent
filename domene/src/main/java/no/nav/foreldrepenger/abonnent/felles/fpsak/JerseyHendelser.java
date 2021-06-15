@@ -23,7 +23,11 @@ public class JerseyHendelser extends AbstractJerseyOidcRestClient implements Hen
     private static final String SEND_HENDELSE_PATH = "motta";
     private static final String GROVSORTER_HENDELSE_PATH = "grovsorter";
 
-    private final URI baseUri;
+    private URI baseUri;
+
+    private JerseyHendelser() {
+
+    }
 
     public JerseyHendelser(@KonfigVerdi(value = HENDELSE_BASE_ENDPOINT, defaultVerdi = "some sensible default") URI baseUri) {
         this.baseUri = baseUri;

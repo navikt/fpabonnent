@@ -29,7 +29,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer;
+import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
@@ -67,15 +67,13 @@ public class SorterHendelseTaskTest {
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
     @Mock
-    private HendelseConsumer mockHendelseConsumer;
+    private Hendelser hendelser;
     @Mock
     private ProsessTaskRepository mockProsessTaskRepository;
 
     @BeforeEach
     public void setup() {
-        sorterHendelseTask = new SorterHendelseTask(mockProsessTaskRepository, inngåendeHendelseTjeneste,
-                mockHendelseConsumer);
-
+        sorterHendelseTask = new SorterHendelseTask(mockProsessTaskRepository, inngåendeHendelseTjeneste, hendelser);
         prosessTaskData = new ProsessTaskData(PROSESSTASK_STEG);
         prosessTaskData.setSekvens("1");
     }
@@ -91,7 +89,7 @@ public class SorterHendelseTaskTest {
     public void skal_ikke_opprette_task_når_ingen_hendelser_kommer_inn() {
         // Arrange
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
-        lenient().when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(List.of());
+        lenient().when(hendelser.grovsorterAktørIder(anyList())).thenReturn(List.of());
 
         // Act
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
@@ -103,7 +101,7 @@ public class SorterHendelseTaskTest {
     @Test
     public void skal_ikke_opprette_SendHendelseTask_når_grovsortering_returnerer_tom_liste() {
         // Arrange
-        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(List.of());
+        when(hendelser.grovsorterAktørIder(anyList())).thenReturn(List.of());
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
@@ -131,7 +129,7 @@ public class SorterHendelseTaskTest {
         HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
-        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
+        when(hendelser.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
         ArgumentCaptor<ProsessTaskData> argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
 
         // Act
@@ -152,7 +150,7 @@ public class SorterHendelseTaskTest {
     public void skal_ikke_opprette_SendHendelseTask_for_ikke_relevant_aktørid() {
         // Arrange
         List<String> eksisterendeAktørIder = List.of("12", "13");
-        when(mockHendelseConsumer.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
+        when(hendelser.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
 
         InngåendeHendelse hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
