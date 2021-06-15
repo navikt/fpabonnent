@@ -35,7 +35,7 @@ public class PdlLeesahOversetter {
     public PdlFødsel oversettFødsel(Personhendelse personhendelse) {
         PdlFødsel.Builder builder = PdlFødsel.builder();
         oversettPersonhendelse(personhendelse, builder);
-        Foedsel foedsel = personhendelse.getFoedsel();
+        var foedsel = personhendelse.getFoedsel();
 
         if (foedsel != null) {
             if (foedsel.getFoedselsaar() != null) {
