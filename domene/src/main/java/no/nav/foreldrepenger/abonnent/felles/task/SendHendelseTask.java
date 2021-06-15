@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
+import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -24,25 +24,25 @@ public class SendHendelseTask implements ProsessTaskHandler {
 
     public static final String TASKNAME = "hendelser.sendHendelse";
 
-    private Hendelser hendelseConsumer;
+    private Hendelser hendelser;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
     private HendelseRepository hendelseRepository;
 
     @Inject
-    public SendHendelseTask(Hendelser hendelseConsumer,
+    public SendHendelseTask(@Jersey Hendelser hendelser,
             InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
             HendelseRepository hendelseRepository) {
-        this.hendelseConsumer = hendelseConsumer;
+        this.hendelser = hendelser;
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.hendelseRepository = hendelseRepository;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
-        HendelsePayload hendelsePayload = getHendelsePayload(dataWrapper);
+        var dataWrapper = new HendelserDataWrapper(prosessTaskData);
+        var hendelsePayload = getHendelsePayload(dataWrapper);
 
-        hendelseConsumer.sendHendelse(hendelsePayload);
+        hendelser.sendHendelse(hendelsePayload);
         inngåendeHendelseTjeneste.oppdaterHendelseSomSendtNå(hendelsePayload);
         LOGGER.info("Sendt hendelse: [{}] til FPSAK.", hendelsePayload.getHendelseId());
     }
@@ -51,7 +51,13 @@ public class SendHendelseTask implements ProsessTaskHandler {
         Long inngåendeHendelseId = dataWrapper.getInngåendeHendelseId()
                 .orElseThrow(() -> AbonnentHendelserFeil.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(),
                         dataWrapper.getProsessTaskData().getId()));
-        InngåendeHendelse inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId);
+        var inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId);
         return inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " [hendelser=" + hendelser + ", inngåendeHendelseTjeneste=" + inngåendeHendelseTjeneste
+                + ", hendelseRepository=" + hendelseRepository + "]";
     }
 }
