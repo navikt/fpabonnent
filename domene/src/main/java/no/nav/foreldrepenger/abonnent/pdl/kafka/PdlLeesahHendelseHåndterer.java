@@ -27,10 +27,10 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDødfødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
+import no.nav.pdl.DoedfoedtBarn;
+import no.nav.pdl.Doedsfall;
+import no.nav.pdl.Foedsel;
 import no.nav.person.pdl.leesah.Personhendelse;
-import no.nav.person.pdl.leesah.doedfoedtbarn.DoedfoedtBarn;
-import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
-import no.nav.person.pdl.leesah.foedsel.Foedsel;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.log.mdc.MDCOperations;
@@ -53,9 +53,9 @@ public class PdlLeesahHendelseHåndterer {
 
     @Inject
     public PdlLeesahHendelseHåndterer(HendelseRepository hendelseRepository,
-                                      PdlLeesahOversetter pdlLeesahOversetter,
-                                      ProsessTaskRepository prosessTaskRepository,
-                                      ForsinkelseTjeneste forsinkelseTjeneste) {
+            PdlLeesahOversetter pdlLeesahOversetter,
+            ProsessTaskRepository prosessTaskRepository,
+            ForsinkelseTjeneste forsinkelseTjeneste) {
         this.hendelseRepository = hendelseRepository;
         this.oversetter = pdlLeesahOversetter;
         this.prosessTaskRepository = prosessTaskRepository;
@@ -65,10 +65,13 @@ public class PdlLeesahHendelseHåndterer {
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
         setCallIdForHendelse(payload);
 
-        Optional<InngåendeHendelse> inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(), HendelseKilde.PDL);
+        Optional<InngåendeHendelse> inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(),
+                HendelseKilde.PDL);
         if (inngåendeHendelse.isPresent()) {
-            LOG.warn("FPABONNENT mottok duplikat hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}. Tiltak: Sjekk om det skjedde en deploy/restart av Fpabonnent i det samme tidsrommet - i så fall kan dette ignoreres.",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+            LOG.warn(
+                    "FPABONNENT mottok duplikat hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}. Tiltak: Sjekk om det skjedde en deploy/restart av Fpabonnent i det samme tidsrommet - i så fall kan dette ignoreres.",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                    payload.getTidligereHendelseId());
             return;
         }
 
@@ -79,19 +82,25 @@ public class PdlLeesahHendelseHåndterer {
         } else if (DØDFØDSEL.contentEquals(payload.getOpplysningstype())) {
             håndterDødfødtBarn(payload);
         } else {
-            LOG.info("FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+            LOG.info(
+                    "FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                    payload.getTidligereHendelseId());
         }
     }
 
     private void håndterFødsel(Personhendelse payload) {
         Foedsel foedsel = payload.getFoedsel();
         if (foedsel != null) {
-            LOG.info("FPABONNENT mottok fødsel: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} fødselsdato={} fødselsår={} fødested={} fødeKommune={} fødeland={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), foedsel.getFoedselsdato(), foedsel.getFoedselsaar(), foedsel.getFoedested(), foedsel.getFoedekommune(), foedsel.getFoedeland());
+            LOG.info(
+                    "FPABONNENT mottok fødsel: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} fødselsdato={} fødselsår={} fødested={} fødeKommune={} fødeland={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                    payload.getTidligereHendelseId(), foedsel.getFoedselsdato(), foedsel.getFoedselsaar(), foedsel.getFoedested(),
+                    foedsel.getFoedekommune(), foedsel.getFoedeland());
         } else {
             LOG.info("FPABONNENT mottok fødsel: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                    payload.getTidligereHendelseId());
         }
         PdlFødsel pdlFødsel = oversetter.oversettFødsel(payload);
         prosesserHendelseVidereHvisRelevant(pdlFødsel);
@@ -100,11 +109,14 @@ public class PdlLeesahHendelseHåndterer {
     private void håndterDødsfall(Personhendelse payload) {
         Doedsfall doedsfall = payload.getDoedsfall();
         if (doedsfall != null) {
-            LOG.info("FPABONNENT mottok dødsfall: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dødsdato={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), doedsfall.getDoedsdato());
+            LOG.info(
+                    "FPABONNENT mottok dødsfall: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dødsdato={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                    payload.getTidligereHendelseId(), doedsfall.getDoedsdato());
         } else {
             LOG.info("FPABONNENT mottok dødsfall: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                    payload.getTidligereHendelseId());
         }
         PdlDød pdlDød = oversetter.oversettDød(payload);
         prosesserHendelseVidereHvisRelevant(pdlDød);
@@ -113,11 +125,14 @@ public class PdlLeesahHendelseHåndterer {
     private void håndterDødfødtBarn(Personhendelse payload) {
         DoedfoedtBarn doedfoedtBarn = payload.getDoedfoedtBarn();
         if (doedfoedtBarn != null) {
-            LOG.info("FPABONNENT mottok dødfødtBarn: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dato={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId(), doedfoedtBarn.getDato());
+            LOG.info(
+                    "FPABONNENT mottok dødfødtBarn: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} dato={}",
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                    payload.getTidligereHendelseId(), doedfoedtBarn.getDato());
         } else {
             LOG.info("FPABONNENT mottok dødfødtBarn: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(), payload.getTidligereHendelseId());
+                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                    payload.getTidligereHendelseId());
         }
         PdlDødfødsel pdlDødfødsel = oversetter.oversettDødfødsel(payload);
         prosesserHendelseVidereHvisRelevant(pdlDødfødsel);
@@ -134,10 +149,15 @@ public class PdlLeesahHendelseHåndterer {
 
     private void prosesserHendelseVidereHvisRelevant(PdlPersonhendelse personhendelse) {
         if (personhendelse.erRelevantForFpsak()) {
+            LOG.info("Lagrer");
             InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
+            LOG.info("Finner neste");
             LocalDateTime håndteresEtterTidspunkt = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse);
+            LOG.info("Opppdaterer");
             hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, håndteresEtterTidspunkt);
+            LOG.info("Oppretter");
             opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId(), håndteresEtterTidspunkt);
+            LOG.info("Opprettet OK");
         } else {
             LOG.info("Ikke-relevant hendelseId={} filtrert bort", personhendelse.getHendelseId());
         }
