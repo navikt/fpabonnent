@@ -24,11 +24,7 @@ public class JerseyHendelser extends AbstractJerseyOidcRestClient implements Hen
     private static final String SEND_HENDELSE_PATH = "motta";
     private static final String GROVSORTER_HENDELSE_PATH = "grovsorter";
 
-    private URI baseUri;
-
-    private JerseyHendelser() {
-
-    }
+    private final URI baseUri;
 
     @Inject
     public JerseyHendelser(@KonfigVerdi(value = HENDELSE_BASE_ENDPOINT, defaultVerdi = "http://fpsak/fpsak/api/hendelser") URI baseUri) {
