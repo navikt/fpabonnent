@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.List;
 
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.core.GenericType;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
@@ -29,6 +30,7 @@ public class JerseyHendelser extends AbstractJerseyOidcRestClient implements Hen
 
     }
 
+    @Inject
     public JerseyHendelser(@KonfigVerdi(value = HENDELSE_BASE_ENDPOINT, defaultVerdi = "http://fpsak/fpsak/api/hendelser") URI baseUri) {
         this.baseUri = baseUri;
     }
