@@ -7,6 +7,8 @@ import java.io.Writer;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.prometheus.client.CollectorRegistry;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 
 @Path("/metrics")
 @ApplicationScoped
+@Produces(MediaType.TEXT_PLAIN)
 public class PrometheusRestService {
 
     @GET
@@ -28,4 +31,3 @@ public class PrometheusRestService {
         }
     }
 }
-
