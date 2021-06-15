@@ -26,7 +26,7 @@ public class DatabaseHealthCheck {
     public DatabaseHealthCheck() {
         this.jndiName = JDBC_DEFAULT_DS;
     }
-    
+
     DatabaseHealthCheck(String dsJndiName) {
         this.jndiName = dsJndiName;
     }
@@ -66,7 +66,7 @@ public class DatabaseHealthCheck {
                 }
                 result = url;
             }
-        } catch (SQLException e) { //NOSONAR
+        } catch (SQLException e) { // NOSONAR
             // ikke fatalt
         }
         return result;

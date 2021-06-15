@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
-@ApplicationScoped
+@Dependent
 public class HendelseConsumer implements Hendelser {
     private static final Logger LOG = LoggerFactory.getLogger(HendelseConsumer.class);
     private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
@@ -25,14 +25,10 @@ public class HendelseConsumer implements Hendelser {
     private static final String SEND_HENDELSE_PATH = "motta";
     private static final String GROVSORTER_HENDELSE_PATH = "grovsorter";
 
-    private OidcRestClient oidcRestClient;
-    private URI baseEndpoint;
-    private URI sendHendelseEndpoint;
-    private URI grovsorterEndpoint;
-
-    public HendelseConsumer() {
-        // CDI
-    }
+    private final OidcRestClient oidcRestClient;
+    private final URI baseEndpoint;
+    private final URI sendHendelseEndpoint;
+    private final URI grovsorterEndpoint;
 
     @Inject
     public HendelseConsumer(OidcRestClient oidcRestClient, @KonfigVerdi(HENDELSE_BASE_ENDPOINT) URI baseEndpoint) {

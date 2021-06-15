@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
@@ -20,19 +20,15 @@ import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
 import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 import no.nav.vedtak.util.LRUCache;
 
-@ApplicationScoped
+@Dependent
 public class AktørTjeneste {
 
     private static final int DEFAULT_CACHE_SIZE = 1000;
     private static final long DEFAULT_CACHE_TIMEOUT = TimeUnit.MILLISECONDS.convert(8, TimeUnit.HOURS);
 
-    private LRUCache<PersonIdent, AktørId> cacheIdentTilAktørId;
+    private final LRUCache<PersonIdent, AktørId> cacheIdentTilAktørId;
 
-    private Pdl pdlKlient;
-
-    AktørTjeneste() {
-        // CDI
-    }
+    private final Pdl pdlKlient;
 
     @Inject
     public AktørTjeneste(@Jersey Pdl pdlKlient) {
@@ -64,7 +60,8 @@ public class AktørTjeneste {
         }
 
         var aktørId = identliste.getIdenter().stream().findFirst().map(IdentInformasjon::getIdent).map(AktørId::new);
-        aktørId.ifPresent(a -> cacheIdentTilAktørId.put(personIdent, a)); // Kan ikke legge til i cache aktørId -> ident ettersom ident kan være ikke-current
+        aktørId.ifPresent(a -> cacheIdentTilAktørId.put(personIdent, a)); // Kan ikke legge til i cache aktørId -> ident ettersom ident kan være
+                                                                          // ikke-current
         return aktørId;
     }
 }

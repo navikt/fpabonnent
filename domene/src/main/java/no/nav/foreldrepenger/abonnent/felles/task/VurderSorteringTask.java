@@ -71,10 +71,10 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         }
 
         KlarForSorteringResultat klarForSorteringResultat = hendelseTjeneste.vurderOmKlarForSortering(hendelsePayload);
-        if (klarForSorteringResultat.hendelseKlarForSortering()) {
+        if (klarForSorteringResultat.resultat()) {
             hendelseTjeneste.berikHendelseHvisNødvendig(inngåendeHendelse, klarForSorteringResultat);
             opprettSorteringTask(hendelsePayload.getHendelseId(), inngåendeHendelse, dataWrapper);
-        } else if (klarForSorteringResultat.skalPrøveIgjen() && hendelsenErUnderEnUkeGammel(hendelsePayload.getHendelseOpprettetTid())) {
+        } else if (klarForSorteringResultat.prøveIgjen() && hendelsenErUnderEnUkeGammel(hendelsePayload.getHendelseOpprettetTid())) {
             opprettVurderSorteringTask(hendelsePayload, inngåendeHendelse);
         } else {
             hendelseTjeneste.loggFeiletHendelse(hendelsePayload);

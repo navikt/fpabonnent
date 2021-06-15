@@ -3,22 +3,18 @@ package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 
-@ApplicationScoped
+@Dependent
 public class InngåendeHendelseTjeneste {
 
-    private HendelseRepository hendelseRepository;
-    private HendelseTjenesteProvider hendelseTjenesteProvider;
-
-    InngåendeHendelseTjeneste() {
-        // CDI
-    }
+    private final HendelseRepository hendelseRepository;
+    private final HendelseTjenesteProvider hendelseTjenesteProvider;
 
     @Inject
     public InngåendeHendelseTjeneste(HendelseRepository hendelseRepository, HendelseTjenesteProvider hendelseTjenesteProvider) {
@@ -27,7 +23,7 @@ public class InngåendeHendelseTjeneste {
     }
 
     public Optional<InngåendeHendelse> finnHendelseSomErSendtTilSortering(String hendelseId) {
-        Objects.requireNonNull(hendelseId, "mangler hendelseId for inngående hendelse");  //$NON-NLS-1$
+        Objects.requireNonNull(hendelseId, "mangler hendelseId for inngående hendelse"); //$NON-NLS-1$
         return hendelseRepository.finnHendelseSomErSendtTilSortering(hendelseId);
     }
 
@@ -36,7 +32,8 @@ public class InngåendeHendelseTjeneste {
     }
 
     public void oppdaterHendelseSomSendtNå(HendelsePayload hendelsePayload) {
-        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(hendelsePayload.getHendelseKilde(), hendelsePayload.getHendelseId());
+        Optional<InngåendeHendelse> hendelse = hendelseRepository.finnGrovsortertHendelse(hendelsePayload.getHendelseKilde(),
+                hendelsePayload.getHendelseId());
         if (hendelse.isPresent()) {
             hendelseRepository.markerHendelseSomSendtNå(hendelse.get());
             hendelseRepository.oppdaterHåndtertStatus(hendelse.get(), HåndtertStatusType.HÅNDTERT);

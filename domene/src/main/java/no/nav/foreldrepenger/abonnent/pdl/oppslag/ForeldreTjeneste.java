@@ -3,21 +3,17 @@ package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 
-@ApplicationScoped
+@Dependent
 public class ForeldreTjeneste {
 
-    private FødselTjeneste fødselTjeneste;
-    private AktørTjeneste aktørTjeneste;
-
-    ForeldreTjeneste() {
-        //CDI
-    }
+    private final FødselTjeneste fødselTjeneste;
+    private final AktørTjeneste aktørTjeneste;
 
     @Inject
     public ForeldreTjeneste(FødselTjeneste fødselTjeneste, AktørTjeneste aktørTjeneste) {

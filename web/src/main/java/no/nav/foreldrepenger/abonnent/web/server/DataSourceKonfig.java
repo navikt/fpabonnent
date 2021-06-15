@@ -8,8 +8,8 @@ import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import no.nav.vedtak.util.env.Environment;
-
+import io.micrometer.core.instrument.Metrics;
+import no.nav.foreldrepenger.konfig.Environment;
 
 class DataSourceKonfig {
 
@@ -29,15 +29,13 @@ class DataSourceKonfig {
         config.setJdbcUrl(ENV.getProperty(dataSourceName + ".url"));
         config.setUsername(ENV.getProperty(dataSourceName + ".username"));
         config.setPassword(ENV.getProperty(dataSourceName + ".password"));
-
         config.setConnectionTimeout(1000);
         config.setMaximumPoolSize(30);
         config.setConnectionTestQuery("select 1 from dual");
         config.setDriverClassName("oracle.jdbc.OracleDriver");
-
+        config.setMetricRegistry(Metrics.globalRegistry);
         var dsProperties = new Properties();
         config.setDataSourceProperties(dsProperties);
-
         return new HikariDataSource(config);
     }
 

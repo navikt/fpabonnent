@@ -8,7 +8,7 @@ import java.time.MonthDay;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -19,12 +19,15 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 
 /**
- * Tjenesten forsinker hendelser i minst 1 time pga oppførsel der det benyttes ANNULLERT+OPPRETTET til korrigeringer.
- * Det er ikke ønsket at ANNULLERT-hendelsen skal slippes før grunnlaget er klart med den korrigerte informasjonen.
+ * Tjenesten forsinker hendelser i minst 1 time pga oppførsel der det benyttes
+ * ANNULLERT+OPPRETTET til korrigeringer. Det er ikke ønsket at
+ * ANNULLERT-hendelsen skal slippes før grunnlaget er klart med den korrigerte
+ * informasjonen.
  *
- * Videre ønsker vi å unngå hendelser på faste stengt dager, helger, og natten når Oppdrag er stengt.
+ * Videre ønsker vi å unngå hendelser på faste stengt dager, helger, og natten
+ * når Oppdrag er stengt.
  */
-@ApplicationScoped
+@Dependent
 public class ForsinkelseTjeneste {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForsinkelseTjeneste.class);
@@ -40,15 +43,10 @@ public class ForsinkelseTjeneste {
             MonthDay.of(5, 17),
             MonthDay.of(12, 25),
             MonthDay.of(12, 26),
-            MonthDay.of(12, 31)
-    );
+            MonthDay.of(12, 31));
 
-    private ForsinkelseKonfig forsinkelseKonfig;
-    private HendelseRepository hendelseRepository;
-
-    public ForsinkelseTjeneste() {
-        // CDI
-    }
+    private final ForsinkelseKonfig forsinkelseKonfig;
+    private final HendelseRepository hendelseRepository;
 
     @Inject
     public ForsinkelseTjeneste(ForsinkelseKonfig forsinkelseKonfig, HendelseRepository hendelseRepository) {
@@ -71,17 +69,21 @@ public class ForsinkelseTjeneste {
 
     private Optional<LocalDateTime> sjekkOmHendelsenMåKjøreEtterTidligereHendelse(InngåendeHendelse inngåendeHendelse) {
         if (inngåendeHendelse.getTidligereHendelseId() != null) {
-            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(), inngåendeHendelse.getHendelseKilde());
+            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(),
+                    inngåendeHendelse.getHendelseKilde());
             if (tidligereHendelse.isPresent() && !HåndtertStatusType.HÅNDTERT.equals(tidligereHendelse.get().getHåndtertStatus())) {
                 LocalDateTime tidspunktBasertPåTidligereHendelse = tidligereHendelse.get().getHåndteresEtterTidspunkt().plusMinutes(2);
                 if (LocalDateTime.now().isAfter(tidspunktBasertPåTidligereHendelse)) {
                     LocalDateTime nesteDagEtterRetryAll = LocalDateTime.now().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
-                    LOGGER.info("Hendelse {} har en tidligere hendelse {} som skulle vært håndtert {}, men ikke er det, og vil derfor bli forsøkt behandlet igjen i morgen etter retry all: {}",
-                            inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(), tidligereHendelse.get().getHåndteresEtterTidspunkt(), nesteDagEtterRetryAll);
+                    LOGGER.info(
+                            "Hendelse {} har en tidligere hendelse {} som skulle vært håndtert {}, men ikke er det, og vil derfor bli forsøkt behandlet igjen i morgen etter retry all: {}",
+                            inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
+                            tidligereHendelse.get().getHåndteresEtterTidspunkt(), nesteDagEtterRetryAll);
                     return Optional.of(nesteDagEtterRetryAll);
                 } else {
                     LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert {} og vil derfor bli behandlet {}",
-                            inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(), tidligereHendelse.get().getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
+                            inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
+                            tidligereHendelse.get().getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
                     return Optional.of(tidspunktBasertPåTidligereHendelse);
                 }
             }

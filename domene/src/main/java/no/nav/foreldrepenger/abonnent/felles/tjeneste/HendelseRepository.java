@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -20,14 +20,15 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 /**
  * Repository for InngåendeHendelse.
  *
- * OBS1: Hvis du legger til nye spørringer er det viktig at de har HåndtertStatus som kriterie,
- * slik at de treffer riktig partisjon. Tabellen er partisjonert på denne statusen, der HÅNDTERT
- * ligger i den historiske (store) partisjonen som vi ikke tror det skal være behov for å spørre på.
+ * OBS1: Hvis du legger til nye spørringer er det viktig at de har
+ * HåndtertStatus som kriterie, slik at de treffer riktig partisjon. Tabellen er
+ * partisjonert på denne statusen, der HÅNDTERT ligger i den historiske (store)
+ * partisjonen som vi ikke tror det skal være behov for å spørre på.
  *
- * OBS2: Du treffer ikke riktig index/partisjon hvis du spør på NOT en gitt status,
- * og heller ikke med status1 OR status2 (Oracle 12c R1).
+ * OBS2: Du treffer ikke riktig index/partisjon hvis du spør på NOT en gitt
+ * status, og heller ikke med status1 OR status2 (Oracle 12c R1).
  */
-@ApplicationScoped
+@Dependent
 public class HendelseRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(HendelseRepository.class);
 
@@ -37,11 +38,7 @@ public class HendelseRepository {
     private static final String HENDELSE_KILDE = "hendelseKilde";
     private static final String HENDELSE_ID = "hendelseId";
 
-    private EntityManager entityManager;
-
-    HendelseRepository() {
-        // for CDI proxy
-    }
+    private final EntityManager entityManager;
 
     @Inject
     public HendelseRepository(EntityManager entityManager) {
@@ -57,7 +54,8 @@ public class HendelseRepository {
         TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
                 "from InngåendeHendelse where hendelseId = :hendelseId " + //$NON-NLS-1$
                         "and håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
-                        SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
+                        SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT,
+                InngåendeHendelse.class);
         query.setParameter(HENDELSE_ID, hendelseId);
         query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.SENDT_TIL_SORTERING);
         return queryTilOptional(hendelseId, query);
@@ -66,7 +64,8 @@ public class HendelseRepository {
     public Optional<InngåendeHendelse> finnHendelseFraIdHvisFinnes(String hendelseId, HendelseKilde hendelseKilde) {
         TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
                 "from InngåendeHendelse where hendelseKilde = :hendelseKilde " + //$NON-NLS-1$
-                        "and hendelseId = :hendelseId ", InngåendeHendelse.class); //$NON-NLS-1$
+                        "and hendelseId = :hendelseId ", //$NON-NLS-1$
+                InngåendeHendelse.class);
         query.setParameter(HENDELSE_KILDE, hendelseKilde);
         query.setParameter(HENDELSE_ID, hendelseId);
         return queryTilOptional(hendelseId, query);
@@ -112,14 +111,16 @@ public class HendelseRepository {
                 "from InngåendeHendelse where hendelseKilde = :hendelseKilde " + //$NON-NLS-1$
                         "and hendelseId = :hendelseId " + //$NON-NLS-1$
                         "and håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
-                        SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
+                        SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT,
+                InngåendeHendelse.class);
         query.setParameter(HENDELSE_KILDE, hendelseKilde);
         query.setParameter(HENDELSE_ID, hendelseId);
         query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.GROVSORTERT);
 
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.fantMerEnnEnHendelseMedStatus(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getMessage());
+            LOGGER.warn(HendelseRepositoryFeil.fantMerEnnEnHendelseMedStatus(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT)
+                    .getMessage());
         } else if (resultater.isEmpty()) {
             LOGGER.warn(HendelseRepositoryFeil.fantIkkeHendelse(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getMessage());
             return Optional.empty();

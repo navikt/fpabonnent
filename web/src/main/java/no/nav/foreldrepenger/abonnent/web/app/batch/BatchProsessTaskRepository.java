@@ -2,21 +2,17 @@ package no.nav.foreldrepenger.abonnent.web.app.batch;
 
 import java.util.Objects;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
-@ApplicationScoped
+@Dependent
 public class BatchProsessTaskRepository {
 
-    private EntityManager entityManager;
-
-    BatchProsessTaskRepository() {
-        // for CDI proxying
-    }
+    private final EntityManager entityManager;
 
     @Inject
     public BatchProsessTaskRepository(EntityManager entityManager) {
@@ -31,7 +27,7 @@ public class BatchProsessTaskRepository {
                 "neste_kjoering_etter = current_timestamp " +
                 "WHERE STATUS = :feilet");
         query.setParameter("status", ProsessTaskStatus.KLAR.getDbKode())
-             .setParameter("feilet", ProsessTaskStatus.FEILET.getDbKode());
+                .setParameter("feilet", ProsessTaskStatus.FEILET.getDbKode());
         int updatedRows = query.executeUpdate();
         entityManager.flush();
 

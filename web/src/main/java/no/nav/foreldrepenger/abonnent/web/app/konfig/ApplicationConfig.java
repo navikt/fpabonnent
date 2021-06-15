@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.abonnent.web.app.konfig;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,10 +15,11 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.ConstraintViolationMapper;
+import no.nav.foreldrepenger.abonnent.web.app.exceptions.GeneralRestExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonParseExceptionMapper;
+import no.nav.foreldrepenger.abonnent.web.app.jackson.JacksonJsonConfig;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
-
 
 @ApplicationPath(ApplicationConfig.API_URI)
 public class ApplicationConfig extends Application {
@@ -56,14 +55,13 @@ public class ApplicationConfig extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<>();
-        classes.add(ProsessTaskRestTjeneste.class);
-        classes.add(OpenApiResource.class);
-        classes.add(ConstraintViolationMapper.class);
-        classes.add(JsonMappingExceptionMapper.class);
-        classes.add(JsonParseExceptionMapper.class);
-        classes.addAll(FellesKlasserForRest.getClasses());
+        return Set.of(ProsessTaskRestTjeneste.class,
+                OpenApiResource.class,
+                ConstraintViolationMapper.class,
+                JsonMappingExceptionMapper.class,
+                JsonParseExceptionMapper.class,
+                JacksonJsonConfig.class,
+                GeneralRestExceptionMapper.class);
 
-        return Collections.unmodifiableSet(classes);
     }
 }
