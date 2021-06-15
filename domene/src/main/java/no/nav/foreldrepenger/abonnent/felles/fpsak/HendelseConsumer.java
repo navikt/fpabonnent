@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
@@ -16,6 +19,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class HendelseConsumer /* implements Hendelser */ {
+    private static final Logger LOG = LoggerFactory.getLogger(HendelseConsumer.class);
     private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
     // URI append paths
     private static final String SEND_HENDELSE_PATH = "motta";
@@ -40,9 +44,11 @@ public class HendelseConsumer /* implements Hendelser */ {
 
     // @Override
     public void sendHendelse(HendelsePayload hendelsePayload) {
-        Objects.requireNonNull(hendelsePayload, SEND_HENDELSE_PATH); // $NON-NLS-1$
+        Objects.requireNonNull(hendelsePayload, SEND_HENDELSE_PATH);
         HendelseWrapperDto hendelseWrapperDto = hendelsePayload.mapPayloadTilDto();
+        LOG.info("Sender hendelse");
         oidcRestClient.post(sendHendelseEndpoint, hendelseWrapperDto);
+        LOG.info("Sendt hendelse OK");
     }
 
     // @Override
@@ -50,7 +56,10 @@ public class HendelseConsumer /* implements Hendelser */ {
     public List<String> grovsorterAktørIder(List<String> aktørIdList) {
         if (!aktørIdList.isEmpty()) {
             List<AktørIdDto> dtoList = aktørIdList.stream().map(AktørIdDto::new).collect(Collectors.toList());
-            return oidcRestClient.post(grovsorterEndpoint, dtoList, List.class);
+            LOG.info("Grovsorterer");
+            var res = oidcRestClient.post(grovsorterEndpoint, dtoList, List.class);
+            LOG.info("Grovsortert OK");
+            return res;
         }
         return List.of();
     }
