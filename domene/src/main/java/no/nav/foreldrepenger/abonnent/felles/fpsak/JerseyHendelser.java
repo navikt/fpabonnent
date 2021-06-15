@@ -29,7 +29,7 @@ public class JerseyHendelser extends AbstractJerseyOidcRestClient implements Hen
 
     }
 
-    public JerseyHendelser(@KonfigVerdi(value = HENDELSE_BASE_ENDPOINT, defaultVerdi = "some sensible default") URI baseUri) {
+    public JerseyHendelser(@KonfigVerdi(value = HENDELSE_BASE_ENDPOINT, defaultVerdi = "http://fpsak/fpsak/api/hendelser") URI baseUri) {
         this.baseUri = baseUri;
     }
 
