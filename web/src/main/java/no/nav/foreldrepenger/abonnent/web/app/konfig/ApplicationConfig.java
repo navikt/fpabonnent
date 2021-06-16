@@ -19,8 +19,8 @@ import io.swagger.v3.oas.models.servers.Server;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.ConstraintViolationMapper;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonParseExceptionMapper;
+import no.nav.vedtak.felles.integrasjon.rest.jersey.TimingFilter;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
-
 
 @ApplicationPath(ApplicationConfig.API_URI)
 public class ApplicationConfig extends Application {
@@ -57,6 +57,7 @@ public class ApplicationConfig extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<>();
+        classes.add(TimingFilter.class);
         classes.add(ProsessTaskRestTjeneste.class);
         classes.add(OpenApiResource.class);
         classes.add(ConstraintViolationMapper.class);
