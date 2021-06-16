@@ -8,8 +8,8 @@ import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import io.micrometer.core.instrument.Metrics;
 import no.nav.vedtak.util.env.Environment;
-
 
 class DataSourceKonfig {
 
@@ -29,7 +29,7 @@ class DataSourceKonfig {
         config.setJdbcUrl(ENV.getProperty(dataSourceName + ".url"));
         config.setUsername(ENV.getProperty(dataSourceName + ".username"));
         config.setPassword(ENV.getProperty(dataSourceName + ".password"));
-
+        config.setMetricRegistry(Metrics.globalRegistry);
         config.setConnectionTimeout(1000);
         config.setMaximumPoolSize(30);
         config.setConnectionTestQuery("select 1 from dual");
