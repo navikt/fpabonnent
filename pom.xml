@@ -27,7 +27,7 @@
 
         <felles.version>3.2.105</felles.version>
         <prosesstask.version>2.5.29</prosesstask.version>
-        <fp-kontrakter.version>5.2.5</fp-kontrakter.version>
+        <fp-kontrakter.version>6.0.0</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <flyway.version>4.2.0</flyway.version>
