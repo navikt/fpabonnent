@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.abonnent.felles.domene;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -48,7 +49,12 @@ public enum HendelseType implements Kodeverdi {
     PDL_DØDFØDSEL_ANNULLERT("PDL_DOEDFOEDSEL_ANNULLERT"),
     PDL_DØDFØDSEL_OPPHØRT("PDL_DOEDFOEDSEL_OPPHOERT"),
 
-    // Prosesseres ikke pt:
+    PDL_UTFLYTTING_OPPRETTET("PDL_UTFLYTTING_OPPRETTET"),
+    PDL_UTFLYTTING_KORRIGERT("PDL_UTFLYTTING_KORRIGERT"),
+    PDL_UTFLYTTING_ANNULLERT("PDL_UTFLYTTING_ANNULLERT"),
+    PDL_UTFLYTTING_OPPHØRT("PDL_UTFLYTTING_OPPHOERT"),
+
+    // Prosesseres ikke pt: - sjekk forekomst i database før evt slettes herfra
     PDL_FAMILIERELASJON_OPPRETTET("PDL_FAMILIERELASJON_OPPRETTET"),
     PDL_FAMILIERELASJON_KORRIGERT("PDL_FAMILIERELASJON_KORRIGERT"),
     PDL_FAMILIERELASJON_ANNULLERT("PDL_FAMILIERELASJON_ANNULLERT"),
@@ -118,28 +124,19 @@ public enum HendelseType implements Kodeverdi {
     }
 
     public static boolean erPdlFødselHendelseType(HendelseType hendelseType) {
-        return PDL_FØDSEL_OPPRETTET.equals(hendelseType)
-                || PDL_FØDSEL_KORRIGERT.equals(hendelseType)
-                || PDL_FØDSEL_ANNULLERT.equals(hendelseType)
-                || PDL_FØDSEL_OPPHØRT.equals(hendelseType);
+        return Set.of(PDL_FØDSEL_OPPRETTET, PDL_FØDSEL_KORRIGERT, PDL_FØDSEL_ANNULLERT, PDL_FØDSEL_OPPHØRT).contains(hendelseType);
     }
 
     public static boolean erPdlDødHendelseType(HendelseType hendelseType) {
-        return PDL_DØD_OPPRETTET.equals(hendelseType)
-                || PDL_DØD_KORRIGERT.equals(hendelseType)
-                || PDL_DØD_ANNULLERT.equals(hendelseType)
-                || PDL_DØD_OPPHØRT.equals(hendelseType);
+        return Set.of(PDL_DØD_OPPRETTET, PDL_DØD_KORRIGERT, PDL_DØD_ANNULLERT, PDL_DØD_OPPHØRT).contains(hendelseType);
     }
 
     public static boolean erPdlDødfødselHendelseType(HendelseType hendelseType) {
-        return PDL_DØDFØDSEL_OPPRETTET.equals(hendelseType)
-                || PDL_DØDFØDSEL_KORRIGERT.equals(hendelseType)
-                || PDL_DØDFØDSEL_ANNULLERT.equals(hendelseType)
-                || PDL_DØDFØDSEL_OPPHØRT.equals(hendelseType);
+        return Set.of(PDL_DØDFØDSEL_OPPRETTET, PDL_DØDFØDSEL_KORRIGERT, PDL_DØDFØDSEL_ANNULLERT, PDL_DØDFØDSEL_OPPHØRT).contains(hendelseType);
     }
 
-    public boolean erPdlHendelse() {
-        return erPdlFødselHendelseType(this) || erPdlDødHendelseType(this) || erPdlDødfødselHendelseType(this);
+    public static boolean erPdlUtflyttingHendelseType(HendelseType hendelseType) {
+        return Set.of(PDL_UTFLYTTING_OPPRETTET, PDL_UTFLYTTING_KORRIGERT, PDL_UTFLYTTING_ANNULLERT, PDL_UTFLYTTING_OPPHØRT).contains(hendelseType);
     }
 
     @Converter(autoApply = true)

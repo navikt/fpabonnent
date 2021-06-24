@@ -25,6 +25,7 @@ public @interface HendelseTypeRef {
     String PDL_FØDSEL_HENDELSE = "PDL_FØDSEL_HENDELSE";
     String PDL_DØD_HENDELSE = "PDL_DØD_HENDELSE";
     String PDL_DØDFØDSEL_HENDELSE = "PDL_DØDFØDSEL_HENDELSE";
+    String PDL_UTFLYTTING_HENDELSE = "PDL_UTFLYTTING_HENDELSE";
 
     String value();
 
@@ -42,6 +43,8 @@ public @interface HendelseTypeRef {
                 this.navn = PDL_DØD_HENDELSE;
             } else if (HendelseType.erPdlDødfødselHendelseType(hendelseType)) {
                 this.navn = PDL_DØDFØDSEL_HENDELSE;
+            } else if (HendelseType.erPdlUtflyttingHendelseType(hendelseType)) {
+                this.navn = PDL_UTFLYTTING_HENDELSE;
             } else {
                 this.navn = hendelseType.getKode();
             }
