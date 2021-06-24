@@ -7,11 +7,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 
 public class PdlFødsel extends PdlPersonhendelse {
 
-    private Integer fødselsår;
     private LocalDate fødselsdato;
-    private String fødeland;
-    private String fødested;
-    private String fødekommune;
     private Set<String> aktørIdForeldre;
 
     public boolean erRelevantForFpsak() {
@@ -20,24 +16,8 @@ public class PdlFødsel extends PdlPersonhendelse {
                 || HendelseType.PDL_FØDSEL_KORRIGERT.equals(getHendelseType());
     }
 
-    public Integer getFødselsår() {
-        return fødselsår;
-    }
-
     public LocalDate getFødselsdato() {
         return fødselsdato;
-    }
-
-    public String getFødeland() {
-        return fødeland;
-    }
-
-    public String getFødested() {
-        return fødested;
-    }
-
-    public String getFødekommune() {
-        return fødekommune;
     }
 
     public Set<String> getAktørIdForeldre() {
@@ -58,28 +38,8 @@ public class PdlFødsel extends PdlPersonhendelse {
             super.mal = new PdlFødsel();
         }
 
-        public Builder medFødselsår(Integer fødselsår) {
-            getMal().fødselsår = fødselsår;
-            return this;
-        }
-
         public Builder medFødselsdato(LocalDate fødselsdato) {
             getMal().fødselsdato = fødselsdato;
-            return this;
-        }
-
-        public Builder medFødeland(String fødeland) {
-            getMal().fødeland = fødeland;
-            return this;
-        }
-
-        public Builder medFødested(String fødested) {
-            getMal().fødested = fødested;
-            return this;
-        }
-
-        public Builder medFødekommune(String fødekommune) {
-            getMal().fødekommune = fødekommune;
             return this;
         }
 
