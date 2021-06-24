@@ -65,13 +65,14 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
 
     @Override
     public void loggFeiletHendelse(PdlUtflyttingHendelsePayload payload) {
-        String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
-        String årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
+        String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. {}";
         if (payload.getUtflyttingsdato().isEmpty()) {
-            årsak = "Årsaken er at utflyttingsdato mangler på hendelsen.";
+            LOGGER.info(basismelding, "Årsaken er at utflyttingsdato mangler på hendelsen.", payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         } else if (payload.getAktørId().isEmpty()) {
-            årsak = "Årsaken er at aktørId mangler på hendelsen.";
+            LOGGER.warn(basismelding, "Årsaken er at aktørId mangler på hendelsen.", payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+        } else {
+            LOGGER.warn(basismelding, "Årsaken er ukjent - bør undersøkes av utvikler.", payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         }
-        LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+
     }
 }
