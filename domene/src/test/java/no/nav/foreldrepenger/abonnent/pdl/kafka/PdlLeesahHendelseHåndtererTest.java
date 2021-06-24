@@ -41,6 +41,7 @@ public class PdlLeesahHendelseHåndtererTest {
 
     private static final LocalDateTime OPPRETTET_TID = LocalDateTime.now();
     private static final LocalDate DØDSDATO = LocalDate.now().minusDays(1);
+    private static final LocalDate UTFLYTTINGSDATO = LocalDate.now().minusDays(1);
 
     @BeforeEach
     public void before() {
@@ -92,7 +93,7 @@ public class PdlLeesahHendelseHåndtererTest {
     }
 
     @Test
-    public void skal_lagre_oversatt_utflyttings_og_opprette_vurder_sortering_task() {
+    public void skal_lagre_oversatt_utflyttingshendelse_og_opprette_vurder_sortering_task() {
         // Arrange
         Personhendelse payload = new Personhendelse();
         payload.setHendelseId("ABC");
@@ -102,7 +103,7 @@ public class PdlLeesahHendelseHåndtererTest {
         payload.setOpplysningstype("UTFLYTTING_FRA_NORGE");
         payload.setEndringstype(Endringstype.OPPRETTET);
         UtflyttingFraNorge utflyttingFraNorge = new UtflyttingFraNorge();
-        utflyttingFraNorge.setUtflyttingsdato(DØDSDATO);
+        utflyttingFraNorge.setUtflyttingsdato(UTFLYTTINGSDATO);
         payload.setUtflyttingFraNorge(utflyttingFraNorge);
         ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
