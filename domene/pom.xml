@@ -19,8 +19,11 @@
 			<url>https://packages.confluent.io/maven/</url>
 		</repository>
 	</repositories>
-	<dependencies>
-		<dependency>
+		
+		<!-- Kafka -->
+    <dependencies>
+	    
+	    <dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
 		</dependency>
@@ -69,10 +72,7 @@
 					<artifactId>error_prone_annotations</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
 
-		<!-- Kafka -->
-    <dependencies>
       <dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
