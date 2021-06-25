@@ -72,7 +72,7 @@
 					<artifactId>error_prone_annotations</artifactId>
 				</exclusion>
 			</exclusions>
-
+</dependency>
       <dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
