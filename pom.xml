@@ -25,7 +25,7 @@
         <!-- default argLine for surefire-plugin -->
         <argLine>-Xms256m -Dlog.level.no.nav=WARN -Dfile.encoding=${project.build.sourceEncoding}</argLine>
 
-        <felles.version>3.2.116</felles.version>
+        <felles.version>3.2.118</felles.version>
         <prosesstask.version>2.6.3</prosesstask.version>
         <fp-kontrakter.version>6.0.1</fp-kontrakter.version>
 
@@ -95,6 +95,13 @@
                 <type>pom</type>
             </dependency>
             <dependency>
+                <groupId>no.nav.vedtak.prosesstask</groupId>
+                <artifactId>prosesstask-root</artifactId>
+                <version>${prosesstask.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
                 <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
                 <artifactId>felles-integrasjon-pom</artifactId>
                 <version>${felles.version}</version>
@@ -102,14 +109,10 @@
                 <type>pom</type>
             </dependency>
             <dependency>
-                <!-- Importeres etter felles-root og felles for å sikre samme avhengigheter gjennom hele! -->
-                <groupId>no.nav.vedtak.prosesstask</groupId>
-                <artifactId>prosesstask-root</artifactId>
-                <version>${prosesstask.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
+                <groupId>no.nav.foreldrepenger.felles</groupId>
+                <artifactId>felles-db</artifactId>
+                <version>${felles.version}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>

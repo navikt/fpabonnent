@@ -14,9 +14,9 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDødfødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
+import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlUtflytting;
 import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
-import no.nav.person.pdl.leesah.foedsel.Foedsel;
 
 @ApplicationScoped
 public class PdlLeesahOversetter {
@@ -26,40 +26,25 @@ public class PdlLeesahOversetter {
     public static final String FØDSEL = "FOEDSEL_V1";
     public static final String DØD = "DOEDSFALL_V1";
     public static final String DØDFØDSEL = "DOEDFOEDT_BARN_V1";
-    public static final String FAMILIERELASJON = "FAMILIERELASJON_V1";
+    public static final String UTFLYTTING = "UTFLYTTING_FRA_NORGE";
 
     public PdlLeesahOversetter() {
         // CDI
     }
 
     public PdlFødsel oversettFødsel(Personhendelse personhendelse) {
-        PdlFødsel.Builder builder = PdlFødsel.builder();
+        var builder = PdlFødsel.builder();
         oversettPersonhendelse(personhendelse, builder);
-        var foedsel = personhendelse.getFoedsel();
 
-        if (foedsel != null) {
-            if (foedsel.getFoedselsaar() != null) {
-                builder.medFødselsår(foedsel.getFoedselsaar());
-            }
-            if (foedsel.getFoedselsdato() != null) {
-                builder.medFødselsdato(foedsel.getFoedselsdato());
-            }
-            if (foedsel.getFoedeland() != null) {
-                builder.medFødeland(foedsel.getFoedeland().toString());
-            }
-            if (foedsel.getFoedested() != null) {
-                builder.medFødested(foedsel.getFoedested().toString());
-            }
-            if (foedsel.getFoedekommune() != null) {
-                builder.medFødekommune(foedsel.getFoedekommune().toString());
-            }
+        if (personhendelse.getFoedsel() != null) {
+            builder.medFødselsdato(personhendelse.getFoedsel().getFoedselsdato());
         }
 
         return builder.build();
     }
 
     public PdlDød oversettDød(Personhendelse personhendelse) {
-        PdlDød.Builder builder = PdlDød.builder();
+        var builder = PdlDød.builder();
         oversettPersonhendelse(personhendelse, builder);
         if (personhendelse.getDoedsfall() != null) {
             builder.medDødsdato(personhendelse.getDoedsfall().getDoedsdato());
@@ -67,8 +52,17 @@ public class PdlLeesahOversetter {
         return builder.build();
     }
 
+    public PdlUtflytting oversettUtflytting(Personhendelse personhendelse) {
+        var builder = PdlUtflytting.builder();
+        oversettPersonhendelse(personhendelse, builder);
+        if (personhendelse.getUtflyttingFraNorge() != null) {
+            builder.medUtflyttingsdato(personhendelse.getUtflyttingFraNorge().getUtflyttingsdato());
+        }
+        return builder.build();
+    }
+
     public PdlDødfødsel oversettDødfødsel(Personhendelse personhendelse) {
-        PdlDødfødsel.Builder builder = PdlDødfødsel.builder();
+        var builder = PdlDødfødsel.builder();
         oversettPersonhendelse(personhendelse, builder);
         if (personhendelse.getDoedfoedtBarn() != null) {
             builder.medDødfødselsdato(personhendelse.getDoedfoedtBarn().getDato());
@@ -104,36 +98,37 @@ public class PdlLeesahOversetter {
             String opplysningstype = personhendelse.getOpplysningstype().toString();
             Endringstype endringstype = personhendelse.getEndringstype();
 
-            if (FØDSEL.equals(opplysningstype)) {
-                if (Endringstype.OPPRETTET.equals(endringstype)) {
-                    return HendelseType.PDL_FØDSEL_OPPRETTET;
-                } else if (Endringstype.ANNULLERT.equals(endringstype)) {
-                    return HendelseType.PDL_FØDSEL_ANNULLERT;
-                } else if (Endringstype.KORRIGERT.equals(endringstype)) {
-                    return HendelseType.PDL_FØDSEL_KORRIGERT;
-                } else if (Endringstype.OPPHOERT.equals(endringstype)) {
-                    return HendelseType.PDL_FØDSEL_OPPHØRT;
-                }
-            } else if (DØD.equals(opplysningstype)) {
-                if (Endringstype.OPPRETTET.equals(endringstype)) {
-                    return HendelseType.PDL_DØD_OPPRETTET;
-                } else if (Endringstype.ANNULLERT.equals(endringstype)) {
-                    return HendelseType.PDL_DØD_ANNULLERT;
-                } else if (Endringstype.KORRIGERT.equals(endringstype)) {
-                    return HendelseType.PDL_DØD_KORRIGERT;
-                } else if (Endringstype.OPPHOERT.equals(endringstype)) {
-                    return HendelseType.PDL_DØD_OPPHØRT;
-                }
-            } else if (DØDFØDSEL.equals(opplysningstype)) {
-                if (Endringstype.OPPRETTET.equals(endringstype)) {
-                    return HendelseType.PDL_DØDFØDSEL_OPPRETTET;
-                } else if (Endringstype.ANNULLERT.equals(endringstype)) {
-                    return HendelseType.PDL_DØDFØDSEL_ANNULLERT;
-                } else if (Endringstype.KORRIGERT.equals(endringstype)) {
-                    return HendelseType.PDL_DØDFØDSEL_KORRIGERT;
-                } else if (Endringstype.OPPHOERT.equals(endringstype)) {
-                    return HendelseType.PDL_DØDFØDSEL_OPPHØRT;
-                }
+            switch (opplysningstype) {
+                case FØDSEL:
+                    return switch (endringstype) {
+                        case OPPRETTET -> HendelseType.PDL_FØDSEL_OPPRETTET;
+                        case ANNULLERT -> HendelseType.PDL_FØDSEL_ANNULLERT;
+                        case KORRIGERT -> HendelseType.PDL_FØDSEL_KORRIGERT;
+                        case OPPHOERT -> HendelseType.PDL_FØDSEL_OPPHØRT;
+                    };
+                case DØD:
+                    return switch (endringstype) {
+                        case OPPRETTET -> HendelseType.PDL_DØD_OPPRETTET;
+                        case ANNULLERT -> HendelseType.PDL_DØD_ANNULLERT;
+                        case KORRIGERT -> HendelseType.PDL_DØD_KORRIGERT;
+                        case OPPHOERT -> HendelseType.PDL_DØD_OPPHØRT;
+                    };
+                case DØDFØDSEL:
+                    return switch (endringstype) {
+                        case OPPRETTET -> HendelseType.PDL_DØDFØDSEL_OPPRETTET;
+                        case ANNULLERT -> HendelseType.PDL_DØDFØDSEL_ANNULLERT;
+                        case KORRIGERT -> HendelseType.PDL_DØDFØDSEL_KORRIGERT;
+                        case OPPHOERT -> HendelseType.PDL_DØDFØDSEL_OPPHØRT;
+                    };
+                case UTFLYTTING:
+                    return switch (endringstype) {
+                        case OPPRETTET -> HendelseType.PDL_UTFLYTTING_OPPRETTET;
+                        case ANNULLERT -> HendelseType.PDL_UTFLYTTING_ANNULLERT;
+                        case KORRIGERT -> HendelseType.PDL_UTFLYTTING_KORRIGERT;
+                        case OPPHOERT -> HendelseType.PDL_UTFLYTTING_OPPHØRT;
+                    };
+                default:
+                    break;
             }
         }
 

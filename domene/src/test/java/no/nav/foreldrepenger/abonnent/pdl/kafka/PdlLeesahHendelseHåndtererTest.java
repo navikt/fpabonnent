@@ -27,6 +27,7 @@ import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
+import no.nav.person.pdl.leesah.utflytting.UtflyttingFraNorge;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
@@ -40,6 +41,7 @@ public class PdlLeesahHendelseHåndtererTest {
 
     private static final LocalDateTime OPPRETTET_TID = LocalDateTime.now();
     private static final LocalDate DØDSDATO = LocalDate.now().minusDays(1);
+    private static final LocalDate UTFLYTTINGSDATO = LocalDate.now().minusDays(1);
 
     @BeforeEach
     public void before() {
@@ -88,6 +90,43 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
                 forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_DØD_OPPRETTET.getKode());
+    }
+
+    @Test
+    public void skal_lagre_oversatt_utflyttingshendelse_og_opprette_vurder_sortering_task() {
+        // Arrange
+        Personhendelse payload = new Personhendelse();
+        payload.setHendelseId("ABC");
+        payload.setPersonidenter(List.of("1111111111111", "22222222222"));
+        payload.setMaster("Freg");
+        payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
+        payload.setOpplysningstype("UTFLYTTING_FRA_NORGE");
+        payload.setEndringstype(Endringstype.OPPRETTET);
+        UtflyttingFraNorge utflyttingFraNorge = new UtflyttingFraNorge();
+        utflyttingFraNorge.setUtflyttingsdato(UTFLYTTINGSDATO);
+        payload.setUtflyttingFraNorge(utflyttingFraNorge);
+        ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
+        doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
+        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+
+        // Act
+        hendelseHåndterer.handleMessage("", payload);
+
+        // Assert
+        InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
+        assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
+        assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
+        assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
+        assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_UTFLYTTING_OPPRETTET);
+
+        ProsessTaskData prosessTaskData = taskCaptor.getValue();
+        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
+        assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
+                forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
+        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_UTFLYTTING_OPPRETTET.getKode());
     }
 
     @Test
