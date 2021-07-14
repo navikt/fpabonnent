@@ -32,7 +32,7 @@
         <!-- Eksterne -->
         <flyway.version>4.2.0</flyway.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
-        <hikari.version>4.0.3</hikari.version>
+        <hikari.version>5.0.0</hikari.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
         <owaspencoder.version>1.2.3</owaspencoder.version>
