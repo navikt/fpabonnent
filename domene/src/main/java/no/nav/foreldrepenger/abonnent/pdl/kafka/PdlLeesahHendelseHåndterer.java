@@ -173,11 +173,15 @@ public class PdlLeesahHendelseHåndterer {
     }
 
     private InngåendeHendelse lagreInngåendeHendelse(PdlPersonhendelse personhendelse, HåndtertStatusType håndtertStatusType) {
+        var jsonPayload = JsonMapper.toJson(personhendelse);
+        if (jsonPayload == null) {
+            LOG.warn("Tom payload for objekt {}", personhendelse);
+        }
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
                 .hendelseType(personhendelse.getHendelseType())
                 .hendelseId(personhendelse.getHendelseId())
                 .tidligereHendelseId(personhendelse.getTidligereHendelseId())
-                .payload(JsonMapper.toJson(personhendelse))
+                .payload(jsonPayload)
                 .hendelseKilde(HendelseKilde.PDL)
                 .håndtertStatus(håndtertStatusType)
                 .build();

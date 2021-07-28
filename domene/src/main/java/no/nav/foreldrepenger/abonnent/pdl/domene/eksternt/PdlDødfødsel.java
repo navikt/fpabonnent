@@ -18,6 +18,13 @@ public class PdlDødfødsel extends PdlPersonhendelse {
         return dødfødselsdato;
     }
 
+    @Override
+    public String toString() {
+        return "PdlDødfødsel{" + toStringInnhold() +
+                ", dødfødselsdato=" + dødfødselsdato +
+                '}';
+    }
+
     public static Builder builder() {
         return new Builder();
     }
