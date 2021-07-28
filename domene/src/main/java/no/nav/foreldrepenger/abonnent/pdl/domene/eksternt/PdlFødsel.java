@@ -28,6 +28,14 @@ public class PdlFødsel extends PdlPersonhendelse {
         this.aktørIdForeldre = aktørIdForeldre;
     }
 
+    @Override
+    public String toString() {
+        return "PdlFødsel{" + toStringInnhold() +
+                ", fødselsdato=" + fødselsdato +
+                ", aktørIdForeldre=" + aktørIdForeldre +
+                '}';
+    }
+
     public static Builder builder() {
         return new Builder();
     }

@@ -17,6 +17,13 @@ public class PdlUtflytting extends PdlPersonhendelse {
         return utflyttingsdato;
     }
 
+    @Override
+    public String toString() {
+        return "PdlUtflytting{" + toStringInnhold() +
+                ", utflyttingsdato=" + utflyttingsdato +
+                '}';
+    }
+
     public static Builder builder() {
         return new Builder();
     }

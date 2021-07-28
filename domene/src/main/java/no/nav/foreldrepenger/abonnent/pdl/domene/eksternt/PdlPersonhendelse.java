@@ -51,6 +51,17 @@ public abstract class PdlPersonhendelse {
         return hendelseType;
     }
 
+    protected String toStringInnhold() {
+        return "hendelseId='" + hendelseId + '\'' +
+                ", personidenter=" + personidenter +
+                ", master='" + master + '\'' +
+                ", opprettet=" + opprettet +
+                ", opplysningstype='" + opplysningstype + '\'' +
+                ", endringstype=" + endringstype +
+                ", tidligereHendelseId='" + tidligereHendelseId + '\'' +
+                ", hendelseType=" + hendelseType;
+    }
+
     public static abstract class PdlPersonhendelseBuilder {
         protected PdlPersonhendelse mal;
 

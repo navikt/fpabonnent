@@ -35,10 +35,22 @@
 			<groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
 			<artifactId>felles-sikkerhet</artifactId>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.minidev</groupId>
+					<artifactId>json-smart</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>no.nav.foreldrepenger.felles</groupId>
 			<artifactId>felles-abac-legacy</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>net.minidev</groupId>
+					<artifactId>json-smart</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Resteasy -->
@@ -185,6 +197,12 @@
 			<groupId>no.nav.foreldrepenger.felles</groupId>
 			<artifactId>felles-testutilities</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.minidev</groupId>
+					<artifactId>json-smart</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
