@@ -6,6 +6,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 
 public class PdlUtflytting extends PdlPersonhendelse {
 
+    // For innkommende hendelser er dette dato oppgitt av bruker. Må utledes dersom mangler.
     private LocalDate utflyttingsdato;
 
     public boolean erRelevantForFpsak() {
@@ -15,6 +16,10 @@ public class PdlUtflytting extends PdlPersonhendelse {
 
     public LocalDate getUtflyttingsdato() {
         return utflyttingsdato;
+    }
+
+    public void setUtflyttingsdato(LocalDate utflyttingsdato) {
+        this.utflyttingsdato = utflyttingsdato;
     }
 
     @Override
