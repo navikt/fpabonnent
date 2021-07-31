@@ -2,12 +2,16 @@ package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
 import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper.hentUtAktørIderFraString;
 
+import java.time.LocalDate;
+import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTypeRef;
@@ -15,6 +19,7 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlUtflytting;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlUtflyttingHendelsePayload;
+import no.nav.foreldrepenger.abonnent.pdl.oppslag.UtflyttingsDatoTjeneste;
 
 
 @ApplicationScoped
@@ -24,14 +29,17 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
     private static final Logger LOGGER = LoggerFactory.getLogger(PdlUtflyttingHendelseTjeneste.class);
 
     private HendelseTjenesteHjelper hendelseTjenesteHjelper;
+    private UtflyttingsDatoTjeneste utflyttingTjeneste;
 
     public PdlUtflyttingHendelseTjeneste() {
         // CDI
     }
 
     @Inject
-    public PdlUtflyttingHendelseTjeneste(HendelseTjenesteHjelper hendelseTjenesteHjelper) {
+    public PdlUtflyttingHendelseTjeneste(HendelseTjenesteHjelper hendelseTjenesteHjelper,
+                                         UtflyttingsDatoTjeneste utflyttingTjeneste) {
         this.hendelseTjenesteHjelper = hendelseTjenesteHjelper;
+        this.utflyttingTjeneste = utflyttingTjeneste;
     }
 
     @Override
@@ -56,11 +64,26 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
 
     @Override
     public KlarForSorteringResultat vurderOmKlarForSortering(PdlUtflyttingHendelsePayload payload) {
-        if (payload.getAktørId().isPresent() && (payload.getUtflyttingsdato().isPresent()
-                || payload.getUtflyttingsdato().isEmpty() && PdlEndringstype.ANNULLERT.name().equals(payload.getEndringstype()))) {
-            return new KlarForSorteringResultat(true);
+        var aktuellAktør = payload.getAktørId().orElse(Set.of()).stream().findFirst();
+        if (aktuellAktør.isEmpty()) {
+            LOGGER.warn("Hendelse {} med type {} har ikke aktørid", payload.getHendelseId(), payload.getHendelseType());
+            return new UtflyttingKlarForSorteringResultat(false, false);
         }
-        return new KlarForSorteringResultat(false);
+        var resultat = new UtflyttingKlarForSorteringResultat(true);
+        if (payload.getUtflyttingsdato().isEmpty() && PdlEndringstype.OPPRETTET.name().equals(payload.getEndringstype())) {
+            resultat.setUtflyttingsdato(utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get(), payload.getHendelseId()));
+        }
+        return resultat;
+    }
+
+    @Override
+    public void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {
+        var identifisertDato = ((UtflyttingKlarForSorteringResultat)klarForSorteringResultat).getUtflyttingsdato();
+        if (identifisertDato != null) {
+            var utflytting = JsonMapper.fromJson(inngåendeHendelse.getPayload(), PdlUtflytting.class);
+            utflytting.setUtflyttingsdato(identifisertDato);
+            inngåendeHendelse.setPayload(JsonMapper.toJson(utflytting));
+        }
     }
 
     @Override
@@ -74,5 +97,26 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
             LOGGER.warn(basismelding, "Årsaken er ukjent - bør undersøkes av utvikler.", payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         }
 
+    }
+
+    private class UtflyttingKlarForSorteringResultat extends KlarForSorteringResultat {
+
+        private LocalDate utflyttingsdato;
+
+        public UtflyttingKlarForSorteringResultat(boolean resultat) {
+            super(resultat);
+        }
+
+        public UtflyttingKlarForSorteringResultat(boolean resultat, boolean prøveIgjen) {
+            super(resultat, prøveIgjen);
+        }
+
+        public LocalDate getUtflyttingsdato() {
+            return utflyttingsdato;
+        }
+
+        public void setUtflyttingsdato(LocalDate utflyttingsdato) {
+            this.utflyttingsdato = utflyttingsdato;
+        }
     }
 }
