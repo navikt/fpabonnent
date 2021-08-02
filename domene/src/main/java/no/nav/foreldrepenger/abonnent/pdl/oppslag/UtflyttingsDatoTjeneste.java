@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -23,6 +24,7 @@ import no.nav.pdl.PersonFolkeregisterpersonstatusParametrizedInput;
 import no.nav.pdl.PersonResponseProjection;
 import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
 import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
+import no.nav.vedtak.konfig.Tid;
 
 @ApplicationScoped
 public class UtflyttingsDatoTjeneste {
@@ -61,7 +63,8 @@ public class UtflyttingsDatoTjeneste {
                 .max(Comparator.naturalOrder());
 
         var fraBostedsAdresse = person.getBostedsadresse().stream()
-                .max(Comparator.comparing(Bostedsadresse::getGyldigFraOgMed))
+                .max(Comparator.comparing(UtflyttingsDatoTjeneste::bostedsAdresseFraDato)
+                        .thenComparing(UtflyttingsDatoTjeneste::bostedsAdresseTilDato))
                 .map(Bostedsadresse::getGyldigTilOgMed)
                 .map(UtflyttingsDatoTjeneste::localDateFraDate)
                 .filter(d -> d.isAfter(idag.minusMonths(6)));
@@ -87,6 +90,14 @@ public class UtflyttingsDatoTjeneste {
             brukFom = gyldigFom != null ? gyldigFom : ajourFom;
         }
         return localDateFraDate(brukFom);
+    }
+
+    private static LocalDate bostedsAdresseFraDato(Bostedsadresse bostedsadresse) {
+        return bostedsadresse.getGyldigFraOgMed() == null ? Tid.TIDENES_BEGYNNELSE : localDateFraDate(bostedsadresse.getGyldigFraOgMed());
+    }
+
+    private static LocalDate bostedsAdresseTilDato(Bostedsadresse bostedsadresse) {
+        return bostedsadresse.getGyldigTilOgMed() == null ? Tid.TIDENES_ENDE  : localDateFraDate(bostedsadresse.getGyldigTilOgMed());
     }
 
     private static LocalDate localDateFraDate(Date fom) {
