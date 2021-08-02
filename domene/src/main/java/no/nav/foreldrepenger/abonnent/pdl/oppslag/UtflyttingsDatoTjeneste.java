@@ -63,7 +63,8 @@ public class UtflyttingsDatoTjeneste {
                 .max(Comparator.naturalOrder());
 
         var fraBostedsAdresse = person.getBostedsadresse().stream()
-                .max(Comparator.comparing(UtflyttingsDatoTjeneste::bostedsAdresseFraDato))
+                .max(Comparator.comparing(UtflyttingsDatoTjeneste::bostedsAdresseFraDato)
+                        .thenComparing(UtflyttingsDatoTjeneste::bostedsAdresseTilDato))
                 .map(Bostedsadresse::getGyldigTilOgMed)
                 .map(UtflyttingsDatoTjeneste::localDateFraDate)
                 .filter(d -> d.isAfter(idag.minusMonths(6)));
@@ -93,6 +94,10 @@ public class UtflyttingsDatoTjeneste {
 
     private static LocalDate bostedsAdresseFraDato(Bostedsadresse bostedsadresse) {
         return bostedsadresse.getGyldigFraOgMed() == null ? Tid.TIDENES_BEGYNNELSE : localDateFraDate(bostedsadresse.getGyldigFraOgMed());
+    }
+
+    private static LocalDate bostedsAdresseTilDato(Bostedsadresse bostedsadresse) {
+        return bostedsadresse.getGyldigTilOgMed() == null ? Tid.TIDENES_ENDE  : localDateFraDate(bostedsadresse.getGyldigTilOgMed());
     }
 
     private static LocalDate localDateFraDate(Date fom) {
