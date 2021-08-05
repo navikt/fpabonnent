@@ -72,6 +72,12 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
         var resultat = new UtflyttingKlarForSorteringResultat(true);
         if (payload.getUtflyttingsdato().isEmpty() && PdlEndringstype.OPPRETTET.name().equals(payload.getEndringstype())) {
             resultat.setUtflyttingsdato(utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get(), payload.getHendelseId()));
+        } else {
+            payload.getUtflyttingsdato().ifPresent(oppgittdato -> {
+                var registerdato = utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get(), payload.getHendelseId());
+                if (!oppgittdato.isEqual(registerdato))
+                    LOGGER.info("Utflyttingsdato avvik mellom oppgitt {} og register {} vurder å bruke register konsekvent", oppgittdato, registerdato);
+            });
         }
         return resultat;
     }
