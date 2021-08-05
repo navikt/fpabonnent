@@ -75,8 +75,13 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
         } else {
             payload.getUtflyttingsdato().ifPresent(oppgittdato -> {
                 var registerdato = utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get(), payload.getHendelseId());
-                if (!oppgittdato.isEqual(registerdato))
-                    LOGGER.info("Utflyttingshendelse {} fant datoer: avvik mellom oppgitt {} og register {}", payload.getHendelseId(), oppgittdato, registerdato);
+                if (oppgittdato.isAfter(registerdato)) {
+                    LOGGER.warn("Utflyttingshendelse {} fant datoer: avvik oppgitt {} etter register {} - varsle daglig-overvåkning", payload.getHendelseId(), oppgittdato, registerdato);
+                } else if (oppgittdato.isBefore(registerdato)) {
+                    LOGGER.info("Utflyttingshendelse {} fant datoer: avvik oppgitt {} før register {}", payload.getHendelseId(), oppgittdato, registerdato);
+                } else {
+                    LOGGER.info("Utflyttingshendelse {} fant datoer: likhet oppgitt {} og register {}", payload.getHendelseId(), oppgittdato, registerdato);
+                }
             });
         }
         return resultat;
