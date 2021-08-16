@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.pdl.oppslag.ForeldreTjeneste;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.konfig.Environment;
 
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_FØDSEL_HENDELSE)

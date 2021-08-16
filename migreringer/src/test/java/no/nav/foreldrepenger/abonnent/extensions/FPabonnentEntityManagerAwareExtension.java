@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.vedtak.felles.testutilities.db.EntityManagerAwareExtension;
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.konfig.Environment;
 
 public class FPabonnentEntityManagerAwareExtension extends EntityManagerAwareExtension {
     private static final Logger LOG = LoggerFactory.getLogger(FPabonnentEntityManagerAwareExtension.class);

@@ -5,13 +5,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Objects;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import no.nav.pdl.Bostedsadresse;
 import no.nav.pdl.BostedsadresseResponseProjection;
@@ -28,8 +24,6 @@ import no.nav.vedtak.konfig.Tid;
 
 @ApplicationScoped
 public class UtflyttingsDatoTjeneste {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UtflyttingsDatoTjeneste.class);
 
     private Pdl pdlKlient;
 
@@ -68,8 +62,6 @@ public class UtflyttingsDatoTjeneste {
                 .map(Bostedsadresse::getGyldigTilOgMed)
                 .map(UtflyttingsDatoTjeneste::localDateFraDate)
                 .filter(d -> d.isAfter(idag.minusMonths(6)));
-
-        LOGGER.info("Utflyttingshendelse {} fant datoer: personstatus {} bosted {}", hendelseId, fraPersonStatus, fraBostedsAdresse);
 
         if (fraPersonStatus.isEmpty() && fraBostedsAdresse.isEmpty()) {
             return idag;

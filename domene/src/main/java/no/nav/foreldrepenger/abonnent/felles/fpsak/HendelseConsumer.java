@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
-import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class HendelseConsumer implements Hendelser {
