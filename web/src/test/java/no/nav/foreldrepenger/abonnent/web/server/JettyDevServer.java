@@ -28,7 +28,7 @@ import ch.qos.logback.core.util.StatusPrinter;
 import no.nav.foreldrepenger.abonnent.dbstøtte.Databaseskjemainitialisering;
 import no.nav.foreldrepenger.abonnent.web.app.konfig.ApplicationConfig;
 import no.nav.vedtak.isso.IssoApplication;
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.konfig.Environment;
 
 /**
  * Setter opp jetty automatisk lokalt med riktig konfig verdier.

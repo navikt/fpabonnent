@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import no.nav.person.pdl.leesah.Personhendelse;
-import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 
 @Dependent
 public class PdlLeesahHendelseProperties {

@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.felles.integrasjon.rest.RestSelftestConsumer;
-import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class HendelseSelftestConsumer implements RestSelftestConsumer {
