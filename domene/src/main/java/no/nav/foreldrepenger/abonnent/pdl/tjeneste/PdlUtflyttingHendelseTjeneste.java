@@ -70,15 +70,11 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
             return new UtflyttingKlarForSorteringResultat(false, false);
         }
         var resultat = new UtflyttingKlarForSorteringResultat(true);
-        if (payload.getUtflyttingsdato().isEmpty() && PdlEndringstype.OPPRETTET.name().equals(payload.getEndringstype())) {
-            resultat.setUtflyttingsdato(utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get(), payload.getHendelseId()));
-        } else {
-            payload.getUtflyttingsdato().ifPresent(oppgittdato -> {
-                var registerdato = utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get(), payload.getHendelseId());
-                if (oppgittdato.isAfter(registerdato)) {
-                    LOGGER.warn("Utflyttingshendelse {} fant datoer: avvik oppgitt {} etter register {} - varsle daglig-overvåkning", payload.getHendelseId(), oppgittdato, registerdato);
-                }
-            });
+        if (payload.getUtflyttingsdato().isPresent() || PdlEndringstype.OPPRETTET.name().equals(payload.getEndringstype())) {
+            var registerdato = utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get(), payload.getHendelseId());
+            var brukdato = payload.getUtflyttingsdato().filter(d -> d.isBefore(registerdato)).isPresent() ?
+                    payload.getUtflyttingsdato().orElseThrow() : registerdato;
+            resultat.setUtflyttingsdato(brukdato);
         }
         return resultat;
     }
