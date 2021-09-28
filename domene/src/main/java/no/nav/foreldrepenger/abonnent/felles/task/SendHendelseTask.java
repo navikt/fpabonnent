@@ -17,12 +17,10 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(SendHendelseTask.TASKNAME)
+@ProsessTask("hendelser.sendHendelse")
 public class SendHendelseTask implements ProsessTaskHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendHendelseTask.class);
-
-    public static final String TASKNAME = "hendelser.sendHendelse";
 
     private Hendelser hendelser;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;

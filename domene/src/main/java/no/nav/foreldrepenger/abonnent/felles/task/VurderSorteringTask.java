@@ -22,27 +22,26 @@ import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ApplicationScoped
-@ProsessTask(VurderSorteringTask.TASKNAME)
+@ProsessTask("hendelser.vurderSortering")
 public class VurderSorteringTask implements ProsessTaskHandler {
-
-    public static final String TASKNAME = "hendelser.vurderSortering";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VurderSorteringTask.class);
 
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste prosessTaskTjeneste;
     private ForsinkelseTjeneste forsinkelseTjeneste;
     private HendelseTjenesteProvider hendelseTjenesteProvider;
     private HendelseRepository hendelseRepository;
 
     @Inject
-    public VurderSorteringTask(ProsessTaskRepository prosessTaskRepository,
+    public VurderSorteringTask(ProsessTaskTjeneste prosessTaskTjeneste,
                                ForsinkelseTjeneste forsinkelseTjeneste,
                                HendelseTjenesteProvider hendelseTjenesteProvider,
                                HendelseRepository hendelseRepository) {
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.forsinkelseTjeneste = forsinkelseTjeneste;
         this.hendelseTjenesteProvider = hendelseTjenesteProvider;
         this.hendelseRepository = hendelseRepository;
@@ -52,7 +51,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
         String hendelseType = dataWrapper.getHendelseType()
-                .orElseThrow(() -> AbonnentHendelserFeil.ukjentHendelseType());
+                .orElseThrow(AbonnentHendelserFeil::ukjentHendelseType);
         HendelseTjeneste<HendelsePayload> hendelseTjeneste = getHendelseTjeneste(dataWrapper, hendelseType);
 
         Optional<Long> inngåendeHendelseId = dataWrapper.getInngåendeHendelseId();
@@ -96,11 +95,11 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     }
 
     private void opprettSorteringTask(String hendelseId, InngåendeHendelse inngåendeHendelse, HendelserDataWrapper dataWrapper) {
-        HendelserDataWrapper grovsorteringTask = dataWrapper.nesteSteg(SorterHendelseTask.TASKNAME);
+        HendelserDataWrapper grovsorteringTask = dataWrapper.nesteSteg(TaskType.forProsessTask(SorterHendelseTask.class));
         grovsorteringTask.setHendelseId(hendelseId);
         grovsorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
         grovsorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
-        prosessTaskRepository.lagre(grovsorteringTask.getProsessTaskData());
+        prosessTaskTjeneste.lagre(grovsorteringTask.getProsessTaskData());
         hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.SENDT_TIL_SORTERING);
     }
 
@@ -109,12 +108,12 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}",
                 hendelsePayload.getHendelseId(), inngåendeHendelse.getHendelseType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
         hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, nesteKjøringEtter);
-        HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
         vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
         vurderSorteringTask.setHendelseId(hendelsePayload.getHendelseId());
         vurderSorteringTask.setNesteKjøringEtter(nesteKjøringEtter);
         vurderSorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
-        prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
+        prosessTaskTjeneste.lagre(vurderSorteringTask.getProsessTaskData());
     }
 
     private boolean hendelsenErUnderEnUkeGammel(LocalDateTime hendelseOpprettetTid) {

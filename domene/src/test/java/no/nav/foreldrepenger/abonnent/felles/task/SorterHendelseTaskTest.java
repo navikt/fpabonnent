@@ -13,37 +13,38 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.TimeZone;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
+import no.nav.foreldrepenger.abonnent.extensions.FPabonnentEntityManagerAwareExtension;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
+import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
+import no.nav.vedtak.felles.testutilities.cdi.UnitTestLookupInstanceImpl;
 
-@CdiDbAwareTest
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(FPabonnentEntityManagerAwareExtension.class)
 public class SorterHendelseTaskTest {
-
-    static {
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"));
-    }
 
     private static final String PROSESSTASK_STEG = "hendelser.grovsorter";
 
@@ -55,27 +56,25 @@ public class SorterHendelseTaskTest {
     private static final String FORELDER2 = "1312345678909";
     private static final PdlFødsel FMELDING = lagFødselsmelding(HENDELSE_ID, of(BARNET), of(FORELDER1, FORELDER2), FØDSELSDATO);
 
-    @Inject
     private EntityManager entityManager;
-
-    @Inject
     private HendelseRepository hendelseRepository;
     private SorterHendelseTask sorterHendelseTask;
     private ProsessTaskData prosessTaskData;
 
-    @Inject
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
     @Mock
     private Hendelser hendelser;
     @Mock
-    private ProsessTaskRepository mockProsessTaskRepository;
+    private ProsessTaskTjeneste prosessTaskTjeneste;
 
     @BeforeEach
-    public void setup() {
-        sorterHendelseTask = new SorterHendelseTask(mockProsessTaskRepository, inngåendeHendelseTjeneste, hendelser);
-        prosessTaskData = new ProsessTaskData(PROSESSTASK_STEG);
-        prosessTaskData.setSekvens("1");
+    public void setup(EntityManager em) {
+        this.entityManager = em;
+        this.hendelseRepository = new HendelseRepository(em);
+        this.inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, new HendelseTjenesteProvider(new UnitTestLookupInstanceImpl<>(new PdlFødselHendelseTjeneste())));
+        sorterHendelseTask = new SorterHendelseTask(prosessTaskTjeneste, inngåendeHendelseTjeneste, hendelser);
+        prosessTaskData = ProsessTaskData.forProsessTask(SorterHendelseTask.class);
     }
 
     @Test
@@ -95,7 +94,7 @@ public class SorterHendelseTaskTest {
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
 
         // Assert
-        verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
     }
 
     @Test
@@ -113,7 +112,7 @@ public class SorterHendelseTaskTest {
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
 
         // Assert
-        verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
         InngåendeHendelse inngåendeHendelse = finnHendelseMedHendelseId(HENDELSE_ID);
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
     }
@@ -136,8 +135,8 @@ public class SorterHendelseTaskTest {
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
 
         // Assert
-        verify(mockProsessTaskRepository).lagre(argumentCaptor.capture());
-        assertThat(argumentCaptor.getValue().getTaskType()).isEqualTo(SendHendelseTask.TASKNAME);
+        verify(prosessTaskTjeneste).lagre(argumentCaptor.capture());
+        assertThat(argumentCaptor.getValue().taskType()).isEqualTo(TaskType.forProsessTask(SendHendelseTask.class));
         HendelserDataWrapper data = new HendelserDataWrapper(argumentCaptor.getValue());
         assertThat(data.getHendelseType()).isPresent().hasValue(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         assertThat(data.getHendelseId()).isPresent().hasValue(FMELDING.getHendelseId());
@@ -162,7 +161,7 @@ public class SorterHendelseTaskTest {
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
 
         // Assert
-        verify(mockProsessTaskRepository, times(0)).lagre(any(ProsessTaskData.class));
+        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
         InngåendeHendelse inngåendeHendelse = finnHendelseMedHendelseId(HENDELSE_ID);
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
     }

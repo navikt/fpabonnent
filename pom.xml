@@ -18,15 +18,13 @@
         <sha1></sha1>
         <changelist>-SNAPSHOT</changelist>
         <java.version>16</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- default argLine for surefire-plugin -->
         <argLine>-Xms256m -Dlog.level.no.nav=WARN -Dfile.encoding=${project.build.sourceEncoding}</argLine>
 
         <felles.version>4.0.8</felles.version>
-        <prosesstask.version>2.6.6</prosesstask.version>
+        <prosesstask.version>3.0.2</prosesstask.version>
         <fp-kontrakter.version>6.0.4</fp-kontrakter.version>
 
         <!-- Eksterne -->
@@ -353,6 +351,7 @@
                         <source>${java.version}</source>
                         <target>${java.version}</target>
                         <encoding>UTF-8</encoding>
+                        <release>${java.version}</release>
                     </configuration>
                 </plugin>
                 <plugin>

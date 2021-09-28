@@ -60,8 +60,7 @@ public class SendHendelseTaskTest {
         inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, hendelseTjenesteProvider);
         sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste, hendelseRepository);
 
-        prosessTaskData = new ProsessTaskData(SendHendelseTask.TASKNAME);
-        prosessTaskData.setSekvens("1");
+        prosessTaskData = ProsessTaskData.forProsessTask(SendHendelseTask.class);
     }
 
     @Test

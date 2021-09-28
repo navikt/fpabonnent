@@ -32,7 +32,7 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlUtflytting;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
 @Transactional
@@ -44,7 +44,7 @@ public class PdlLeesahHendelseHåndterer {
 
     private HendelseRepository hendelseRepository;
     private PdlLeesahOversetter oversetter;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste prosessTaskTjeneste;
     private ForsinkelseTjeneste forsinkelseTjeneste;
 
     PdlLeesahHendelseHåndterer() {
@@ -54,11 +54,11 @@ public class PdlLeesahHendelseHåndterer {
     @Inject
     public PdlLeesahHendelseHåndterer(HendelseRepository hendelseRepository,
             PdlLeesahOversetter pdlLeesahOversetter,
-            ProsessTaskRepository prosessTaskRepository,
+            ProsessTaskTjeneste prosessTaskTjeneste,
             ForsinkelseTjeneste forsinkelseTjeneste) {
         this.hendelseRepository = hendelseRepository;
         this.oversetter = pdlLeesahOversetter;
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.forsinkelseTjeneste = forsinkelseTjeneste;
     }
 
@@ -190,11 +190,11 @@ public class PdlLeesahHendelseHåndterer {
     }
 
     private void opprettVurderSorteringTask(PdlPersonhendelse personhendelse, Long inngåendeHendelseId, LocalDateTime håndteresEtterTidspunkt) {
-        HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(new ProsessTaskData(VurderSorteringTask.TASKNAME));
+        HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
         vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelseId);
         vurderSorteringTask.setHendelseId(personhendelse.getHendelseId());
         vurderSorteringTask.setNesteKjøringEtter(håndteresEtterTidspunkt);
         vurderSorteringTask.setHendelseType(personhendelse.getHendelseType().getKode());
-        prosessTaskRepository.lagre(vurderSorteringTask.getProsessTaskData());
+        prosessTaskTjeneste.lagre(vurderSorteringTask.getProsessTaskData());
     }
 }
