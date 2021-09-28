@@ -66,6 +66,10 @@
 			<artifactId>felles-db</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>jakarta.el</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
 			<artifactId>felles-integrasjon-rest-klient</artifactId>
 		</dependency>

@@ -46,8 +46,6 @@ import no.nav.vedtak.felles.testutilities.cdi.UnitTestLookupInstanceImpl;
 @ExtendWith(FPabonnentEntityManagerAwareExtension.class)
 public class SorterHendelseTaskTest {
 
-    private static final String PROSESSTASK_STEG = "hendelser.grovsorter";
-
     private static final LocalDate FØDSELSDATO = LocalDate.of(2018, 1, 25);
 
     private static final String HENDELSE_ID = "1";
