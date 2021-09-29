@@ -20,26 +20,25 @@ import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ApplicationScoped
-@ProsessTask(SorterHendelseTask.TASKNAME)
+@ProsessTask("hendelser.grovsorter")
 public class SorterHendelseTask implements ProsessTaskHandler {
-
-    public static final String TASKNAME = "hendelser.grovsorter";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SorterHendelseTask.class);
 
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste prosessTaskTjeneste;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
     private Hendelser hendelser;
 
     @Inject
-    public SorterHendelseTask(ProsessTaskRepository prosessTaskRepository,
+    public SorterHendelseTask(ProsessTaskTjeneste prosessTaskTjeneste,
             InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
             @Jersey Hendelser hendelser) {
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.hendelser = hendelser;
     }
 
@@ -72,16 +71,16 @@ public class SorterHendelseTask implements ProsessTaskHandler {
 
     private String getHendelseId(HendelserDataWrapper dataWrapper) {
         if (dataWrapper.getHendelseId().isEmpty()) {
-            throw AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(TASKNAME, HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId());
+            throw AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(dataWrapper.getProsessTaskData().getTaskType(), HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId());
         }
         return dataWrapper.getHendelseId().get();
     }
 
     private void opprettSendHendelseTask(HendelserDataWrapper dataWrapper, HendelsePayload hendelsePayload) {
-        var nesteSteg = dataWrapper.nesteSteg(SendHendelseTask.TASKNAME);
+        var nesteSteg = dataWrapper.nesteSteg(TaskType.forProsessTask(SendHendelseTask.class));
         nesteSteg.setHendelseId(hendelsePayload.getHendelseId());
         nesteSteg.setHendelseType(hendelsePayload.getHendelseType());
-        prosessTaskRepository.lagre(nesteSteg.getProsessTaskData());
+        prosessTaskTjeneste.lagre(nesteSteg.getProsessTaskData());
     }
 
     private boolean hendelseErRelevant(List<String> aktørIdList, HendelsePayload hendelsePayload) {
@@ -90,7 +89,7 @@ public class SorterHendelseTask implements ProsessTaskHandler {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [prosessTaskRepository=" + prosessTaskRepository + ", inngåendeHendelseTjeneste="
+        return getClass().getSimpleName() + " [prosessTaskRepository=" + prosessTaskTjeneste + ", inngåendeHendelseTjeneste="
                 + inngåendeHendelseTjeneste
                 + ", hendelser=" + hendelser + "]";
     }

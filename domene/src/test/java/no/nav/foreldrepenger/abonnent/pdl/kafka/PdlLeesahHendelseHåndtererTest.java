@@ -29,12 +29,13 @@ import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
 import no.nav.person.pdl.leesah.utflytting.UtflyttingFraNorge;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class PdlLeesahHendelseHåndtererTest {
 
     private HendelseRepository hendelseRepository;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste prosessTaskTjeneste;
     private ForsinkelseTjeneste forsinkelseTjeneste;
 
     private PdlLeesahHendelseHåndterer hendelseHåndterer;
@@ -46,12 +47,12 @@ public class PdlLeesahHendelseHåndtererTest {
     @BeforeEach
     public void before() {
         hendelseRepository = mock(HendelseRepository.class);
-        prosessTaskRepository = mock(ProsessTaskRepository.class);
+        prosessTaskTjeneste = mock(ProsessTaskTjeneste.class);
         ForsinkelseKonfig forsinkelseKonfig = mock(ForsinkelseKonfig.class);
         when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
         forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
 
-        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskRepository, forsinkelseTjeneste);
+        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskTjeneste, forsinkelseTjeneste);
     }
 
     @Test
@@ -70,7 +71,7 @@ public class PdlLeesahHendelseHåndtererTest {
         ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
@@ -84,7 +85,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_DØD_OPPRETTET);
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
@@ -108,7 +109,7 @@ public class PdlLeesahHendelseHåndtererTest {
         ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
@@ -121,7 +122,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_UTFLYTTING_OPPRETTET);
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
@@ -142,7 +143,7 @@ public class PdlLeesahHendelseHåndtererTest {
         ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
         ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        doReturn("").when(prosessTaskRepository).lagre(taskCaptor.capture());
+        doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
@@ -156,7 +157,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT);
 
         ProsessTaskData prosessTaskData = taskCaptor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo(VurderSorteringTask.TASKNAME);
+        assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(

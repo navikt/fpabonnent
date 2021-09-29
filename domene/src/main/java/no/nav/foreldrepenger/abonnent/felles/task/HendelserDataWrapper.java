@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.abonnent.felles.task;
 
-import java.sql.Clob;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Properties;
 
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class HendelserDataWrapper {
 
@@ -23,10 +23,10 @@ public class HendelserDataWrapper {
         return prosessTaskData;
     }
 
-    public HendelserDataWrapper nesteSteg(String stegnavn) {
-        ProsessTaskData nesteStegProsessTaskData = new ProsessTaskData(stegnavn);
+    public HendelserDataWrapper nesteSteg(TaskType steg) {
+        ProsessTaskData nesteStegProsessTaskData = ProsessTaskData.forTaskType(steg);
 
-        String taskSekvensnummer = getProsessTaskData().getSekvens();
+        String taskSekvensnummer = Optional.ofNullable(getProsessTaskData().getSekvens()).orElse("1");
         Long taskSekvens = Long.parseLong(taskSekvensnummer) + 1;
         nesteStegProsessTaskData.setSekvens(taskSekvens.toString());
         HendelserDataWrapper neste = new HendelserDataWrapper(nesteStegProsessTaskData);
@@ -36,7 +36,7 @@ public class HendelserDataWrapper {
 
     private void copyData(HendelserDataWrapper fra) {
         this.addProperties(fra.prosessTaskData.getProperties());
-        this.setPayload(fra.prosessTaskData.getPayload());
+        this.setPayload(fra.prosessTaskData.getPayloadAsString());
         this.getProsessTaskData().setGruppe(fra.getProsessTaskData().getGruppe());
     }
 
@@ -44,7 +44,7 @@ public class HendelserDataWrapper {
         prosessTaskData.getProperties().putAll(newProps);
     }
 
-    public void setPayload(Clob payload) {
+    public void setPayload(String payload) {
         prosessTaskData.setPayload(payload);
     }
 

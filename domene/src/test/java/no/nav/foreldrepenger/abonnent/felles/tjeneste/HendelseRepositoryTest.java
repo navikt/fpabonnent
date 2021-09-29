@@ -4,28 +4,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.TimeZone;
 
-import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.abonnent.extensions.CdiDbAwareTest;
+import no.nav.foreldrepenger.abonnent.extensions.FPabonnentEntityManagerAwareExtension;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
 
-@CdiDbAwareTest
+@ExtendWith(FPabonnentEntityManagerAwareExtension.class)
 public class HendelseRepositoryTest {
-    static {
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"));
-    }
+
     private static final String HENDELSE_ID = "1000";
 
-    @Inject
     private HendelseRepository hendelseRepository;
+
+    @BeforeEach
+    public void before(EntityManager em) {
+        hendelseRepository = new HendelseRepository(em);
+    }
 
     @Test
     public void skal_returnere_hendelse_som_er_sendt_til_sortering() {

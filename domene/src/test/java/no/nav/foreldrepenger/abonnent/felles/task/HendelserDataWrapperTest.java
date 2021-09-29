@@ -6,19 +6,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class HendelserDataWrapperTest {
 
-    private static final String PROSESSTASK_STEG1 = "prosesstask.steg1";
-    private static final String PROSESSTASK_STEG2 = "prosesstask.steg2";
+    private static final TaskType PROSESSTASK_STEG1 = new TaskType("prosesstask.steg1");
+    private static final TaskType PROSESSTASK_STEG2 = new TaskType("prosesstask.steg2");
 
     private ProsessTaskData eksisterendeData;
     private HendelserDataWrapper wrapper;
 
     @BeforeEach
     public void setup() {
-        eksisterendeData = new ProsessTaskData(PROSESSTASK_STEG1);
-        eksisterendeData.setSekvens("1");
+        eksisterendeData = ProsessTaskData.forTaskType(PROSESSTASK_STEG1);
         wrapper = new HendelserDataWrapper(eksisterendeData);
     }
 
@@ -40,7 +40,7 @@ public class HendelserDataWrapperTest {
 
         HendelserDataWrapper wrapperNesteSteg = wrapper.nesteSteg(PROSESSTASK_STEG2);
         assertThat(wrapperNesteSteg.getHendelseId()).as("Forventer at hendelseId blir med til neste steg.").isEqualTo(wrapper.getHendelseId());
-        assertThat(wrapperNesteSteg.getProsessTaskData().getPayload()).as("Forventer at payload også blir kopiert over").isNotNull();
+        assertThat(wrapperNesteSteg.getProsessTaskData().getPayloadAsString()).as("Forventer at payload også blir kopiert over").isNotNull();
     }
 
     @Test
