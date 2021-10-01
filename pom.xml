@@ -21,7 +21,7 @@
         <!-- default argLine for surefire-plugin -->
         <argLine>-Xms256m -Dlog.level.no.nav=WARN -Dfile.encoding=UTF-8</argLine>
 
-        <felles.version>4.0.8</felles.version>
+        <felles.version>4.0.9</felles.version>
         <prosesstask.version>3.0.3</prosesstask.version>
         <fp-kontrakter.version>6.0.4</fp-kontrakter.version>
 
