@@ -34,7 +34,7 @@
         <owaspencoder.version>1.2.3</owaspencoder.version>
         <jersey.version>2.34</jersey.version>
         <swagger.version>2.1.10</swagger.version>
-        <swagger-ui.version>3.52.1</swagger-ui.version>
+        <swagger-ui.version>3.52.3</swagger-ui.version>
         <kafka.version>3.0.0</kafka.version>
         <avro.version>1.10.2</avro.version>
         <confluent.version>6.2.1</confluent.version>
