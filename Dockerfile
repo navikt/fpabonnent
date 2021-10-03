@@ -1,4 +1,4 @@
-FROM navikt/java:16-appdynamics
+FROM navikt/java:17-appdynamics
 ENV APPD_ENABLED=false
 ENV APP_NAME=fpabonnent
 ENV APPDYNAMICS_CONTROLLER_HOST_NAME=appdynamics.adeo.no
