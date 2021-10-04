@@ -26,7 +26,7 @@ public class RekjørFeiledeTasksBatchTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        var rekjørAlleFeiledeTasks = prosessTaskTjeneste.flaggAlleFeileteProsessTasksForRestart();
-        log.info("Rekjører alle feilede tasks. {} tasks ble oppdatert.", rekjørAlleFeiledeTasks.size());
+        var rekjørAlleFeiledeTasks = prosessTaskTjeneste.restartAlleFeiledeTasks();
+        log.info("Rekjører alle feilede tasks. {} tasks ble oppdatert.", rekjørAlleFeiledeTasks);
     }
 }

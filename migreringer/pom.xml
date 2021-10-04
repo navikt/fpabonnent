@@ -13,14 +13,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.oracle.ojdbc</groupId>
             <artifactId>ojdbc8</artifactId>
-            <version>${ojdbc.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
@@ -72,29 +67,6 @@
         </pluginManagement>
 
         <plugins>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>${flyway.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.flywaydb</groupId>
-                        <artifactId>flyway-core</artifactId>
-                        <version>${flyway.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.oracle.ojdbc</groupId>
-                        <artifactId>ojdbc8</artifactId>
-                        <version>${ojdbc.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <driver>oracle.jdbc.driver.OracleDriver</driver>
-                    <encoding>ISO-8859-1</encoding>
-                    <initOnMigrate>true</initOnMigrate>
-                    <location>db/migration</location>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-remote-resources-plugin</artifactId>
