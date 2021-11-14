@@ -24,6 +24,7 @@ public final class Databaseskjemainitialisering {
 
     public static final DBProperties DEFAULT_DS_PROPERTIES = dbProperties("defaultDS", "fpabonnent");
     public static final String URL_DEFAULT = "jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp) (HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XE)))";
+    protected static final String SCHEMA_VERSION_TABLE = "schema_version";
 
     public static void main(String[] args) {
         migrer();
@@ -52,12 +53,13 @@ public final class Databaseskjemainitialisering {
 
     private static void migrer(DBProperties dbProperties) {
         LOG.info("Migrerer {}", dbProperties.schema());
-        var flyway = new Flyway();
-        flyway.setBaselineOnMigrate(true);
-        flyway.setDataSource(dbProperties.dataSource());
-        flyway.setTable("schema_version");
-        flyway.setLocations(dbProperties.scriptLocation());
-        flyway.setCleanOnValidationError(true);
+        var flyway = Flyway.configure()
+                .baselineOnMigrate(true)
+                .dataSource(dbProperties.dataSource())
+                .table(SCHEMA_VERSION_TABLE)
+                .locations(dbProperties.scriptLocation())
+                .cleanOnValidationError(true)
+                .load();
         if (!ENV.isLocal()) {
             throw new IllegalStateException("Forventer at denne migreringen bare kjøres lokalt");
         }
