@@ -36,7 +36,7 @@
         <swagger.version>2.1.11</swagger.version>
         <swagger-ui.version>3.52.3</swagger-ui.version>
         <kafka.version>3.0.0</kafka.version>
-        <avro.version>1.10.2</avro.version>
+        <avro.version>1.11.0</avro.version>
         <confluent.version>6.2.1</confluent.version>
         <metrics.version>4.2.4</metrics.version>
         <prometheus.version>0.12.0</prometheus.version>
