@@ -41,7 +41,7 @@
         <metrics.version>4.2.4</metrics.version>
         <prometheus.version>0.12.0</prometheus.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
-        <logstash.version>7.0</logstash.version>
+        <logstash.version>7.0.1</logstash.version>
         <mockito.version>4.0.0</mockito.version>
     </properties>
 
