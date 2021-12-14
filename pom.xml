@@ -39,7 +39,7 @@
         <avro.version>1.11.0</avro.version>
         <confluent.version>6.2.1</confluent.version>
         <metrics.version>4.2.4</metrics.version>
-        <prometheus.version>0.12.0</prometheus.version>
+        <prometheus.version>0.13.0</prometheus.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash.version>7.0.1</logstash.version>
         <mockito.version>4.1.0</mockito.version>
