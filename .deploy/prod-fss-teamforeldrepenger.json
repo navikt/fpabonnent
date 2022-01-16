@@ -14,13 +14,10 @@
 		"KAFKA_PDL_LEESAH_APPLICATION_ID": "fpabonnent-default-KC-aapen-person-pdl-leesah-v1",
 		"KAFKA_PDL_LEESAH_TOPIC": "aapen-person-pdl-leesah-v1",
 		"LOADBALANCER_URL": "https://fpabonnent.nais.adeo.no",
-		"OIDC_OPENAM_ISSUERURL": "https://isso.adeo.no:443/isso/oauth2",
-		"OIDC_OPENAM_JWKSURL": "https://isso.adeo.no:443/isso/oauth2/connect/jwk_uri",
-		"OIDC_STS_ISSUER_URL": "https://security-token-service.nais.adeo.no",
-		"OIDC_STS_JWKS_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts/jwks",
+		"OIDC_OPEN_AM_WELL_KNOWN_URL": "https://isso.adeo.no/isso/oauth2/.well-known/openid-configuration",
+		"OIDC_OPEN_AM_CLIENT_ID": "fpabonnent-p",
+		"OIDC_STS_WELL_KNOWN_URL": "http://security-token-service.default/.well-known/openid-configuration",
 		"OPENIDCONNECT_USERNAME": "fpabonnent-p",
-		"OPENIDCONNECT_ISSOHOST": "https://isso.adeo.no:443/isso/oauth2",
-		"SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
 		"FPSAKHENDELSER_V1_URL": "http://fpsak/fpsak/api/hendelser/",
 		"PDL_BASE_URL" : "http://pdl-api.pdl/graphql"
 	}

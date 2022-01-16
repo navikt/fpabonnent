@@ -17,13 +17,10 @@
       "KAFKA_PDL_LEESAH_APPLICATION_ID": "fpabonnent-q1-KC-aapen-person-pdl-leesah-v1",
       "KAFKA_PDL_LEESAH_TOPIC": "aapen-person-pdl-leesah-v1",
       "LOADBALANCER_URL": "https://fpabonnent-q1.nais.preprod.local",
-      "OIDC_OPENAM_JWKSURL": "https://isso-q.adeo.no:443/isso/oauth2/connect/jwk_uri",
-      "OIDC_OPENAM_ISSUERURL": "https://isso-q.adeo.no:443/isso/oauth2",
-      "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
-      "OIDC_STS_JWKS_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
+      "OIDC_OPEN_AM_WELL_KNOWN_URL": "https://isso-q.adeo.no:443/isso/oauth2/.well-known/openid-configuration",
+      "OIDC_OPEN_AM_CLIENT_ID": "fpabonnent-q1",
+      "OIDC_STS_WELL_KNOWN_URL": "http://security-token-service.default/.well-known/openid-configuration",
       "OPENIDCONNECT_USERNAME": "fpabonnent-q1",
-      "OPENIDCONNECT_ISSOHOST": "https://isso-q.adeo.no:443/isso/oauth2",
-      "PDL_BASE_URL" : "http://pdl-api.pdl/graphql",
-      "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/"
+      "PDL_BASE_URL" : "http://pdl-api.pdl/graphql"
     }
 }
