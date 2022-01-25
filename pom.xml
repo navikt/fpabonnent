@@ -42,7 +42,7 @@
         <prometheus.version>0.14.1</prometheus.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash.version>7.0.1</logstash.version>
-        <mockito.version>4.2.0</mockito.version>
+        <mockito.version>4.3.0</mockito.version>
     </properties>
 
     <dependencyManagement>
