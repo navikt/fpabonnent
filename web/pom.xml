@@ -149,18 +149,6 @@
 			<artifactId>weld-servlet-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.geronimo.components</groupId>
-			<artifactId>geronimo-jaspi</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-osgi-locator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.owasp.encoder</groupId>
-			<artifactId>encoder</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
 		</dependency>
