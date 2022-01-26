@@ -21,28 +21,25 @@
         <!-- default argLine for surefire-plugin -->
         <argLine>-Xms256m -Dlog.level.no.nav=WARN -Dfile.encoding=UTF-8</argLine>
 
-        <felles.version>4.1.12</felles.version>
+        <felles.version>4.1.16</felles.version>
         <prosesstask.version>3.1.6</prosesstask.version>
-        <fp-kontrakter.version>6.1.3</fp-kontrakter.version>
+        <fp-kontrakter.version>6.1.4</fp-kontrakter.version>
 
         <!-- Eksterne -->
-        <flyway.version>8.4.1</flyway.version>
+        <flyway.version>8.4.2</flyway.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <hikari.version>5.0.1</hikari.version>
-        <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
-        <geronimo.osgi.version>1.1</geronimo.osgi.version>
-        <owaspencoder.version>1.2.3</owaspencoder.version>
         <jersey.version>2.35</jersey.version>
         <swagger.version>2.1.12</swagger.version>
-        <swagger-ui.version>4.1.3</swagger-ui.version>
-        <kafka.version>3.0.0</kafka.version>
+        <swagger-ui.version>4.2.1</swagger-ui.version>
+        <kafka.version>3.1.0</kafka.version>
         <avro.version>1.11.0</avro.version>
         <confluent.version>6.2.2</confluent.version>
         <metrics.version>4.2.7</metrics.version>
         <prometheus.version>0.14.1</prometheus.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash.version>7.0.1</logstash.version>
-        <mockito.version>4.2.0</mockito.version>
+        <mockito.version>4.3.1</mockito.version>
     </properties>
 
     <dependencyManagement>
@@ -133,7 +130,7 @@
             <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>jakarta.el</artifactId>
-                <version>3.0.3</version>
+                <version>3.0.4</version>
             </dependency>
 
             <!-- Logging -->
@@ -171,24 +168,6 @@
                 <version>${jersey.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- Sikkerhet: Geronimo -->
-            <dependency>
-                <groupId>org.apache.geronimo.components</groupId>
-                <artifactId>geronimo-jaspi</artifactId>
-                <version>${geronimo.jaspi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-osgi-locator</artifactId>
-                <version>${geronimo.osgi.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.owasp.encoder</groupId>
-                <artifactId>encoder</artifactId>
-                <version>${owaspencoder.version}</version>
             </dependency>
 
             <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
