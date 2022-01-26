@@ -15,7 +15,7 @@
 
     <properties>
         <revision>4.0</revision>
-        <sha1></sha1>
+        <sha1/>
         <changelist>-SNAPSHOT</changelist>
         <java.version>17</java.version>
         <!-- default argLine for surefire-plugin -->
@@ -133,7 +133,7 @@
             <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>jakarta.el</artifactId>
-                <version>3.0.3</version>
+                <version>3.0.4</version>
             </dependency>
 
             <!-- Logging -->
@@ -452,7 +452,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
