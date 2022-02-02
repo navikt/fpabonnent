@@ -1,8 +1,6 @@
 {
-	"cluster": "prod",
-	"namespace": "teamforeldrepenger",
-	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
 	"oraclecredskv": "/oracle/data/prod/creds/fpabonnent_p-fpabonnent_p",
+	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
 	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",
 	"ingresses": [ "https://fpabonnent.nais.adeo.no" ],
 	"env": {

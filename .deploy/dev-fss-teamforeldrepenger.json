@@ -1,8 +1,6 @@
 {
-    "cluster": "preprod",
-    "namespace": "teamforeldrepenger",
-	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q1",
 	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_q1-fpabonnent_q1",
+	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q1",
 	"serviceuserkv": "/serviceuser/data/dev/srvfpabonnent",
 	"ingresses": [
         "https://fpabonnent-q1.nais.preprod.local/",

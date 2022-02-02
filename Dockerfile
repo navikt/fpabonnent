@@ -1,6 +1,6 @@
 FROM navikt/java:17-appdynamics
 ENV APPD_ENABLED=false
-ENV APP_NAME=fpabonnent
+ENV APPD_NAME=fpabonnent
 ENV APPDYNAMICS_CONTROLLER_HOST_NAME=appdynamics.adeo.no
 ENV APPDYNAMICS_CONTROLLER_PORT=443
 ENV APPDYNAMICS_CONTROLLER_SSL_ENABLED=true
@@ -9,7 +9,7 @@ RUN mkdir /app/lib
 RUN mkdir /app/conf
 
 # Config
-COPY web/target/classes/logback.xml /app/conf/
+COPY web/target/classes/logback*.xml /app/conf/
 
 # Application Container (Jetty)
 COPY web/target/app.jar /app/
