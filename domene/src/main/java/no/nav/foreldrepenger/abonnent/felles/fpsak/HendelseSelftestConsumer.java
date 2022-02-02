@@ -12,8 +12,6 @@ import no.nav.foreldrepenger.konfig.KonfigVerdi;
 @ApplicationScoped
 public class HendelseSelftestConsumer implements RestSelftestConsumer {
 
-    private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
-
     private OidcRestClient oidcRestClient;
     private URI endpointUrl;
 
@@ -22,7 +20,7 @@ public class HendelseSelftestConsumer implements RestSelftestConsumer {
     }
 
     @Inject
-    public HendelseSelftestConsumer(OidcRestClient oidcRestClient, @KonfigVerdi(HENDELSE_BASE_ENDPOINT) URI endpointUrl) {
+    public HendelseSelftestConsumer(OidcRestClient oidcRestClient, @KonfigVerdi("fpsakhendelser.v1.url") URI endpointUrl) {
         this.endpointUrl = endpointUrl.resolve("ping");
         this.oidcRestClient = oidcRestClient;
     }

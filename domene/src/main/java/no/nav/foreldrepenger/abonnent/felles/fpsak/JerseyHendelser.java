@@ -20,21 +20,18 @@ import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 @Dependent
 @Jersey
 public class JerseyHendelser extends AbstractJerseyOidcRestClient implements Hendelser {
-    private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
-    private static final String SEND_HENDELSE_PATH = "motta";
-    private static final String GROVSORTER_HENDELSE_PATH = "grovsorter";
 
     private final URI baseUri;
 
     @Inject
-    public JerseyHendelser(@KonfigVerdi(value = HENDELSE_BASE_ENDPOINT, defaultVerdi = "http://fpsak/fpsak/api/hendelser") URI baseUri) {
+    public JerseyHendelser(@KonfigVerdi(value = "fpsakhendelser.v1.url", defaultVerdi = "http://fpsak/fpsak/api/hendelser") URI baseUri) {
         this.baseUri = baseUri;
     }
 
     @Override
     public void sendHendelse(HendelsePayload h) {
         invoke(client.target(baseUri)
-                .path(SEND_HENDELSE_PATH)
+                .path("motta")
                 .request(APPLICATION_JSON_TYPE)
                 .buildPost(json(h.mapPayloadTilDto())));
     }
@@ -43,7 +40,7 @@ public class JerseyHendelser extends AbstractJerseyOidcRestClient implements Hen
     public List<String> grovsorterAktørIder(List<String> aktører) {
         if (!aktører.isEmpty()) {
             return invoke(client.target(baseUri)
-                    .path(GROVSORTER_HENDELSE_PATH)
+                    .path("grovsorter")
                     .request(APPLICATION_JSON_TYPE)
                     .buildPost(json(aktører.stream()
                             .map(AktørIdDto::new)

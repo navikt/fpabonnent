@@ -7,18 +7,6 @@
         "https://fpabonnent-q1.dev.adeo.no/"
 	],
 	"env": {
-      "ABAC_PDP_ENDPOINT_URL": "http://abac-foreldrepenger.teamabac/application/authorize",
-      "ABAC_ATTRIBUTT_DRIFT": "no.nav.abac.attributter.foreldrepenger.drift",
-      "FPSAKHENDELSER_V1_URL": "http://fpsak/fpsak/api/hendelser/",
-      "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
-      "KAFKA_SCHEMA_REGISTRY_URL": "https://kafka-schema-registry.nais.preprod.local",
-      "KAFKA_PDL_LEESAH_APPLICATION_ID": "fpabonnent-q1-KC-aapen-person-pdl-leesah-v1",
-      "KAFKA_PDL_LEESAH_TOPIC": "aapen-person-pdl-leesah-v1",
-      "LOADBALANCER_URL": "https://fpabonnent-q1.nais.preprod.local",
-      "OIDC_OPEN_AM_WELL_KNOWN_URL": "https://isso-q.adeo.no:443/isso/oauth2/.well-known/openid-configuration",
-      "OIDC_OPEN_AM_CLIENT_ID": "fpabonnent-q1",
-      "OIDC_STS_WELL_KNOWN_URL": "https://security-token-service.nais.preprod.local/.well-known/openid-configuration",
-      "OPENIDCONNECT_USERNAME": "fpabonnent-q1",
-      "PDL_BASE_URL" : "http://pdl-api.pdl/graphql"
+      "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD"
     }
 }
