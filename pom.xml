@@ -35,7 +35,7 @@
         <kafka.version>3.1.0</kafka.version>
         <avro.version>1.11.0</avro.version>
         <confluent.version>6.2.2</confluent.version>
-        <metrics.version>4.2.7</metrics.version>
+        <metrics.version>4.2.8</metrics.version>
         <prometheus.version>0.14.1</prometheus.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash.version>7.0.1</logstash.version>
