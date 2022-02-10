@@ -29,7 +29,7 @@
         <flyway.version>8.4.4</flyway.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <hikari.version>5.0.1</hikari.version>
-        <jersey.version>2.35</jersey.version>
+        <jersey.version>3.0.4</jersey.version>
         <swagger.version>2.1.13</swagger.version>
         <swagger-ui.version>4.5.0</swagger-ui.version>
         <kafka.version>3.1.0</kafka.version>
