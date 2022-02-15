@@ -19,7 +19,7 @@ public class VtpKafkaAvroDeserializer extends KafkaAvroDeserializer {
     private static SchemaRegistryClient getMockClient(final Schema schema$) {
         return new MockSchemaRegistryClient() {
             @Override
-            public synchronized AvroSchema getSchemaById(int id) {
+            public synchronized AvroSchema getSchemaBySubjectAndId(String subject, int id) {
                 return new AvroSchema(schema$);
             }
         };
