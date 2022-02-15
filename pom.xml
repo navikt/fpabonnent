@@ -26,7 +26,7 @@
         <fp-kontrakter.version>6.1.4</fp-kontrakter.version>
 
         <!-- Eksterne -->
-        <flyway.version>8.4.4</flyway.version>
+        <flyway.version>8.5.0</flyway.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <hikari.version>5.0.1</hikari.version>
         <jersey.version>2.35</jersey.version>
@@ -34,7 +34,7 @@
         <swagger-ui.version>4.5.0</swagger-ui.version>
         <kafka.version>3.1.0</kafka.version>
         <avro.version>1.11.0</avro.version>
-        <confluent.version>6.2.2</confluent.version>
+        <confluent.version>7.0.1</confluent.version>
         <metrics.version>4.2.8</metrics.version>
         <prometheus.version>0.15.0</prometheus.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
@@ -336,7 +336,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.9.0</version>
+                    <version>3.10.0</version>
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
@@ -363,11 +363,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.2.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

@@ -22,6 +22,11 @@ public class VtpKafkaAvroDeserializer extends KafkaAvroDeserializer {
             public synchronized AvroSchema getSchemaById(int id) {
                 return new AvroSchema(schema$);
             }
+
+            @Override
+            public synchronized AvroSchema getSchemaBySubjectAndId(String subject, int id) {
+                return new AvroSchema(schema$);
+            }
         };
     }
 }
