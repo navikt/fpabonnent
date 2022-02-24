@@ -26,7 +26,7 @@
         <fp-kontrakter.version>6.1.4</fp-kontrakter.version>
 
         <!-- Eksterne -->
-        <flyway.version>8.5.0</flyway.version>
+        <flyway.version>8.5.1</flyway.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <hikari.version>5.0.1</hikari.version>
         <jersey.version>2.35</jersey.version>
