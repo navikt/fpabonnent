@@ -78,7 +78,7 @@ public class PdlLeesahHendelseHåndtererTest {
 
         // Assert
         InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
-        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"DOEDSFALL_V1\"", "\"endringstype\":\"OPPRETTET\"", "\"hendelseType\":{\"kode\":\"PDL_DOED_OPPRETTET\"", "\"kodeverk\":\"HENDELSE_TYPE\"}");
+        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"DOEDSFALL_V1\"", "\"endringstype\":\"OPPRETTET\"", "\"hendelseType\":\"PDL_DOED_OPPRETTET\"");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
         assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
@@ -150,7 +150,7 @@ public class PdlLeesahHendelseHåndtererTest {
 
         // Assert
         InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
-        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"", "\"hendelseType\":{\"kode\":\"PDL_FOEDSEL_ANNULLERT\"", "\"kodeverk\":\"HENDELSE_TYPE\"}");
+        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"", "\"hendelseType\":\"PDL_FOEDSEL_ANNULLERT\"");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
         assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
