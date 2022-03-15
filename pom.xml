@@ -23,7 +23,7 @@
 
         <felles.version>4.1.17</felles.version>
         <prosesstask.version>3.1.7</prosesstask.version>
-        <fp-kontrakter.version>6.1.4</fp-kontrakter.version>
+        <fp-kontrakter.version>6.1.18</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <flyway.version>8.5.2</flyway.version>
