@@ -2,19 +2,13 @@ package no.nav.foreldrepenger.abonnent.felles.domene;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@JsonFormat(shape = Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HendelseKilde implements Kodeverdi {
 
     // Ligger igjen til evt databaseopprydding:
@@ -31,10 +25,9 @@ public enum HendelseKilde implements Kodeverdi {
     UDEFINERT("-"),
     ;
 
-    public static final String KODEVERK = "HENDELSE_KILDE";
-
     private static final Map<String, HendelseKilde> KODER = new LinkedHashMap<>();
 
+    @JsonValue
     private String kode;
 
     HendelseKilde() {
@@ -45,36 +38,10 @@ public enum HendelseKilde implements Kodeverdi {
         this.kode = kode;
     }
 
-    @JsonCreator
-    public static HendelseKilde fraKode(@JsonProperty("kode") String kode) {
-        if (kode == null) {
-            return null;
-        }
-        var ad = KODER.get(kode);
-        if (ad == null) {
-            throw new IllegalArgumentException("Ukjent Fagsystem: " + kode);
-        }
-        return ad;
-    }
-
-    public static HendelseKilde fraKodeDefaultUdefinert(@JsonProperty("kode") String kode) {
-        if (kode == null) {
-            return UDEFINERT;
-        }
-        return KODER.getOrDefault(kode, UDEFINERT);
-    }
-
     public static void main(String[] args) {
         System.out.println(KODER.keySet());
     }
 
-    @JsonProperty
-    @Override
-    public String getKodeverk() {
-        return KODEVERK;
-    }
-
-    @JsonProperty
     @Override
     public String getKode() {
         return kode;
@@ -98,6 +65,14 @@ public enum HendelseKilde implements Kodeverdi {
         @Override
         public HendelseKilde convertToEntityAttribute(String dbData) {
             return dbData == null ? null : fraKode(dbData);
+        }
+
+        private static HendelseKilde fraKode(String kode) {
+            if (kode == null) {
+                return null;
+            }
+            return Optional.ofNullable(KODER.get(kode))
+                .orElseThrow(() -> new IllegalArgumentException("Ukjent HendelseKilde: " + kode));
         }
     }
 }

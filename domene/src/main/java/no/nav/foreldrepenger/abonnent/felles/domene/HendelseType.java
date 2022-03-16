@@ -2,20 +2,14 @@ package no.nav.foreldrepenger.abonnent.felles.domene;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@JsonFormat(shape = Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HendelseType implements Kodeverdi {
 
     // Ikke lengre støttet, men beholdes så lenge det finnes data i tabeller:
@@ -66,10 +60,9 @@ public enum HendelseType implements Kodeverdi {
     UDEFINERT("-"),
     ;
 
-    public static final String KODEVERK = "HENDELSE_TYPE";
-
     private static final Map<String, HendelseType> KODER = new LinkedHashMap<>();
 
+    @JsonValue
     private String kode;
 
     HendelseType() {
@@ -80,36 +73,19 @@ public enum HendelseType implements Kodeverdi {
         this.kode = kode;
     }
 
-    @JsonCreator
-    public static HendelseType fraKode(@JsonProperty("kode") String kode) {
+    public static HendelseType fraKode(String kode) {
         if (kode == null) {
             return null;
         }
-        var ad = KODER.get(kode);
-        if (ad == null) {
-            throw new IllegalArgumentException("Ukjent Fagsystem: " + kode);
-        }
-        return ad;
+        return Optional.ofNullable(KODER.get(kode))
+            .orElseThrow(() -> new IllegalArgumentException("Ukjent Hendelsetype: " + kode));
     }
 
-    public static HendelseType fraKodeDefaultUdefinert(@JsonProperty("kode") String kode) {
-        if (kode == null) {
-            return UDEFINERT;
-        }
-        return KODER.getOrDefault(kode, UDEFINERT);
-    }
 
     public static void main(String[] args) {
         System.out.println(KODER.keySet());
     }
 
-    @JsonProperty
-    @Override
-    public String getKodeverk() {
-        return KODEVERK;
-    }
-
-    @JsonProperty
     @Override
     public String getKode() {
         return kode;
