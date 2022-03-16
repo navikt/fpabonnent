@@ -8,6 +8,8 @@ import java.util.Set;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum HendelseType implements Kodeverdi {
@@ -73,11 +75,13 @@ public enum HendelseType implements Kodeverdi {
         this.kode = kode;
     }
 
-    public static HendelseType fraKode(String kode) {
-        if (kode == null) {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static HendelseType fraKode(@JsonProperty(value = "kode") Object node) {
+        if (node == null) {
             return null;
         }
-        return Optional.ofNullable(KODER.get(kode))
+        var kode = TempAvledeKode.getVerdi(HendelseType.class, node, "kode");
+        return Optional.ofNullable(kode).map(KODER::get)
             .orElseThrow(() -> new IllegalArgumentException("Ukjent Hendelsetype: " + kode));
     }
 
