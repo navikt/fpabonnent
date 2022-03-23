@@ -31,7 +31,7 @@
         <hikari.version>5.0.1</hikari.version>
         <jersey.version>2.35</jersey.version>
         <swagger.version>2.1.13</swagger.version>
-        <swagger-ui.version>4.5.2</swagger-ui.version>
+        <swagger-ui.version>4.8.0</swagger-ui.version>
         <kafka.version>3.1.0</kafka.version>
         <avro.version>1.11.0</avro.version>
         <confluent.version>7.0.1</confluent.version>
