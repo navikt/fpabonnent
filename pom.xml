@@ -15,7 +15,7 @@
 
     <properties>
         <revision>4.0</revision>
-        <sha1></sha1>
+        <sha1/>
         <changelist>-SNAPSHOT</changelist>
         <java.version>17</java.version>
         <!-- default argLine for surefire-plugin -->
@@ -38,7 +38,7 @@
         <metrics.version>4.2.9</metrics.version>
         <prometheus.version>0.15.0</prometheus.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
-        <logstash.version>7.0.1</logstash.version>
+        <logstash.version>7.1</logstash.version>
         <mockito.version>4.4.0</mockito.version>
     </properties>
 
@@ -427,7 +427,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
