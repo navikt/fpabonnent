@@ -1,4 +1,5 @@
 {
+	"environment": "dev",
 	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_q1-fpabonnent_q1",
 	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q1",
 	"serviceuserkv": "/serviceuser/data/dev/srvfpabonnent",

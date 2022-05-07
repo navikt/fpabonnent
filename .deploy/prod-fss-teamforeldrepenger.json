@@ -1,4 +1,5 @@
 {
+	"environment": "prod",
 	"oraclecredskv": "/oracle/data/prod/creds/fpabonnent_p-fpabonnent_p",
 	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
 	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",

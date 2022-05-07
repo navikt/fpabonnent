@@ -3,7 +3,7 @@
 
     <groupId>no.nav.foreldrepenger.abonnent</groupId>
     <artifactId>fpabonnent</artifactId>
-    <version>${revision}${sha1}${changelist}</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>fpabonnent :: Root</name>
 
@@ -14,9 +14,7 @@
     </modules>
 
     <properties>
-        <revision>4.0</revision>
-        <sha1></sha1>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>4.0-SNAPSHOT</revision>
         <java.version>17</java.version>
         <!-- default argLine for surefire-plugin -->
         <argLine>-Xms256m -Dlog.level.no.nav=WARN -Dfile.encoding=UTF-8</argLine>
@@ -407,37 +405,6 @@
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.7</version>
                 </plugin>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.codehaus.mojo
-                                        </groupId>
-                                        <artifactId>
-                                            flatten-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [1.0.0,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>flatten</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -450,13 +417,6 @@
 					<flattenedPomFilename>.flattened</flattenedPomFilename>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
                     <execution>
                         <id>flatten.clean</id>
                         <phase>clean</phase>

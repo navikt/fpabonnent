@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>no.nav.foreldrepenger.abonnent</groupId>
 		<artifactId>fpabonnent</artifactId>
-		<version>${revision}${sha1}${changelist}</version>
+		<version>${revision}</version>
 	</parent>
 
 	<groupId>no.nav.foreldrepenger.abonnent.web</groupId>
@@ -239,42 +239,11 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
 							<mainClass>no.nav.foreldrepenger.abonnent.web.server.JettyServer</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>buildnumber-maven-plugin</artifactId>
-										<versionRange>[1.4,)</versionRange>
-										<goals>
-											<goal>create-metadata</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 </project>
