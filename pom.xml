@@ -19,25 +19,25 @@
         <!-- default argLine for surefire-plugin -->
         <argLine>-Xms256m -Dlog.level.no.nav=WARN -Dfile.encoding=UTF-8</argLine>
 
-        <felles.version>4.1.16</felles.version>
-        <prosesstask.version>3.1.6</prosesstask.version>
-        <fp-kontrakter.version>6.1.4</fp-kontrakter.version>
+        <felles.version>4.1.20</felles.version>
+        <prosesstask.version>3.1.7</prosesstask.version>
+        <fp-kontrakter.version>6.1.19</fp-kontrakter.version>
 
         <!-- Eksterne -->
-        <flyway.version>8.4.4</flyway.version>
+        <flyway.version>8.5.4</flyway.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <hikari.version>5.0.1</hikari.version>
         <jersey.version>2.35</jersey.version>
-        <swagger.version>2.1.12</swagger.version>
-        <swagger-ui.version>4.4.1</swagger-ui.version>
+        <swagger.version>2.1.13</swagger.version>
+        <swagger-ui.version>4.5.2</swagger-ui.version>
         <kafka.version>3.1.0</kafka.version>
         <avro.version>1.11.0</avro.version>
-        <confluent.version>6.2.2</confluent.version>
-        <metrics.version>4.2.7</metrics.version>
-        <prometheus.version>0.14.1</prometheus.version>
+        <confluent.version>7.0.1</confluent.version>
+        <metrics.version>4.2.9</metrics.version>
+        <prometheus.version>0.15.0</prometheus.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash.version>7.0.1</logstash.version>
-        <mockito.version>4.3.1</mockito.version>
+        <mockito.version>4.4.0</mockito.version>
     </properties>
 
     <dependencyManagement>
@@ -45,7 +45,7 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-bom</artifactId>
-                <version>10.0.7</version>
+                <version>10.0.8</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -168,13 +168,14 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
             <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>9.2</version>
+                <!-- for Bean validation -->
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>6.2.2.Final</version>
             </dependency>
+
+            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
             <dependency>
                 <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
                 <groupId>com.fasterxml</groupId>
@@ -334,7 +335,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.9.0</version>
+                    <version>3.10.1</version>
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
@@ -361,11 +362,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.2.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
