@@ -7,36 +7,36 @@ metadata:
     team: teamforeldrepenger
 spec:
   image: {{image}}
-  port: 8080 
+  port: 8080
   team: teamforeldrepenger
-  liveness: 
+  liveness:
     path: /fpabonnent/internal/health/isAlive
     initialDelay: 30
     timeout: 5
-    periodSeconds: 10  
-    failureThreshold: 27 
-  readiness: 
+    periodSeconds: 10
+    failureThreshold: 27
+  readiness:
     path: /fpabonnent/internal/health/isReady
     initialDelay: 30
     timeout: 5
     periodSeconds: 10
     failureThreshold: 27
-  replicas: 
-    min: 2 
-    max: 2 
-    cpuThresholdPercentage: 80 
-  preStopHookPath: /fpabonnent/internal/health/preStop 
-  prometheus: 
-    enabled: true 
-    path: /fpabonnent/internal/metrics/prometheus 
-  resources: 
+  replicas:
+    min: 2
+    max: 2
+    cpuThresholdPercentage: 80
+  preStopHookPath: /fpabonnent/internal/health/preStop
+  prometheus:
+    enabled: true
+    path: /fpabonnent/internal/metrics/prometheus
+  resources:
     limits:
-      cpu: "2000m" 
-      memory: "2048Mi"  
-    requests: 
+      cpu: "2000m"
+      memory: "2048Mi"
+    requests:
       cpu: "600m"
       memory: "1024Mi"
-  ingresses: 
+  ingresses:
 {{#each ingresses as |url|}}
     - {{url}}
 {{/each}}
@@ -44,13 +44,13 @@ spec:
     enabled: true
     paths:
     - kvPath: {{oraclecredskv}}
-      mountPath: /secrets/oracle/
+      mountPath: /var/run/secrets/nais.io/defaultDS
     - kvPath: {{oracleconfigkv}}
-      mountPath: /config/oracle
+      mountPath: /var/run/secrets/nais.io/defaultDSconfig
     - kvPath: {{serviceuserkv}}
-      mountPath: /secrets/serviceuser/
-    - kvPath: /kv/{{cluster}}/fss/fpabonnent/{{namespace}}
-      mountPath: /var/run/secrets/nais.io/vault
+      mountPath: /var/run/secrets/nais.io/serviceuser/
+    - kvPath: /apikey/appdynamics/{{environment}}
+      mountPath: /var/run/secrets/nais.io/appdynamics
   env:
 {{#each env}}
    - name: {{@key}}

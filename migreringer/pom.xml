@@ -4,7 +4,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.abonnent</groupId>
         <artifactId>fpabonnent</artifactId>
-        <version>${revision}${sha1}${changelist}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>migreringer</artifactId>

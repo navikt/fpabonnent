@@ -20,13 +20,8 @@ import no.nav.foreldrepenger.konfig.KonfigVerdi;
 @ApplicationScoped
 public class HendelseConsumer implements Hendelser {
     private static final Logger LOG = LoggerFactory.getLogger(HendelseConsumer.class);
-    private static final String HENDELSE_BASE_ENDPOINT = "fpsakhendelser.v1.url";
-    // URI append paths
-    private static final String SEND_HENDELSE_PATH = "motta";
-    private static final String GROVSORTER_HENDELSE_PATH = "grovsorter";
 
     private OidcRestClient oidcRestClient;
-    private URI baseEndpoint;
     private URI sendHendelseEndpoint;
     private URI grovsorterEndpoint;
 
@@ -35,16 +30,15 @@ public class HendelseConsumer implements Hendelser {
     }
 
     @Inject
-    public HendelseConsumer(OidcRestClient oidcRestClient, @KonfigVerdi(HENDELSE_BASE_ENDPOINT) URI baseEndpoint) {
+    public HendelseConsumer(OidcRestClient oidcRestClient, @KonfigVerdi("fpsakhendelser.v1.url") URI baseEndpoint) {
         this.oidcRestClient = oidcRestClient;
-        this.baseEndpoint = baseEndpoint;
-        sendHendelseEndpoint = this.baseEndpoint.resolve(SEND_HENDELSE_PATH);
-        grovsorterEndpoint = this.baseEndpoint.resolve(GROVSORTER_HENDELSE_PATH);
+        sendHendelseEndpoint = baseEndpoint.resolve("motta");
+        grovsorterEndpoint = baseEndpoint.resolve("grovsorter");
     }
 
     @Override
     public void sendHendelse(HendelsePayload hendelsePayload) {
-        Objects.requireNonNull(hendelsePayload, SEND_HENDELSE_PATH);
+        Objects.requireNonNull(hendelsePayload, "hendelsePayload");
         HendelseWrapperDto hendelseWrapperDto = hendelsePayload.mapPayloadTilDto();
         LOG.info("Sender hendelse");
         oidcRestClient.post(sendHendelseEndpoint, hendelseWrapperDto);

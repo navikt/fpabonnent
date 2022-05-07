@@ -1,24 +1,10 @@
 {
-	"cluster": "prod",
-	"namespace": "teamforeldrepenger",
-	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
+	"environment": "prod",
 	"oraclecredskv": "/oracle/data/prod/creds/fpabonnent_p-fpabonnent_p",
+	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
 	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",
 	"ingresses": [ "https://fpabonnent.nais.adeo.no" ],
 	"env": {
-		"ABAC_PDP_ENDPOINT_URL": "http://abac-foreldrepenger.teamabac/application/authorize",
-		"ABAC_ATTRIBUTT_DRIFT": "no.nav.abac.attributter.foreldrepenger.drift",
-		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
-		"KAFKA_BOOTSTRAP_SERVERS": "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
-		"KAFKA_SCHEMA_REGISTRY_URL": "http://kafka-schema-registry.tpa:8081",
-		"KAFKA_PDL_LEESAH_APPLICATION_ID": "fpabonnent-default-KC-aapen-person-pdl-leesah-v1",
-		"KAFKA_PDL_LEESAH_TOPIC": "aapen-person-pdl-leesah-v1",
-		"LOADBALANCER_URL": "https://fpabonnent.nais.adeo.no",
-		"OIDC_OPEN_AM_WELL_KNOWN_URL": "https://isso.adeo.no/isso/oauth2/.well-known/openid-configuration",
-		"OIDC_OPEN_AM_CLIENT_ID": "fpabonnent-p",
-		"OIDC_STS_WELL_KNOWN_URL": "https://security-token-service.nais.adeo.no/.well-known/openid-configuration",
-		"OPENIDCONNECT_USERNAME": "fpabonnent-p",
-		"FPSAKHENDELSER_V1_URL": "http://fpsak/fpsak/api/hendelser/",
-		"PDL_BASE_URL" : "http://pdl-api.pdl/graphql"
+		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD"
 	}
 }
