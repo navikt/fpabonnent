@@ -15,7 +15,7 @@ import no.nav.vedtak.felles.testutilities.cdi.CdiAwareExtension;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @ExtendWith(CdiAwareExtension.class)
-@ExtendWith(FPabonnentEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 @ExtendWith(MockitoExtension.class)
 public @interface CdiDbAwareTest {
 

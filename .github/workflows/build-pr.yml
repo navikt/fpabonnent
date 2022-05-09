@@ -14,8 +14,29 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
 
+    services:
+      oracle:
+        image: gvenzl/oracle-xe:18-slim
+
+        # Provide passwords and other environment variables to container
+        env:
+          ORACLE_RANDOM_PASSWORD: true
+          APP_USER: fpabonnent_unit
+          APP_USER_PASSWORD: fpabonnent_unit
+
+        # Forward Oracle port
+        ports:
+          - 1521:1521
+
+        # Provide healthcheck script options for startup
+        options: >-
+          --health-cmd healthcheck.sh
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
       - uses: actions/checkout@v3
 
       - name: Setup maven

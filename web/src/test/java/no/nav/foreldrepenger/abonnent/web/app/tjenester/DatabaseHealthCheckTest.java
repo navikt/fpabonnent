@@ -10,7 +10,7 @@ public class DatabaseHealthCheckTest {
 
     @Test
     public void test_check_healthy() {
-        Databaseskjemainitialisering.settJdniOppslag();
+        Databaseskjemainitialisering.initUnitTestDataSource();
         DatabaseHealthCheck dbCheck = new DatabaseHealthCheck();
 
         assertThat(dbCheck.isReady()).isTrue();

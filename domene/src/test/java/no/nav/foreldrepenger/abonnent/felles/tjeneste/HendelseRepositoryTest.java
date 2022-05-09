@@ -11,14 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.abonnent.extensions.FPabonnentEntityManagerAwareExtension;
+import no.nav.foreldrepenger.abonnent.extensions.JpaExtension;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
 
-@ExtendWith(FPabonnentEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class HendelseRepositoryTest {
 
     private static final String HENDELSE_ID = "1000";

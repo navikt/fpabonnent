@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.abonnent.web.server;
+package no.nav.foreldrepenger.abonnent.web.server.abac;
 
 import javax.enterprise.context.Dependent;
 
