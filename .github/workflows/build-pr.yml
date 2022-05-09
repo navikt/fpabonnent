@@ -21,8 +21,8 @@ jobs:
 
         # Provide passwords and other environment variables to container
         env:
-          ORACLE_RANDOM_PASSWORD: true
-          ORACLE_DATABASE: XE
+          ORACLE_RANDOM_PASSWORD=true
+          ORACLE_DATABASE=XEPDB2
           APP_USER: fpabonnent_unit
           APP_USER_PASSWORD: fpabonnent_unit
 
