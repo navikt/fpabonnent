@@ -85,7 +85,7 @@ public final class Databaseskjemainitialisering {
     private static HikariDataSource createDs(String user) {
         Objects.requireNonNull(user, "user");
         var cfg = new HikariConfig();
-        cfg.setJdbcUrl("jdbc:oracle:thin:@localhost:1521:XEPDB1");
+        cfg.setJdbcUrl("jdbc:oracle:thin:@localhost:1521:XE");
         cfg.setUsername(user);
         cfg.setPassword(user);
         cfg.setConnectionTimeout(1500);
