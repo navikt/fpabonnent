@@ -17,7 +17,7 @@ jobs:
 
     services:
       oracle:
-        image: gvenzl/oracle-xe:latest
+        image: gvenzl/oracle-xe:18-full
 
         # Provide passwords and other environment variables to container
         env:
