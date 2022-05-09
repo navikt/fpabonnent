@@ -7,18 +7,6 @@ on:
 jobs:
   snyk:
     runs-on: ubuntu-latest
-
-    services:
-      oracle:
-        image: gvenzl/oracle-xe:18.4.0-slim
-        env:
-          ORACLE_RANDOM_PASSWORD: true
-          APP_USER: fpabonnent_unit
-          APP_USER_PASSWORD: fpabonnent_unit
-        ports:
-          - 1521:1521
-        options: --health-cmd healthcheck.sh --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
