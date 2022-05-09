@@ -60,6 +60,13 @@ jobs:
           DATABASE_PORT: ${{ job.services.oracle.ports[1521] }}
           DATABASE_SERVICE: XEPDB1
 
+      - name: Login to GitHub Packages Docker Registry
+        uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7 # Use commit-sha1 instead of tag for security concerns
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Bygg, tag og push Docker image
         run: |
           docker build --pull --tag ${IMAGE_BASE}:${BUILD_VERSION} --tag ${IMAGE_BASE}:latest .
