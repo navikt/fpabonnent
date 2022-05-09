@@ -29,17 +29,13 @@ public class RestApiTester {
     }
 
     static Collection<Class<?>> finnAlleRestTjenester() {
-        List<Class<?>> klasser = new ArrayList<>();
-
-        klasser.addAll(finnAlleRestTjenester(new ApplicationConfig()));
-
-        return klasser;
+        return new ArrayList<>(finnAlleRestTjenester(new ApplicationConfig()));
     }
 
     static Collection<Class<?>> finnAlleRestTjenester(Application config) {
         return config.getClasses().stream()
             .filter(c -> c.getAnnotation(Path.class) != null)
             .filter(c -> !UNNTATT.contains(c))
-            .collect(Collectors.toList());
+            .toList();
     }
 }

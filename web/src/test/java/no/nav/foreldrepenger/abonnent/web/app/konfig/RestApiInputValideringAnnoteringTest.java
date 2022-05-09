@@ -18,7 +18,7 @@ import no.nav.vedtak.isso.config.ServerInfo;
 public class RestApiInputValideringAnnoteringTest extends RestApiTester {
     private static String PREV_LB_URL;
 
-    private Function<Method, String> printKlasseOgMetodeNavn = (method -> String.format("%s.%s", method.getDeclaringClass(), method.getName()));
+    private final Function<Method, String> printKlasseOgMetodeNavn = (method -> String.format("%s.%s", method.getDeclaringClass(), method.getName()));
 
     /**
      * IKKE ignorer eller fjern denne testen, den sørger for at inputvalidering er i orden for REST-grensesnittene

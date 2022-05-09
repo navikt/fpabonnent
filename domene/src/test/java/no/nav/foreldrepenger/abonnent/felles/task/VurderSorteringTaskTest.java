@@ -23,7 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.foreldrepenger.abonnent.extensions.FPabonnentEntityManagerAwareExtension;
+import no.nav.foreldrepenger.abonnent.extensions.JpaExtension;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
@@ -48,7 +48,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ExtendWith(MockitoExtension.class)
-@ExtendWith(FPabonnentEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class VurderSorteringTaskTest {
 
     private static final String FNR_BARN = new FiktiveFnr().nesteBarnFnr();

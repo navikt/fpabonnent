@@ -24,7 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.foreldrepenger.abonnent.extensions.FPabonnentEntityManagerAwareExtension;
+import no.nav.foreldrepenger.abonnent.extensions.JpaExtension;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
@@ -43,7 +43,7 @@ import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.testutilities.cdi.UnitTestLookupInstanceImpl;
 
 @ExtendWith(MockitoExtension.class)
-@ExtendWith(FPabonnentEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class SorterHendelseTaskTest {
 
     private static final LocalDate FØDSELSDATO = LocalDate.of(2018, 1, 25);
