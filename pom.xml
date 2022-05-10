@@ -22,13 +22,15 @@
     <properties>
         <revision>4.0-SNAPSHOT</revision>
         <java.version>17</java.version>
-        <!-- default argLine for surefire-plugin -->
+
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+        <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
+
         <felles.version>4.1.25</felles.version>
         <prosesstask.version>3.1.7</prosesstask.version>
         <fp-kontrakter.version>6.1.19</fp-kontrakter.version>
 
         <!-- Eksterne -->
-
         <avro.version>1.11.0</avro.version>
         <confluent.version>7.0.1</confluent.version>
     </properties>

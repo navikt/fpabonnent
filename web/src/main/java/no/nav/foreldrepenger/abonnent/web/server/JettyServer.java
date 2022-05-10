@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import no.nav.foreldrepenger.abonnent.web.app.konfig.ApplicationConfig;
-import no.nav.foreldrepenger.abonnent.web.server.abac.db.DataSourceUtil;
+import no.nav.foreldrepenger.abonnent.web.server.abac.db.DatasourceUtil;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.vedtak.isso.IssoApplication;
 import no.nav.vedtak.sikkerhet.ContextPathHolder;
@@ -83,8 +83,8 @@ public class JettyServer {
 
     protected void bootStrap() throws Exception {
         konfigurerSikkerhet();
-        var dataSource = DataSourceUtil.createDataSource(30);
-        konfigurerDataSource(dataSource);
+        var dataSource = DatasourceUtil.createDatasource(30);
+        konfigurerDatasource(dataSource);
         migrerDatabase(dataSource);
         start();
     }
@@ -120,7 +120,7 @@ public class JettyServer {
         System.setProperty(trustStorePasswordProp, password);
     }
 
-    private static void konfigurerDataSource(DataSource dataSource) throws NamingException {
+    private static void konfigurerDatasource(DataSource dataSource) throws NamingException {
         new EnvEntry("jdbc/defaultDS", dataSource);
     }
 

@@ -49,8 +49,9 @@ jobs:
       - name: Build
         run: |
           echo "Building $BUILD_VERSION"
-          mvn package -q -B -s settings.xml -Drevision=${BUILD_VERSION}
+          mvn jacoco:prepare-agent verify jacoco:report sonar:sonar -q -B -s settings.xml -Drevision=${BUILD_VERSION}
         env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           DATABASE_HOST: localhost
           DATABASE_PORT: ${{ job.services.oracle.ports[1521] }}
           DATABASE_SERVICE: XEPDB1
