@@ -2,8 +2,6 @@ package no.nav.foreldrepenger.abonnent.dbstøtte;
 
 import static java.lang.Runtime.getRuntime;
 
-import java.io.File;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.naming.NamingException;
@@ -12,8 +10,6 @@ import javax.sql.DataSource;
 import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -29,8 +25,7 @@ public final class Databaseskjemainitialisering {
     private static final Environment ENV = Environment.current();
     public static final String USER = "fpabonnent_unit";
     private static final String DB_SCRIPT_LOCATION = "/db/migration/";
-
-    private static final DataSource DS = settJdniOppslag(USER);
+    private static final DataSource DS = settJdniOppslag();
     private static final String SCHEMA = "defaultDS";
 
     public static void main(String[] args) {
@@ -42,15 +37,14 @@ public final class Databaseskjemainitialisering {
         if (DS != null) {
             return DS;
         }
-        settJdniOppslag(USER);
+        settJdniOppslag();
         return DS;
     }
 
-    @SuppressWarnings("resource")
     public static void migrerUnittestSkjemaer() {
         if (GUARD_UNIT_TEST_SKJEMAER.compareAndSet(false, true)) {
             var flyway = Flyway.configure()
-                    .dataSource(createDs(USER))
+                    .dataSource(createDs())
                     .locations(DB_SCRIPT_LOCATION + SCHEMA)
                     .table("schema_version")
                     .baselineOnMigrate(true)
@@ -72,8 +66,8 @@ public final class Databaseskjemainitialisering {
         }
     }
 
-    private static synchronized DataSource settJdniOppslag(String user) {
-        var ds = createDs(user);
+    private static synchronized DataSource settJdniOppslag() {
+        var ds = createDs();
         try {
             new EnvEntry("jdbc/defaultDS", ds); // NOSONAR
             return ds;
@@ -82,12 +76,11 @@ public final class Databaseskjemainitialisering {
         }
     }
 
-    private static HikariDataSource createDs(String user) {
-        Objects.requireNonNull(user, "user");
+    private static HikariDataSource createDs() {
         var cfg = new HikariConfig();
         cfg.setJdbcUrl(buildJdbcUrl());
-        cfg.setUsername(ENV.getProperty("database.user", user));
-        cfg.setPassword(ENV.getProperty("database.password", user));
+        cfg.setUsername(ENV.getProperty("database.user", USER));
+        cfg.setPassword(ENV.getProperty("database.password", USER));
         cfg.setConnectionTimeout(1500);
         cfg.setValidationTimeout(120L * 1000L);
         cfg.setMaximumPoolSize(4);

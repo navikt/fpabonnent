@@ -53,9 +53,10 @@ jobs:
       - name: Build artifacts & deploy
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          mvn verify -q -e -B -s settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
+          mvn jacoco:prepare-agent verify jacoco:report sonar:sonar -q -e -B -s settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
           echo "Build artifacts"
         env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           DATABASE_HOST: localhost
           DATABASE_PORT: ${{ job.services.oracle.ports[1521] }}
           DATABASE_SERVICE: XEPDB1
