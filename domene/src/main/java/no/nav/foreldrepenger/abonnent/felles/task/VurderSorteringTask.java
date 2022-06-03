@@ -128,6 +128,6 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     }
 
     private HendelseTjeneste<HendelsePayload> getHendelseTjeneste(HendelserDataWrapper dataWrapper, String hendelseType) {
-        return hendelseTjenesteProvider.finnTjeneste(HendelseType.fraKode(hendelseType), dataWrapper.getHendelseId().orElse(null));
+        return hendelseTjenesteProvider.finnTjeneste(HendelseType.finnFraKode(hendelseType, "vurdersorter"), dataWrapper.getHendelseId().orElse(null));
     }
 }

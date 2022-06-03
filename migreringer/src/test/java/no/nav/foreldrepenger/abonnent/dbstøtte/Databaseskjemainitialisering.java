@@ -93,7 +93,7 @@ public final class Databaseskjemainitialisering {
     private static String buildJdbcUrl() {
         return String.format("jdbc:oracle:thin:@//%s:%s/%s",
                 ENV.getProperty("database.host", "localhost"),
-                ENV.getProperty("database.post", "1521"),
-                ENV.getProperty("database.service", "XE"));
+                ENV.getProperty("database.post", "1522"),
+                ENV.getProperty("database.service", "XEPDB1"));
     }
 }

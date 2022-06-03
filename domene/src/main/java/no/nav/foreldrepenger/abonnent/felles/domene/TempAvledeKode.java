@@ -26,7 +26,7 @@ public class TempAvledeKode {
     private static final Logger LOG = LoggerFactory.getLogger(TempAvledeKode.class);
 
     @SuppressWarnings("rawtypes")
-    public static String getVerdi(Class<? extends Enum> enumCls, Object node, String key) {
+    public static String getVerdi(Class<? extends Enum> enumCls, Object node, String key, String kallCtx) {
         String kode;
         if (node instanceof String) {
             kode = (String) node;
@@ -52,7 +52,7 @@ public class TempAvledeKode {
             } catch (Exception e) {
                 LOG.info("KODEVERK-OBJEKT: tempavledekode kalt uten at det finnes kodeverk - kode {}", kode);
             }
-            LOG.info("KODEVERK-OBJEKT: mottok kodeverdiobjekt som ikke var String - kode {} fra kodeverk {} ", kode, kodeverk);
+            LOG.info("KODEVERK-OBJEKT: mottok kodeverdiobjekt som ikke var String - kode {} fra kodeverk {} kontekst {}", kode, kodeverk, kallCtx);
         }
         return kode;
     }
