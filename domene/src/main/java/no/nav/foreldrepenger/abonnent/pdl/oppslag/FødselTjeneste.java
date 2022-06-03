@@ -16,7 +16,6 @@ import no.nav.pdl.ForelderBarnRelasjonResponseProjection;
 import no.nav.pdl.ForelderBarnRelasjonRolle;
 import no.nav.pdl.HentPersonQueryRequest;
 import no.nav.pdl.PersonResponseProjection;
-import no.nav.pdl.RelatertBiPersonResponseProjection;
 import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
 import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 
@@ -40,15 +39,14 @@ public class FødselTjeneste {
         var request = new HentPersonQueryRequest();
         request.setIdent(barn.getIdent());
         var projection = new PersonResponseProjection()
-                .forelderBarnRelasjon(new ForelderBarnRelasjonResponseProjection().relatertPersonsIdent().relatertPersonsRolle()
-                    .relatertPersonUtenFolkeregisteridentifikator(new RelatertBiPersonResponseProjection().kjoenn().foedselsdato()));
+                .forelderBarnRelasjon(new ForelderBarnRelasjonResponseProjection().relatertPersonsIdent().relatertPersonsRolle());
 
         var person = pdlKlient.hentPerson(request, projection);
 
         var foreldreUtenIdent = person.getForelderBarnRelasjon().stream()
             .filter(f -> !ForelderBarnRelasjonRolle.BARN.equals(f.getRelatertPersonsRolle()))
             .filter(f -> f.getRelatertPersonsIdent() == null)
-            .map(ForelderBarnRelasjon::getRelatertPersonUtenFolkeregisteridentifikator)
+            .map(ForelderBarnRelasjon::getRelatertPersonsRolle)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
