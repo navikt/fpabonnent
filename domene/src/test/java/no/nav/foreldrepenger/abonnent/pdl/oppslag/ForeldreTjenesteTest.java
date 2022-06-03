@@ -38,9 +38,9 @@ public class ForeldreTjenesteTest {
         // Arrange
         Person person = new Person();
         ForelderBarnRelasjon familierelasjonMor = new ForelderBarnRelasjon(MOR_FNR.getIdent(), ForelderBarnRelasjonRolle.MOR,
-                ForelderBarnRelasjonRolle.BARN, null, null);
+                ForelderBarnRelasjonRolle.BARN, null, null, null);
         ForelderBarnRelasjon familierelasjonFar = new ForelderBarnRelasjon(FAR_FNR.getIdent(), ForelderBarnRelasjonRolle.FAR,
-                ForelderBarnRelasjonRolle.BARN, null, null);
+                ForelderBarnRelasjonRolle.BARN, null, null,null);
         person.setForelderBarnRelasjon(List.of(familierelasjonMor, familierelasjonFar));
         when(pdlMock.hentPerson(any(), any())).thenReturn(person);
 

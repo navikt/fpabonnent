@@ -4,7 +4,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.2.7</version>
+        <version>0.3.0</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.abonnent</groupId>
@@ -26,9 +26,9 @@
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>4.1.25</felles.version>
-        <prosesstask.version>3.1.7</prosesstask.version>
-        <fp-kontrakter.version>6.1.19</fp-kontrakter.version>
+        <felles.version>4.1.28</felles.version>
+        <prosesstask.version>3.1.8</prosesstask.version>
+        <fp-kontrakter.version>6.1.21</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <avro.version>1.11.0</avro.version>
@@ -151,8 +151,22 @@
 
     <dependencies>
         <dependency>
+            <groupId>no.nav.foreldrepenger</groupId>
+            <artifactId>konfig</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.oracle.ojdbc</groupId>
             <artifactId>ojdbc8</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-plus</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

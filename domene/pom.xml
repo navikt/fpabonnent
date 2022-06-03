@@ -21,8 +21,27 @@
 	</repositories>
 
 	<!-- Kafka -->
-	<dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+				<artifactId>felles-integrasjon-rest-klient</artifactId>
+				<version>${felles.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+				<artifactId>pdl-klient</artifactId>
+				<version>${felles.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.foreldrepenger.felles</groupId>
+				<artifactId>felles-util</artifactId>
+				<version>${felles.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
+	<dependencies>
 		<dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
