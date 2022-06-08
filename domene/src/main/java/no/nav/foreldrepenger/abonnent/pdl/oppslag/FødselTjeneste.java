@@ -22,8 +22,6 @@ import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 @ApplicationScoped
 public class FødselTjeneste {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FødselTjeneste.class);
-
     private Pdl pdlKlient;
 
     FødselTjeneste() {
@@ -42,17 +40,6 @@ public class FødselTjeneste {
                 .forelderBarnRelasjon(new ForelderBarnRelasjonResponseProjection().relatertPersonsIdent().relatertPersonsRolle());
 
         var person = pdlKlient.hentPerson(request, projection);
-
-        var foreldreUtenIdent = person.getForelderBarnRelasjon().stream()
-            .filter(f -> !ForelderBarnRelasjonRolle.BARN.equals(f.getRelatertPersonsRolle()))
-            .filter(f -> f.getRelatertPersonsIdent() == null)
-            .map(ForelderBarnRelasjon::getRelatertPersonsRolle)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-
-        if (!foreldreUtenIdent.isEmpty()) {
-            LOG.warn("Forelder uten ident ignoreres {}", foreldreUtenIdent);
-        }
 
         return person.getForelderBarnRelasjon().stream()
                 .filter(f -> !ForelderBarnRelasjonRolle.BARN.equals(f.getRelatertPersonsRolle()))
