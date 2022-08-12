@@ -23,7 +23,6 @@
         <revision>4.0-SNAPSHOT</revision>
         <java.version>17</java.version>
 
-        <sonar.organization>navikt</sonar.organization>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
