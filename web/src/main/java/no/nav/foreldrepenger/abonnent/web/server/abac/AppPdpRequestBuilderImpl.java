@@ -3,10 +3,12 @@ package no.nav.foreldrepenger.abonnent.web.server.abac;
 import javax.enterprise.context.ApplicationScoped;
 
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.NavAbacCommonAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpKlient;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
+import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 
 /**
  * Implementasjon av PDP request for denne applikasjonen.
@@ -24,5 +26,15 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
         pdpRequest.put(NavAbacCommonAttributter.XACML10_ACTION_ACTION_ID, attributter.getActionType().getEksternKode());
         pdpRequest.put(NavAbacCommonAttributter.RESOURCE_FELLES_RESOURCE_TYPE, attributter.getResource());
         return pdpRequest;
+    }
+
+    @Override
+    public boolean nyttAbacGrensesnitt() {
+        return true;
+    }
+
+    @Override
+    public AppRessursData lagAppRessursData(AbacDataAttributter dataAttributter) {
+        return AppRessursData.builder().build();
     }
 }
