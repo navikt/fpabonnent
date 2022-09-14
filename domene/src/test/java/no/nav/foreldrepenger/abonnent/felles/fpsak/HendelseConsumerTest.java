@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.abonnent.felles.fpsak;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.List;
@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
 import no.nav.vedtak.felles.integrasjon.rest.RestCompact;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,11 +36,14 @@ public class HendelseConsumerTest {
     @Test
     public void skal_videresende_fødselshendelse() {
         ArgumentCaptor<URI> captor = ArgumentCaptor.forClass(URI.class);
-        consumer.sendHendelse(HendelseTestDataUtil.lagFødselsHendelsePayload());
+        ArgumentCaptor<HendelseWrapperDto> captorPayload = ArgumentCaptor.forClass(HendelseWrapperDto.class);
+        var hendelse = HendelseTestDataUtil.lagFødselsHendelsePayload();
+        consumer.sendHendelse(hendelse);
 
-        verify(restKlient).postString(any(), captor.capture(), eq(HendelseTestDataUtil.lagFødselsHendelsePayload().mapPayloadTilDto()));
+        verify(restKlient).postString(any(), captor.capture(), captorPayload.capture());
         var capturedDto = captor.getValue();
         assertThat(capturedDto.toString()).contains("http://localhost:8080/fpsak");
+        assertThat(captorPayload.getValue().getHendelse().getHendelsetype()).isEqualTo(hendelse.mapPayloadTilDto().getHendelse().getHendelsetype());
     }
 
     @Test
@@ -49,16 +54,18 @@ public class HendelseConsumerTest {
 
     @Test
     public void skal_videresende_aktørId_som_dto() {
-        var captor = ArgumentCaptor.forClass(String[].class);
+        var captor = ArgumentCaptor.forClass(List.class);
 
         List<String> idList = List.of("1", "2", "3");
+        String[] resp = { "1", "2", "3"};
+
+        when(restKlient.postValue(any(), any(), any(), captor.capture(), any())).thenReturn(resp);
 
         consumer.grovsorterAktørIder(idList);
 
-        //verify(restKlient).send(any(), captor.capture());
         var capturedDtoList = captor.getValue();
         assertThat(capturedDtoList).isNotNull();
-        assertThat(capturedDtoList).extracting("aktørId").contains("1", "2", "3");
+        assertThat(capturedDtoList).contains(new AktørIdDto("2"));
     }
 
 }
