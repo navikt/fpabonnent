@@ -11,7 +11,7 @@ import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
-import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
+import no.nav.vedtak.felles.integrasjon.rest.NativeClient;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -27,7 +27,7 @@ public class SendHendelseTask implements ProsessTaskHandler {
     private HendelseRepository hendelseRepository;
 
     @Inject
-    public SendHendelseTask(@Jersey Hendelser hendelser,
+    public SendHendelseTask(@NativeClient Hendelser hendelser,
             InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
             HendelseRepository hendelseRepository) {
         this.hendelser = hendelser;

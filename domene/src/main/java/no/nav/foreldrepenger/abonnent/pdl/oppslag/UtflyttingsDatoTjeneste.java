@@ -19,7 +19,7 @@ import no.nav.pdl.PersonBostedsadresseParametrizedInput;
 import no.nav.pdl.PersonFolkeregisterpersonstatusParametrizedInput;
 import no.nav.pdl.PersonResponseProjection;
 import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
-import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
+import no.nav.vedtak.felles.integrasjon.rest.NativeClient;
 import no.nav.vedtak.konfig.Tid;
 
 @ApplicationScoped
@@ -32,7 +32,7 @@ public class UtflyttingsDatoTjeneste {
     }
 
     @Inject
-    public UtflyttingsDatoTjeneste(@Jersey Pdl pdlKlient) {
+    public UtflyttingsDatoTjeneste(@NativeClient Pdl pdlKlient) {
         this.pdlKlient = pdlKlient;
     }
 

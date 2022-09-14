@@ -16,7 +16,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
-import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
+import no.nav.vedtak.felles.integrasjon.rest.NativeClient;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -36,7 +36,7 @@ public class SorterHendelseTask implements ProsessTaskHandler {
     @Inject
     public SorterHendelseTask(ProsessTaskTjeneste prosessTaskTjeneste,
             InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
-            @Jersey Hendelser hendelser) {
+                              @NativeClient Hendelser hendelser) {
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.hendelser = hendelser;
