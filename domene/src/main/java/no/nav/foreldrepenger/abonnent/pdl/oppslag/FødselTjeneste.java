@@ -7,9 +7,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.pdl.ForelderBarnRelasjon;
 import no.nav.pdl.ForelderBarnRelasjonResponseProjection;
@@ -17,7 +14,7 @@ import no.nav.pdl.ForelderBarnRelasjonRolle;
 import no.nav.pdl.HentPersonQueryRequest;
 import no.nav.pdl.PersonResponseProjection;
 import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
-import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
+import no.nav.vedtak.felles.integrasjon.rest.NativeClient;
 
 @ApplicationScoped
 public class FødselTjeneste {
@@ -29,7 +26,7 @@ public class FødselTjeneste {
     }
 
     @Inject
-    public FødselTjeneste(@Jersey Pdl pdlKlient) {
+    public FødselTjeneste(@NativeClient Pdl pdlKlient) {
         this.pdlKlient = pdlKlient;
     }
 
