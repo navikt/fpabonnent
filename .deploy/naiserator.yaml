@@ -22,8 +22,8 @@ spec:
     periodSeconds: 10
     failureThreshold: 27
   replicas:
-    min: 2
-    max: 2
+    min: {{minReplicas}}
+    max: {{maxReplicas}}
     cpuThresholdPercentage: 80
   preStopHookPath: /fpabonnent/internal/health/preStop
   prometheus:

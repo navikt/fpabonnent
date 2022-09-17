@@ -3,7 +3,9 @@
 	"oraclecredskv": "/oracle/data/prod/creds/fpabonnent_p-fpabonnent_p",
 	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
 	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",
-	"ingresses": [ "https://fpabonnent.nais.adeo.no" ],
+	"minReplicas": "2",
+	"maxReplicas": "3",
+	"ingresses": [ "https://fpabonnent.dev.nav.no" ],
 	"env": {
 		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD"
 	}
