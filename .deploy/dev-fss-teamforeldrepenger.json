@@ -9,6 +9,7 @@
 	"minReplicas": "1",
 	"maxReplicas": "2",
 	"env": {
-      "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD"
+      	"APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
+		"APPD_ENABLED": "false"
     }
 }
