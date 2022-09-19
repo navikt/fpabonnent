@@ -29,7 +29,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.fpsak.Hendelser;
+import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelserKlient;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
@@ -62,7 +62,7 @@ public class SorterHendelseTaskTest {
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
     @Mock
-    private Hendelser hendelser;
+    private HendelserKlient hendelser;
     @Mock
     private ProsessTaskTjeneste prosessTaskTjeneste;
 
