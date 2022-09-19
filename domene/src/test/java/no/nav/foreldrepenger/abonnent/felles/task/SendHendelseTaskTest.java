@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelseConsumer;
+import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelserKlient;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
@@ -42,7 +42,7 @@ public class SendHendelseTaskTest {
     private static final long INNGÅENDE_HENDELSE_ID = 1L;
 
 
-    private HendelseConsumer mockHendelseConsumer;
+    private HendelserKlient mockHendelseConsumer;
     private ProsessTaskData prosessTaskData;
     private HendelseRepository hendelseRepository;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
@@ -55,7 +55,7 @@ public class SendHendelseTaskTest {
         HendelseTjeneste fødselHendelseTjeneste = new PdlFødselHendelseTjeneste();
         when(hendelseTjenesteProvider.finnTjeneste(eq(HENDELSE_TYPE), anyString())).thenReturn(fødselHendelseTjeneste);
 
-        mockHendelseConsumer = mock(HendelseConsumer.class);
+        mockHendelseConsumer = mock(HendelserKlient.class);
         hendelseRepository = mock(HendelseRepository.class);
         inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, hendelseTjenesteProvider);
         sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste, hendelseRepository);
