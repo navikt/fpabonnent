@@ -5,7 +5,7 @@
 	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",
 	"minReplicas": "2",
 	"maxReplicas": "3",
-	"ingresses": [ "https://fpabonnent.dev.nav.no" ],
+	"ingresses": [ "https://fpabonnent.intern.nav.no" ],
 	"env": {
 		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
 		"APPD_ENABLED": "true"
