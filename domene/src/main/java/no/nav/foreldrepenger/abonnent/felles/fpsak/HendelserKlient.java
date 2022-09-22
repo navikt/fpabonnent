@@ -33,8 +33,8 @@ public class HendelserKlient {
     @Inject
     public HendelserKlient(RestClient restKlient) {
         this.restKlient = restKlient;
-        this.motta = UriBuilder.fromUri(RestConfig.endpointFromAnnotation(HendelserKlient.class)).path(API_PATH).path("motta").build();
-        this.grovsorter = UriBuilder.fromUri(RestConfig.endpointFromAnnotation(HendelserKlient.class)).path(API_PATH).path("grovsorter").build();
+        this.motta = UriBuilder.fromUri(RestConfig.contextPathFromAnnotation(HendelserKlient.class)).path(API_PATH).path("motta").build();
+        this.grovsorter = UriBuilder.fromUri(RestConfig.contextPathFromAnnotation(HendelserKlient.class)).path(API_PATH).path("grovsorter").build();
     }
 
     public void sendHendelse(HendelsePayload h) {
