@@ -5,7 +5,10 @@
 	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",
 	"minReplicas": "2",
 	"maxReplicas": "3",
-	"ingresses": [ "https://fpabonnent.intern.nav.no" ],
+	"ingresses": [
+		"https://fpabonnent.intern.nav.no",
+		"https://fpabonnent.prod-fss-pub.nais.io"
+	],
 	"env": {
 		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
 		"APPD_ENABLED": "true"

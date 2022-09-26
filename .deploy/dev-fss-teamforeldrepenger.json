@@ -4,7 +4,8 @@
 	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q1",
 	"serviceuserkv": "/serviceuser/data/dev/srvfpabonnent",
 	"ingresses": [
-        "https://fpabonnent.dev.intern.nav.no/"
+        "https://fpabonnent.dev.intern.nav.no",
+		"https://fpabonnent.dev-fss-pub.nais.io"
 	],
 	"minReplicas": "1",
 	"maxReplicas": "2",
@@ -13,14 +14,6 @@
 		"APPD_ENABLED": "false"
     },
 	"AZURE_IAC_RULES": [
-		{
-			"app": "fp-swagger",
-			"namespace": "teamforeldrepenger",
-			"cluster": "dev-fss",
-			"scopes": [
-				"swagger"
-			]
-		},
 		{
 			"app": "fp-swagger",
 			"namespace": "teamforeldrepenger",
