@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.abonnent.web.app.exceptions.GeneralRestExceptionMap
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonParseExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.jackson.JacksonJsonConfig;
-import no.nav.vedtak.felles.integrasjon.rest.jersey.TimingFilter;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
 @ApplicationPath(ApplicationConfig.API_URI)
@@ -70,7 +69,6 @@ public class ApplicationConfig extends Application {
         classes.add(OpenApiResource.class);
 
         // Applikasjonsoppsett
-        classes.add(TimingFilter.class);
         classes.add(JacksonJsonConfig.class);
 
         // ExceptionMappers pga de som finnes i Jackson+Jersey-media

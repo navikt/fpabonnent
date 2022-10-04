@@ -16,8 +16,7 @@ import no.nav.pdl.IdentInformasjonResponseProjection;
 import no.nav.pdl.Identliste;
 import no.nav.pdl.IdentlisteResponseProjection;
 import no.nav.vedtak.exception.VLException;
-import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
-import no.nav.vedtak.felles.integrasjon.rest.NativeClient;
+import no.nav.vedtak.felles.integrasjon.person.Persondata;
 import no.nav.vedtak.util.LRUCache;
 
 @ApplicationScoped
@@ -28,14 +27,14 @@ public class AktørTjeneste {
 
     private LRUCache<PersonIdent, AktørId> cacheIdentTilAktørId;
 
-    private Pdl pdlKlient;
+    private Persondata pdlKlient;
 
     AktørTjeneste() {
         // CDI
     }
 
     @Inject
-    public AktørTjeneste(@NativeClient Pdl pdlKlient) {
+    public AktørTjeneste(Persondata pdlKlient) {
         this.pdlKlient = pdlKlient;
         this.cacheIdentTilAktørId = new LRUCache<>(DEFAULT_CACHE_SIZE, DEFAULT_CACHE_TIMEOUT);
     }
@@ -57,7 +56,7 @@ public class AktørTjeneste {
         try {
             identliste = pdlKlient.hentIdenter(request, projection);
         } catch (VLException v) {
-            if (Pdl.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
+            if (Persondata.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
                 return Optional.empty();
             }
             throw v;

@@ -17,7 +17,7 @@ import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
 import no.nav.pdl.ForelderBarnRelasjon;
 import no.nav.pdl.ForelderBarnRelasjonRolle;
 import no.nav.pdl.Person;
-import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
+import no.nav.vedtak.felles.integrasjon.person.Persondata;
 
 public class ForeldreTjenesteTest {
     private static final PersonIdent BARN_FNR = new PersonIdent(new FiktiveFnr().nesteBarnFnr());
@@ -26,7 +26,7 @@ public class ForeldreTjenesteTest {
 
     private FødselTjeneste fødselTjeneste;
 
-    private Pdl pdlMock = mock(Pdl.class);
+    private Persondata pdlMock = mock(Persondata.class);
 
     @BeforeEach
     public void setup() {

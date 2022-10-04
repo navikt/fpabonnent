@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
@@ -23,28 +22,31 @@ public class HendelserKlient {
 
     private static final String API_PATH = "/api/hendelser";
     private RestClient restKlient;
+    private RestConfig restConfig;
     private URI motta;
     private URI grovsorter;
 
-    HendelserKlient() {
-        // CDI
+    public HendelserKlient() {
+        this(RestClient.client());
     }
 
-    @Inject
-    public HendelserKlient(RestClient restKlient) {
+    HendelserKlient(RestClient restKlient) {
         this.restKlient = restKlient;
-        this.motta = UriBuilder.fromUri(RestConfig.contextPathFromAnnotation(HendelserKlient.class)).path(API_PATH).path("motta").build();
-        this.grovsorter = UriBuilder.fromUri(RestConfig.contextPathFromAnnotation(HendelserKlient.class)).path(API_PATH).path("grovsorter").build();
+        this.restConfig = RestConfig.forClient(this.getClass());
+        this.motta = UriBuilder.fromUri(restConfig.fpContextPath()).path(API_PATH).path("motta").build();
+        this.grovsorter = UriBuilder.fromUri(restConfig.fpContextPath()).path(API_PATH).path("grovsorter").build();
     }
 
     public void sendHendelse(HendelsePayload h) {
-        restKlient.sendReturnOptional(RestRequest.newPOSTJson(h.mapPayloadTilDto(), motta, HendelserKlient.class), String.class);
+        var request = RestRequest.newPOSTJson(h.mapPayloadTilDto(), motta, restConfig);
+        restKlient.sendReturnOptional(request, String.class);
     }
 
     public List<String> grovsorterAktørIder(List<String> aktører) {
         if (!aktører.isEmpty()) {
             var dtos = aktører.stream().map(AktørIdDto::new).toList();
-            var respons = restKlient.send(RestRequest.newPOSTJson(dtos, grovsorter, TokenFlow.STS_CC, null), String[].class);
+            var request = RestRequest.newPOSTJson(dtos, grovsorter, restConfig);
+            var respons = restKlient.send(request, String[].class);
             return Arrays.asList(respons);
         }
         return List.of();
