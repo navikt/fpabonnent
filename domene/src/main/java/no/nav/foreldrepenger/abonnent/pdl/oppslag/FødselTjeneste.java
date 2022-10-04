@@ -13,20 +13,19 @@ import no.nav.pdl.ForelderBarnRelasjonResponseProjection;
 import no.nav.pdl.ForelderBarnRelasjonRolle;
 import no.nav.pdl.HentPersonQueryRequest;
 import no.nav.pdl.PersonResponseProjection;
-import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
-import no.nav.vedtak.felles.integrasjon.rest.NativeClient;
+import no.nav.vedtak.felles.integrasjon.person.Persondata;
 
 @ApplicationScoped
 public class FødselTjeneste {
 
-    private Pdl pdlKlient;
+    private Persondata pdlKlient;
 
     FødselTjeneste() {
         // CDI
     }
 
     @Inject
-    public FødselTjeneste(@NativeClient Pdl pdlKlient) {
+    public FødselTjeneste(Persondata pdlKlient) {
         this.pdlKlient = pdlKlient;
     }
 

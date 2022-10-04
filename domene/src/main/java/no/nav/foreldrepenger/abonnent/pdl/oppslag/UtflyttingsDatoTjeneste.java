@@ -18,21 +18,20 @@ import no.nav.pdl.HentPersonQueryRequest;
 import no.nav.pdl.PersonBostedsadresseParametrizedInput;
 import no.nav.pdl.PersonFolkeregisterpersonstatusParametrizedInput;
 import no.nav.pdl.PersonResponseProjection;
-import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
-import no.nav.vedtak.felles.integrasjon.rest.NativeClient;
+import no.nav.vedtak.felles.integrasjon.person.Persondata;
 import no.nav.vedtak.konfig.Tid;
 
 @ApplicationScoped
 public class UtflyttingsDatoTjeneste {
 
-    private Pdl pdlKlient;
+    private Persondata pdlKlient;
 
     UtflyttingsDatoTjeneste() {
         // CDI
     }
 
     @Inject
-    public UtflyttingsDatoTjeneste(@NativeClient Pdl pdlKlient) {
+    public UtflyttingsDatoTjeneste(Persondata pdlKlient) {
         this.pdlKlient = pdlKlient;
     }
 
