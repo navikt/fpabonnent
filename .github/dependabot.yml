@@ -1,36 +1,47 @@
 version: 2
-registries: # Define access for private registries
-  fp-felles:
+registries:
+  fp-felles: # Gir tilgang til registre innad i nav med fp-felles som inngang (PATen bestemmer)
     type: maven-repository
     url: https://maven.pkg.github.com/navikt/fp-felles
     username: x-access-token
     password: ${{ secrets.PAT }}
 
 updates:
-- package-ecosystem: "maven"
-  directory: "/"
-  registries: # Allow version updates for dependencies in this registry
-    - fp-felles
-  schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 20
-  ignore:
-  - dependency-name: io.astefanutti.metrics.cdi:metrics-cdi
-    versions:
-    - "> 1.4.0, < 2"
-  - dependency-name: org.flywaydb:flyway-core
-    versions:
-    - ">= 5.a, <= 8"
-  - dependency-name: org.flywaydb:flyway-maven-plugin
-    versions:
-    - ">= 5.a, <= 8"
-  - dependency-name: org.ow2.asm:asm
-    versions:
-    - ">= 8.a, <= 9"
-  - dependency-name: org.ow2.asm:asm-analysis
-    versions:
-    - ">= 8.a, <= 9"
-  - dependency-name: org.ow2.asm:asm-tree
-    versions:
-    - ">= 8.a, <= 9"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+  - package-ecosystem: maven
+    directory: "/"
+    registries:
+      - fp-felles
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 20
+    ignore:
+      - dependency-name: "no.nav.vedtak.prosesstask:*"
+        versions: ["x", "x.x"]
+      - dependency-name: "no.nav.foreldrepenger.felles:*"
+        versions: ["x", "x.x"]
+      - dependency-name: "no.nav.foreldrepenger.kontrakter:*"
+        versions: ["x", "x.x"]
+
+      - dependency-name: io.astefanutti.metrics.cdi:metrics-cdi
+        versions:
+        - "> 1.4.0, < 2"
+      - dependency-name: org.flywaydb:flyway-core
+        versions:
+        - ">= 5.a, <= 8"
+      - dependency-name: org.flywaydb:flyway-maven-plugin
+        versions:
+        - ">= 5.a, <= 8"
+      - dependency-name: org.ow2.asm:asm
+        versions:
+        - ">= 8.a, <= 9"
+      - dependency-name: org.ow2.asm:asm-analysis
+        versions:
+        - ">= 8.a, <= 9"
+      - dependency-name: org.ow2.asm:asm-tree
+        versions:
+        - ">= 8.a, <= 9"
