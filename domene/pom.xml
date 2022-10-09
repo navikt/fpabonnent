@@ -30,7 +30,7 @@
 			</dependency>
 			<dependency>
 				<groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-				<artifactId>pdl-klient</artifactId>
+				<artifactId>person-klient</artifactId>
 				<version>${felles.version}</version>
 			</dependency>
 			<dependency>
@@ -98,7 +98,7 @@
 		</dependency>
 		<dependency>
 			<groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-			<artifactId>pdl-klient</artifactId>
+			<artifactId>person-klient</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId>org.codehaus.plexus</groupId>
