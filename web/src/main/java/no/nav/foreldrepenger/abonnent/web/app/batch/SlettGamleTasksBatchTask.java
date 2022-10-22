@@ -13,21 +13,21 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @Dependent
-@ProsessTask(value = "retry.feiledeTasks", cronExpression = "0 20 7 * * *", maxFailedRuns = 1)
-public class RekjørFeiledeTasksBatchTask implements ProsessTaskHandler {
+@ProsessTask(value = "retry.feiledeTasks", cronExpression = "0 20 2 * * *", maxFailedRuns = 1)
+public class SlettGamleTasksBatchTask implements ProsessTaskHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RekjørFeiledeTasksBatchTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SlettGamleTasksBatchTask.class);
 
     private final ProsessTaskTjeneste prosessTaskTjeneste;
 
     @Inject
-    public RekjørFeiledeTasksBatchTask(ProsessTaskTjeneste prosessTaskTjeneste) {
+    public SlettGamleTasksBatchTask(ProsessTaskTjeneste prosessTaskTjeneste) {
         this.prosessTaskTjeneste = prosessTaskTjeneste;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        var rekjørAlleFeiledeTasks = prosessTaskTjeneste.restartAlleFeiledeTasks();
-        LOG.info("Rekjører alle feilede tasks. {} tasks ble oppdatert.", rekjørAlleFeiledeTasks);
+        var slettet = prosessTaskTjeneste.slettÅrsgamleFerdige();
+        LOG.info("Slettet {} tasks som er over ett år gamle.", slettet);
     }
 }
