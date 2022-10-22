@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViolationException> {
 
-    private static final Logger log = LoggerFactory.getLogger(ConstraintViolationMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConstraintViolationMapper.class);
 
     @Override
     public Response toResponse(ConstraintViolationException exception) {
@@ -33,7 +33,7 @@ public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViol
         List<String> feltNavn = feilene.stream().map(FeltFeilDto::navn).collect(Collectors.toList());
 
         var feil = FeltValideringFeil.feltverdiKanIkkeValideres(feltNavn);
-        log.warn(feil.getMessage());
+        LOG.warn(feil.getMessage());
         return Response
                 .status(Response.Status.BAD_REQUEST)
                 .entity(new FeilDto(feil.getMessage(), feilene))

@@ -13,12 +13,12 @@ import no.nav.vedtak.exception.TekniskException;
 
 public class JsonParseExceptionMapper implements ExceptionMapper<JsonParseException> {
 
-    private static final Logger log = LoggerFactory.getLogger(JsonParseExceptionMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsonParseExceptionMapper.class);
 
     @Override
     public Response toResponse(JsonParseException exception) {
         TekniskException tekniskException = new TekniskException("FP-299955", String.format("JSON-parsing feil: %s", exception.getMessage()), exception);
-        log.warn(tekniskException.getMessage());
+        LOG.warn(tekniskException.getMessage());
         return Response
                 .status(Response.Status.BAD_REQUEST)
                 .entity(new FeilDto(tekniskException.getMessage()))

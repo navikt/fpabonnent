@@ -13,12 +13,12 @@ import no.nav.vedtak.exception.TekniskException;
 
 public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingException> {
 
-    private static final Logger log = LoggerFactory.getLogger(JsonMappingExceptionMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsonMappingExceptionMapper.class);
 
     @Override
     public Response toResponse(JsonMappingException exception) {
         TekniskException tekniskException = new TekniskException("FP-252294", "JSON-mapping feil", exception);
-        log.warn(tekniskException.getMessage());
+        LOG.warn(tekniskException.getMessage());
         return Response
                 .status(Response.Status.BAD_REQUEST)
                 .entity(new FeilDto(tekniskException.getMessage()))

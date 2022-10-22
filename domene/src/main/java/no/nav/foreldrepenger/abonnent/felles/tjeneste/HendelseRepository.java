@@ -126,4 +126,15 @@ public class HendelseRepository {
         }
         return Optional.of(resultater.get(0));
     }
+
+    public int slettIrrelevanteHendelser() {
+        int tps = entityManager.createNativeQuery("DELETE FROM INNGAAENDE_HENDELSE WHERE kilde <> :pdlkilde")
+            .setParameter("pdlkilde", HendelseKilde.PDL.getKode())
+            .executeUpdate();
+        int deletedRows = entityManager.createNativeQuery("DELETE FROM INNGAAENDE_HENDELSE WHERE payload is null and haandtert_status = :handtert")
+            .setParameter("handtert", HåndtertStatusType.HÅNDTERT.getKode())
+            .executeUpdate();
+        entityManager.flush();
+        return tps + deletedRows;
+    }
 }
