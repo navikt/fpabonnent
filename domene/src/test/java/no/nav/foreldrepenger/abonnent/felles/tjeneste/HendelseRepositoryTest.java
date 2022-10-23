@@ -71,14 +71,6 @@ public class HendelseRepositoryTest {
                 .håndtertStatus(HåndtertStatusType.GROVSORTERT)
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
-        InngåendeHendelse hendelse2 = InngåendeHendelse.builder() // Feil kilde
-                .hendelseId(HENDELSE_ID)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload2")
-                .hendelseKilde(HendelseKilde.TPS)
-                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
         InngåendeHendelse hendelse3 = InngåendeHendelse.builder() // Feil hendelseId
                 .hendelseId(HENDELSE_ID + 1)
                 .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
@@ -96,7 +88,6 @@ public class HendelseRepositoryTest {
                 .håndteresEtterTidspunkt(LocalDateTime.now())
                 .build();
         hendelseRepository.lagreInngåendeHendelse(hendelse1);
-        hendelseRepository.lagreInngåendeHendelse(hendelse2);
         hendelseRepository.lagreInngåendeHendelse(hendelse3);
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse4);
 

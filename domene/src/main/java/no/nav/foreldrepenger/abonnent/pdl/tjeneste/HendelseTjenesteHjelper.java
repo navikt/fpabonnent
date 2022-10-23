@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
 import static java.util.Set.of;
+import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseType.PDL_UTFLYTTING_ANNULLERT;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public class HendelseTjenesteHjelper {
      * Sjekker om angitt payload kan forkastes. Vil forkaste hvis:
      * - Endringstypen er ANNULLERT/KORRIGERT og tidligere hendelse ikke er mottatt av oss.
      * - Endringstypen er KORRIGERT og datoen for hendelsen er samme som i siste sendte tidligere hendelse.
+     * - Annullert utflytting som er mer enn 1 uke etter tidligere hendelse (unngå revurderinger i utide)
      *
      * @param payload HendelsePayload som skal vurderes
      * @param payloadFraJsonString Referanse til funksjonen i HendelseTjeneste som oversetter fra JSON til HendelsePayload
@@ -56,6 +58,8 @@ public class HendelseTjenesteHjelper {
             return true;
         } else if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && tidligereHendelse.isPresent()) {
             return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, tidligereHendelse, payloadFraJsonString);
+        } else if (PDL_UTFLYTTING_ANNULLERT.getKode().equals(payload.getHendelseType()) && tidligereHendelse.isPresent()) {
+            return tidligereHendelse.filter(h -> h.getOpprettetTidspunkt().plusWeeks(1).isBefore(payload.getHendelseOpprettetTid())).isPresent();
         }
         return false;
     }
