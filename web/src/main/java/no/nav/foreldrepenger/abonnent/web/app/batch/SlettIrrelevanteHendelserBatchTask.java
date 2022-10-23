@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.abonnent.web.app.batch;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -11,13 +11,13 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
-@ApplicationScoped
+@Dependent
 @ProsessTask(value = "slett.hendelserAndre", cronExpression = "0 1 2 * * *", maxFailedRuns = 1)
 public class SlettIrrelevanteHendelserBatchTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SlettIrrelevanteHendelserBatchTask.class);
 
-    private HendelseRepository hendelseRepository;
+    private final HendelseRepository hendelseRepository;
 
     @Inject
     public SlettIrrelevanteHendelserBatchTask(HendelseRepository hendelseRepository) {
@@ -27,6 +27,6 @@ public class SlettIrrelevanteHendelserBatchTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         var slettet = hendelseRepository.slettIrrelevanteHendelser();
-        LOG.info("Slettet {} tasks som er over ett år gamle.", slettet);
+        LOG.info("Slettet {} hendelser som ikke ble sendt til fpsak.", slettet);
     }
 }

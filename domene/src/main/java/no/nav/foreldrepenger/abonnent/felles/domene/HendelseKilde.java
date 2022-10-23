@@ -11,12 +11,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum HendelseKilde implements Kodeverdi {
 
-    // Ligger igjen til evt databaseopprydding:
-    @Deprecated
-    TPS("JF_TPS"),
-    @Deprecated
-    INFOTRYGD("JF_INFOTRYGD"),
-
     PDL("KAFKA_PDL"),
 
     /**

@@ -14,22 +14,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum HendelseType implements Kodeverdi {
 
-    // Ikke lengre støttet, men beholdes så lenge det finnes data i tabeller:
-    @Deprecated
-    FØDSELSMELDINGOPPRETTET("FOEDSELSMELDINGOPPRETTET"),
-    @Deprecated
-    DØDSMELDINGOPPRETTET("DOEDSMELDINGOPPRETTET"),
-    @Deprecated
-    DØDFØDSELOPPRETTET("DOEDFOEDSELOPPRETTET"),
-    @Deprecated
-    OPPHØERT("OPPHOERT_v1"),
-    @Deprecated
-    INNVILGET("INNVILGET_v1"),
-    @Deprecated
-    ANNULLERT("ANNULLERT_v1"),
-    @Deprecated
-    ENDRET("ENDRET_v1"),
-
     PDL_FØDSEL_OPPRETTET("PDL_FOEDSEL_OPPRETTET"),
     PDL_FØDSEL_KORRIGERT("PDL_FOEDSEL_KORRIGERT"),
     PDL_FØDSEL_ANNULLERT("PDL_FOEDSEL_ANNULLERT"),
