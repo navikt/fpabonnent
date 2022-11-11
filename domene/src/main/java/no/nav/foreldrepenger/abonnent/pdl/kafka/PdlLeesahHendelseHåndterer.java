@@ -68,7 +68,7 @@ public class PdlLeesahHendelseHåndterer {
         Optional<InngåendeHendelse> inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(),
                 HendelseKilde.PDL);
         if (inngåendeHendelse.isPresent()) {
-            LOG.warn(
+            LOG.info(
                     "FPABONNENT mottok duplikat hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}. Tiltak: Sjekk om det skjedde en deploy/restart av Fpabonnent i det samme tidsrommet - i så fall kan dette ignoreres.",
                     payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
                     payload.getTidligereHendelseId());
