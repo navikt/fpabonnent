@@ -64,7 +64,7 @@ public class AivenProperties {
         this.keyStoreLocation = keyStoreLocation;
         this.credStorePassword = credStorePassword;
         this.schemaRegistryUrl = schemaRegistryUrl;
-        this.applicationId = "fpabonnent2";
+        this.applicationId = "fpabonnent";
         this.clientId = "fpabonnent-" + UUID.randomUUID();
         this.bootstrapServers = bootstrapServers;
         // Utleder korrekt topic for å unngå innføring av nye midlertidige verdier i VTP inntil vi er over på Aiven

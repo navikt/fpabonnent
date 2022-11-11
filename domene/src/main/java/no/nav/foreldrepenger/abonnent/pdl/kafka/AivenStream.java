@@ -35,7 +35,7 @@ public class AivenStream implements AppServiceHandler, KafkaIntegration {
                                                    PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer, // ubrukt inntil offset satt
                                                    AivenProperties properties) {
         final Consumed<String, Personhendelse> consumed = Consumed
-                .<String, Personhendelse>with(Topology.AutoOffsetReset.EARLIEST)
+                .<String, Personhendelse>with(Topology.AutoOffsetReset.LATEST)
                 .withKeySerde(topic.getSerdeKey())
                 .withValueSerde(topic.getSerdeValue());
 
