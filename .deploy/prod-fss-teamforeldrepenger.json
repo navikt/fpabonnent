@@ -9,6 +9,7 @@
 		"https://fpabonnent.intern.nav.no",
 		"https://fpabonnent.prod-fss-pub.nais.io"
 	],
+	"kafkaPool": "nav-prod",
 	"env": {
 		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
 		"APPD_ENABLED": "true"
