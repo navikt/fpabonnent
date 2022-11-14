@@ -1,6 +1,6 @@
 FP-Abonnent
 ===============
-Applikasjonen tar inn hendelser fra potensielt flere kilder og videresender disse til FP-Sak, dersom aktuelle aktører har en fagsak der. Pr april 2021 er det kun lesing av fødsel, død og dødfødsel fra PDL/LEESAH Kafka topicen aapen-person-pdl-leesah-v1 som er implementert, men kjernen i applikasjonen er laget for at det skal være mulig å lese fra flere kilder i fremtiden, uten å endre noe særlig på den eksisterende koden.
+Applikasjonen tar inn hendelser fra potensielt flere kilder og videresender disse til FP-Sak, dersom aktuelle aktører har en fagsak der. Pr april 2021 er det kun lesing av fødsel, død og dødfødsel fra PDL/LEESAH Kafka topicen pdl-leesah-v1 som er implementert, men kjernen i applikasjonen er laget for at det skal være mulig å lese fra flere kilder i fremtiden, uten å endre noe særlig på den eksisterende koden.
 
 ### Virkemåte
 * Når en hendelse mottas fra Kafka blir den oversatt til et internt format og serialisert ned som JSON i tabellen INNGAAENDE_HENDELSE i databasen.
@@ -18,5 +18,5 @@ Applikasjonen tar inn hendelser fra potensielt flere kilder og videresender diss
 
 ### Henvendelser
 Spørsmål knyttet til koden eller prosjektet kan rettes til:
-* Jan Erik Johnsen (jan.erik.johnsen@nav.no)
-* Jens-Otto Larsen (jens-otto.larsen@nav.no)
+* nav.team.foreldrepenger@nav.no
+* #teamforeldrepenger
