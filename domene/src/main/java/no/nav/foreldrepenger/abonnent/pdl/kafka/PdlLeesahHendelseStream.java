@@ -1,11 +1,7 @@
 package no.nav.foreldrepenger.abonnent.pdl.kafka;
 
-import java.time.Duration;
-import java.util.Map;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
+import no.nav.person.pdl.leesah.Personhendelse;
+import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
@@ -13,64 +9,48 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.person.pdl.leesah.Personhendelse;
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.Duration;
 
 @ApplicationScoped
 public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegration {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseStream.class);
 
-    private KafkaStreams stream;
+
     private Topic<String, Personhendelse> topic;
+    private KafkaStreams stream;
 
     PdlLeesahHendelseStream() {
     }
 
     @Inject
-    public PdlLeesahHendelseStream(PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer,
-                                   PdlLeesahHendelseProperties pdlLeesahHendelseProperties) {
-        this.topic = pdlLeesahHendelseProperties.getTopic();
-        LOG.info("Starter konsumering av PDL Kafka topic");
-        this.stream = createKafkaStreams(topic, pdlLeesahHendelseHåndterer, pdlLeesahHendelseProperties);
+    public PdlLeesahHendelseStream(PdlLeesahHendelseHåndterer håndterer, PdlLeesahHendelseProperties streamKafkaProperties) {
+        this.topic = streamKafkaProperties.getTopic();
+        this.stream = createKafkaStreams(topic, håndterer, streamKafkaProperties);
     }
 
     @SuppressWarnings("resource")
     private static KafkaStreams createKafkaStreams(Topic<String, Personhendelse> topic,
-                                                   PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer,
+                                                   PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer, // ubrukt inntil offset satt
                                                    PdlLeesahHendelseProperties properties) {
-        if (properties.getSchemaRegistryUrl() != null && !properties.getSchemaRegistryUrl().isEmpty()) {
-            var schemaMap = Map.of("schema.registry.url", properties.getSchemaRegistryUrl(), "specific.avro.reader", true);
-            topic.getSerdeKey().configure(schemaMap, true);
-            topic.getSerdeValue().configure(schemaMap, false);
-        }
-
-        Consumed<String, Personhendelse> consumed = Consumed.<String, Personhendelse>with(Topology.AutoOffsetReset.LATEST)
+        final Consumed<String, Personhendelse> consumed = Consumed
+                .<String, Personhendelse>with(Topology.AutoOffsetReset.LATEST)
                 .withKeySerde(topic.getSerdeKey())
                 .withValueSerde(topic.getSerdeValue());
 
-        StreamsBuilder builder = new StreamsBuilder();
+        final StreamsBuilder builder = new StreamsBuilder();
         builder.stream(topic.getTopic(), consumed)
-                .foreach(pdlLeesahHendelseHåndterer::handleMessage);
+                .foreach((k, v) -> LOG.info("PDL Aivenstream leser melding med hendelseId {}", v.getHendelseId()));
+                //.foreach(pdlLeesahHendelseHåndterer::handleMessage);
 
-        Topology topology = builder.build();
-        return new KafkaStreams(topology, properties.getProperties());
+        return new KafkaStreams(builder.build(), properties.getProperties());
     }
 
-    private void addShutdownHooks() {
-        stream.setStateListener((newState, oldState) -> {
-            LOG.info("{} :: From state={} to state={}", getTopicName(), oldState, newState);
-
-            if (newState == KafkaStreams.State.ERROR) {
-                // if the stream has died there is no reason to keep spinning
-                LOG.warn("{} :: No reason to keep living, closing stream", getTopicName());
-                stop();
-            }
-        });
-        stream.setUncaughtExceptionHandler((t, e) -> {
-            LOG.error(getTopicName() + " :: Caught exception in stream, exiting", e);
-            stop();
-        });
+    @Override
+    public boolean isAlive() {
+        return (stream != null) && stream.state().isRunningOrRebalancing();
     }
 
     @Override
@@ -78,10 +58,6 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
         addShutdownHooks();
         stream.start();
         LOG.info("Starter konsumering av topic={}, tilstand={}", getTopicName(), stream.state());
-    }
-
-    public String getTopicName() {
-        return topic.getTopic();
     }
 
     @Override
@@ -93,8 +69,22 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
         }
     }
 
-    @Override
-    public boolean isAlive() {
-        return stream != null && stream.state().isRunningOrRebalancing();
+    private String getTopicName() {
+        return topic.getTopic();
+    }
+
+    private void addShutdownHooks() {
+        stream.setStateListener((newState, oldState) -> {
+            LOG.info("{} :: From state={} to state={}", getTopicName(), oldState, newState);
+
+            if (newState == KafkaStreams.State.ERROR) {
+                LOG.warn("{} :: No reason to keep living, closing stream", getTopicName());
+                stop();
+            }
+        });
+        stream.setUncaughtExceptionHandler((t, e) -> {
+            LOG.error("{} :: Caught exception in stream, exiting", getTopicName(), e);
+            stop();
+        });
     }
 }
