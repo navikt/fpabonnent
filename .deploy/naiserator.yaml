@@ -40,6 +40,8 @@ spec:
 {{#each ingresses as |url|}}
     - {{url}}
 {{/each}}
+  kafka:
+    pool: {{kafkaPool}}
   vault:
     enabled: true
     paths:
