@@ -30,7 +30,7 @@ import static io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFI
 @Dependent
 public class PdlLeesahHendelseProperties {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahOnpremHendelseProperties.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseProperties.class);
 
     private static final String KAFKA_AVRO_SERDE_CLASS = "kafka.avro.serde.class";
 
@@ -48,8 +48,7 @@ public class PdlLeesahHendelseProperties {
     private final boolean isDeployment = ENV.isProd() || ENV.isDev();
 
     @Inject
-    public PdlLeesahHendelseProperties(@KonfigVerdi(value = "kafka.aiven.pdl.leesah.topic", defaultVerdi = "default") String topicName,
-                                       @KonfigVerdi(value = "kafka.pdl.leesah.topic") String onpremTopicName,
+    public PdlLeesahHendelseProperties(@KonfigVerdi(value = "kafka.pdl.leesah.topic") String topicName,
                                        @KonfigVerdi("KAFKA_BROKERS") String bootstrapServers,
                                        @KonfigVerdi("KAFKA_SCHEMA_REGISTRY") String schemaRegistryUrl,
                                        @KonfigVerdi("KAFKA_SCHEMA_REGISTRY_USER") String schemaRegistryUsername,
@@ -64,12 +63,7 @@ public class PdlLeesahHendelseProperties {
         this.applicationId = "fpabonnent";
         this.clientId = "fpabonnent-" + UUID.randomUUID();
         this.bootstrapServers = bootstrapServers;
-        // Utleder korrekt topic for å unngå innføring av nye midlertidige verdier i VTP inntil vi er over på Aiven
-        if (isDeployment && topicName.equals("default")) {
-            throw new IllegalStateException("Konfigurasjonsfeil: mangler verdi for kafka.aiven.pdl.leesah.topic");
-        }
-        var utledetTopic = !isDeployment ? onpremTopicName : topicName;
-        this.topic = createConfiguredTopic(utledetTopic, schemaRegistryUrl, getBasicAuth(schemaRegistryUsername, schemaRegistryPassword));
+        this.topic = createConfiguredTopic(topicName, schemaRegistryUrl, getBasicAuth(schemaRegistryUsername, schemaRegistryPassword));
     }
 
     public Topic<String, Personhendelse> getTopic() {

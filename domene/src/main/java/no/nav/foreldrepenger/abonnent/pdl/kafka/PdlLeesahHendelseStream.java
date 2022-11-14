@@ -42,8 +42,7 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
 
         final StreamsBuilder builder = new StreamsBuilder();
         builder.stream(topic.getTopic(), consumed)
-                .foreach((k, v) -> LOG.info("PDL Aivenstream leser melding med hendelseId {}", v.getHendelseId()));
-                //.foreach(pdlLeesahHendelseHåndterer::handleMessage);
+                .foreach(pdlLeesahHendelseHåndterer::handleMessage);
 
         return new KafkaStreams(builder.build(), properties.getProperties());
     }
