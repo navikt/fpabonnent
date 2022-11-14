@@ -21,7 +21,6 @@ import org.apache.kafka.streams.errors.LogAndFailExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
@@ -38,7 +37,6 @@ public class AivenProperties {
     private static final Environment ENV = Environment.current();
 
     private final String bootstrapServers;
-    private final String schemaRegistryUrl;
     private final String applicationId;
     private final String trustStorePath;
     private final String keyStoreLocation;
@@ -63,7 +61,6 @@ public class AivenProperties {
         this.trustStorePath = trustStorePath;
         this.keyStoreLocation = keyStoreLocation;
         this.credStorePassword = credStorePassword;
-        this.schemaRegistryUrl = schemaRegistryUrl;
         this.applicationId = "fpabonnent";
         this.clientId = "fpabonnent-" + UUID.randomUUID();
         this.bootstrapServers = bootstrapServers;
@@ -82,11 +79,6 @@ public class AivenProperties {
     public Properties getProperties() {
         final Properties props = new Properties();
 
-        /*
-         * Application ID må være unik per strøm for å unngå en feilsituasjon der
-         * man enkelte ganger får feil partition (dvs partitions fra annen topic
-         * enn den man skal ha).
-         */
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
         LOG.info("Stream APPLICATION_ID_CONFIG: {}", props.getProperty(StreamsConfig.APPLICATION_ID_CONFIG));
         props.put(StreamsConfig.CLIENT_ID_CONFIG, clientId);
@@ -110,12 +102,6 @@ public class AivenProperties {
             props.setProperty(SaslConfigs.SASL_JAAS_CONFIG, jaasCfg);
         }
 
-        // Setup schema-registry
-        if (schemaRegistryUrl != null) {
-            props.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
-        }
-
-        // Serde
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, topic.getSerdeKey().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, topic.getSerdeValue().getClass());
         props.put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, LogAndFailExceptionHandler.class);
