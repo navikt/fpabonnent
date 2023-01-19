@@ -242,6 +242,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
 							<mainClass>no.nav.foreldrepenger.abonnent.web.server.JettyServer</mainClass>
 						</manifest>
 					</archive>
