@@ -3,13 +3,6 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
                  http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
 
-    <listener>
-        <listener-class>org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener</listener-class>
-    </listener>
-    <listener>
-        <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
-    </listener>
-
     <!-- Listeners her slik at vi kan styre rekkefølgen de kjøres i: -->
     <listener>
         <listener-class>no.nav.foreldrepenger.abonnent.web.app.tjenester.ApplicationContextListener</listener-class>
@@ -18,10 +11,7 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Ubeskyttet</web-resource-name>
-            <url-pattern>/cb</url-pattern>
             <url-pattern>/internal/*</url-pattern>
-            <url-pattern>/internal/health/preStop</url-pattern>
-            <url-pattern>/api/openapi.yaml</url-pattern>
             <url-pattern>/api/openapi.json</url-pattern>
         </web-resource-collection>
     </security-constraint>

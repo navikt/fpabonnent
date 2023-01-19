@@ -5,7 +5,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
@@ -29,7 +28,7 @@ public class RestApiTester {
     }
 
     static Collection<Class<?>> finnAlleRestTjenester() {
-        return new ArrayList<>(finnAlleRestTjenester(new ApplicationConfig()));
+        return new ArrayList<>(finnAlleRestTjenester(new ApiConfig()));
     }
 
     static Collection<Class<?>> finnAlleRestTjenester(Application config) {

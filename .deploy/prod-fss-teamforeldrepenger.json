@@ -11,7 +11,6 @@
 	],
 	"kafkaPool": "nav-prod",
 	"env": {
-		"APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
 		"APPD_ENABLED": "true"
 	},
 	"AZURE_IAC_RULES": [
