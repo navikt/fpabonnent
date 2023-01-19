@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.abonnent.web.server;
 
-import no.nav.foreldrepenger.abonnent.web.app.konfig.ApplicationConfig;
+import no.nav.foreldrepenger.abonnent.web.app.konfig.ApiConfig;
 import no.nav.foreldrepenger.abonnent.web.server.abac.db.DatasourceUtil;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule;
@@ -198,7 +198,7 @@ public class JettyServer {
     }
 
     private static List<Class<?>> getWebInfClasses() {
-        return List.of(ApplicationConfig.class);
+        return List.of(ApiConfig.class);
     }
 
     private Integer getServerPort() {

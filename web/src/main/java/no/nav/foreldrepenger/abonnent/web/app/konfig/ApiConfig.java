@@ -1,18 +1,5 @@
 package no.nav.foreldrepenger.abonnent.web.app.konfig;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-
-import org.glassfish.jersey.server.ServerProperties;
-
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -25,37 +12,45 @@ import no.nav.foreldrepenger.abonnent.web.app.exceptions.GeneralRestExceptionMap
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonParseExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.jackson.JacksonJsonConfig;
+import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
+import org.glassfish.jersey.server.ServerProperties;
 
-@ApplicationPath(ApplicationConfig.API_URI)
-public class ApplicationConfig extends Application {
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@ApplicationPath(ApiConfig.API_URI)
+public class ApiConfig extends Application {
+
+    private static final Environment ENV = Environment.current();
 
     public static final String API_URI = "/api";
 
-    public ApplicationConfig() {
+    public ApiConfig() {
         OpenAPI oas = new OpenAPI();
         Info info = new Info()
                 .title("Vedtaksløsningen - Abonnent")
                 .version("1.0")
-                .description("REST grensesnitt for Fpabonnent.");
+                .description("REST grensesnitt for fp-abonnent.");
 
         oas.info(info)
                 .addServersItem(new Server()
-                        .url("/fpabonnent"));
+                        .url(ENV.getProperty("context.path", "/fpabonnent")));
+
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
                 .openAPI(oas)
                 .prettyPrint(true)
-                .scannerClass("io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner")
-                .resourcePackages(Stream.of("no.nav")
-                        .collect(Collectors.toSet()));
-
+                .resourceClasses(getClasses().stream().map(Class::getName).collect(Collectors.toSet()));
         try {
             new JaxrsOpenApiContextBuilder<>()
                     .openApiConfiguration(oasConfig)
                     .buildContext(true)
                     .read();
         } catch (OpenApiConfigurationException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new TekniskException("OPEN-API", e.getMessage(), e);
         }
     }
 
