@@ -79,10 +79,6 @@
 
 		<!-- Metrics, helse- og selftest -->
 		<dependency>
-			<groupId>io.dropwizard.metrics</groupId>
-			<artifactId>metrics-healthchecks</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>io.prometheus</groupId>
 			<artifactId>simpleclient_dropwizard</artifactId>
 		</dependency>
