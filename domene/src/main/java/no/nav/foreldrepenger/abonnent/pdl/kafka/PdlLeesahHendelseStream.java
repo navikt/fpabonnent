@@ -1,7 +1,10 @@
 package no.nav.foreldrepenger.abonnent.pdl.kafka;
 
-import no.nav.person.pdl.leesah.Personhendelse;
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
+import java.time.Duration;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
@@ -9,15 +12,17 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.time.Duration;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.person.pdl.leesah.Personhendelse;
+import no.nav.vedtak.apptjeneste.AppServiceHandler;
+import no.nav.vedtak.felles.integrasjon.kafka.KafkaProperties;
 
 @ApplicationScoped
 public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegration {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseStream.class);
 
+    private static final String APPLICATION_ID = "fpabonnent";  // Hold konstant pga offset commit !!
 
     private Topic<String, Personhendelse> topic;
     private KafkaStreams stream;
@@ -26,25 +31,25 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
     }
 
     @Inject
-    public PdlLeesahHendelseStream(PdlLeesahHendelseHåndterer håndterer, PdlLeesahHendelseProperties streamKafkaProperties) {
-        this.topic = streamKafkaProperties.getTopic();
-        this.stream = createKafkaStreams(topic, håndterer, streamKafkaProperties);
+    public PdlLeesahHendelseStream(@KonfigVerdi(value = "kafka.pdl.leesah.topic") String topicName,
+                                   PdlLeesahHendelseHåndterer håndterer) {
+        this.topic = Topic.createConfiguredTopic(topicName);
+        this.stream = createKafkaStreams(topic, håndterer);
     }
 
     @SuppressWarnings("resource")
     private static KafkaStreams createKafkaStreams(Topic<String, Personhendelse> topic,
-                                                   PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer, // ubrukt inntil offset satt
-                                                   PdlLeesahHendelseProperties properties) {
+                                                   PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer) {
         final Consumed<String, Personhendelse> consumed = Consumed
                 .<String, Personhendelse>with(Topology.AutoOffsetReset.LATEST)
-                .withKeySerde(topic.getSerdeKey())
-                .withValueSerde(topic.getSerdeValue());
+                .withKeySerde(topic.serdeKey())
+                .withValueSerde(topic.serdeValue());
 
         final StreamsBuilder builder = new StreamsBuilder();
-        builder.stream(topic.getTopic(), consumed)
+        builder.stream(topic.topic(), consumed)
                 .foreach(pdlLeesahHendelseHåndterer::handleMessage);
 
-        return new KafkaStreams(builder.build(), properties.getProperties());
+        return new KafkaStreams(builder.build(), KafkaProperties.forStreamsGenericValue(APPLICATION_ID, topic.serdeValue()));
     }
 
     @Override
@@ -69,7 +74,7 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
     }
 
     private String getTopicName() {
-        return topic.getTopic();
+        return topic.topic();
     }
 
     private void addShutdownHooks() {
