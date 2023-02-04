@@ -20,3 +20,9 @@ Applikasjonen tar inn hendelser fra potensielt flere kilder og videresender diss
 Spørsmål knyttet til koden eller prosjektet kan rettes til:
 * nav.team.foreldrepenger@nav.no
 * #teamforeldrepenger
+
+### Sikkerhet
+Det er mulig å kalle tjenesten med bruk av følgende tokens
+- Azure CC
+- Azure OBO med følgende rettigheter:
+    - fpsak-drift
