@@ -3,10 +3,12 @@ package no.nav.foreldrepenger.abonnent.web.app.tjenester;
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 /**
  * Starter interne applikasjontjenester
  */
+@WebListener
 public class ApplicationContextListener implements ServletContextListener {
 
     @Inject

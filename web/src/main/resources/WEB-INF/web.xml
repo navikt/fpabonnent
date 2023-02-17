@@ -3,11 +3,6 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
                  http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
 
-    <!-- Listeners her slik at vi kan styre rekkefølgen de kjøres i: -->
-    <listener>
-        <listener-class>no.nav.foreldrepenger.abonnent.web.app.tjenester.ApplicationContextListener</listener-class>
-    </listener>
-
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Ubeskyttet</web-resource-name>
