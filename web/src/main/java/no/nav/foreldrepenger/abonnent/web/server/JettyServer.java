@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.abonnent.web.server;
 
-import no.nav.foreldrepenger.abonnent.web.app.konfig.ApiConfig;
 import no.nav.foreldrepenger.abonnent.web.server.abac.db.DatasourceUtil;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule;
@@ -14,9 +13,9 @@ import org.eclipse.jetty.security.jaspi.JaspiAuthenticatorFactory;
 import org.eclipse.jetty.security.jaspi.provider.JaspiAuthConfigProvider;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.MetaData;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
@@ -34,23 +33,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.eclipse.jetty.webapp.MetaInfConfiguration.CONTAINER_JAR_PATTERN;
+
 public class JettyServer {
 
     private static final Environment ENV = Environment.current();
     private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
     private static final String CONTEXT_PATH = ENV.getProperty("context.path", "/fpabonnent");
-
-    /**
-     * Legges først slik at alltid resetter context før prosesserer nye requests.
-     * Kjøres først så ikke risikerer andre har satt Request#setHandled(true).
-     */
-    static final class ResetLogContextHandler extends AbstractHandler {
-        @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-            MDC.clear();
-        }
-    }
+    private static final String JETTY_SCAN_LOCATIONS = "^.*jersey-.*\\.jar$|^.*felles-.*\\.jar$|^.*/app\\.jar$";
+    private static final String JETTY_LOCAL_CLASSES = "^.*/target/classes/|";
 
     private final Integer serverPort;
 
@@ -151,7 +143,7 @@ public class JettyServer {
         return httpConfig;
     }
 
-    private static WebAppContext createContext() throws IOException {
+    private static ContextHandler createContext() throws IOException {
         var ctx = new WebAppContext();
         ctx.setParentLoaderPriority(true);
 
@@ -163,15 +155,17 @@ public class JettyServer {
         ctx.setDescriptor(descriptor);
         ctx.setContextPath(CONTEXT_PATH);
         ctx.setResourceBase(".");
-        ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
-        ctx.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern",
-                "^.*jersey-.*.jar$|^.*felles-.*.jar$");
 
-        ctx.addEventListener(new org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener());
+        ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+
+        // Scanns the CLASSPATH for classes and jars.
+        ctx.setAttribute(CONTAINER_JAR_PATTERN, String.format("%s%s", ENV.isLocal() ? JETTY_LOCAL_CLASSES : "", JETTY_SCAN_LOCATIONS));
+
+
         ctx.addEventListener(new org.jboss.weld.environment.servlet.Listener());
+        ctx.addEventListener(new org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener());
 
         ctx.setSecurityHandler(createSecurityHandler());
-        updateMetaData(ctx.getMetaData());
         ctx.setThrowUnavailableOnStartupException(true);
         return ctx;
     }
@@ -187,21 +181,18 @@ public class JettyServer {
         return securityHandler;
     }
 
-    private static void updateMetaData(MetaData metaData) {
-        // Find path to class-files while starting jetty from development environment.
-        var resources = getWebInfClasses().stream()
-                .map(c -> Resource.newResource(c.getProtectionDomain().getCodeSource().getLocation()))
-                .distinct()
-                .toList();
-
-        metaData.setWebInfClassesResources(resources);
-    }
-
-    private static List<Class<?>> getWebInfClasses() {
-        return List.of(ApiConfig.class);
-    }
-
     private Integer getServerPort() {
         return this.serverPort;
+    }
+
+    /**
+     * Legges først slik at alltid resetter context før prosesserer nye requests.
+     * Kjøres først så ikke risikerer andre har satt Request#setHandled(true).
+     */
+    static final class ResetLogContextHandler extends AbstractHandler {
+        @Override
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+            MDC.clear();
+        }
     }
 }
