@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
  *
  * @deprecated endre grensesnitt til @JsonValue istdf @JsonProperty + @JsonCreator
  */
-@Deprecated(since = "2020-09-17")
+@Deprecated(since = "2020-09-17") // OBS: brukes pga gammel payload i inngående hendelse - slett når man sletter eldre htidligereHendelse
 public class TempAvledeKode {
 
     private static final Logger LOG = LoggerFactory.getLogger(TempAvledeKode.class);
