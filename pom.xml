@@ -25,13 +25,13 @@
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>4.2.23</felles.version>
-        <prosesstask.version>3.1.17</prosesstask.version>
-        <fp-kontrakter.version>6.2.9</fp-kontrakter.version>
+        <felles.version>4.2.25</felles.version>
+        <prosesstask.version>3.1.19</prosesstask.version>
+        <fp-kontrakter.version>6.2.10</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <avro.version>1.11.1</avro.version>
-        <confluent.version>7.2.1</confluent.version>
+        <confluent.version>7.3.1</confluent.version>
     </properties>
 
     <dependencyManagement>
