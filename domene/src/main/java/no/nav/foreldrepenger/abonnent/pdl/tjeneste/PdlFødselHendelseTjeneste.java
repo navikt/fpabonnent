@@ -31,7 +31,7 @@ import no.nav.vedtak.exception.TekniskException;
 @HendelseTypeRef(HendelseTypeRef.PDL_FØDSEL_HENDELSE)
 public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHendelsePayload> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PdlFødselHendelseTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PdlFødselHendelseTjeneste.class);
     private static final Environment ENV = Environment.current();
 
     private HendelseTjenesteHjelper hendelseTjenesteHjelper;
@@ -65,9 +65,10 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
     @Override
     public boolean vurderOmHendelseKanForkastes(PdlFødselHendelsePayload payload) {
-        if (payload.getFødselsdato().isPresent() && payload.getFødselsdato().get().isBefore(LocalDate.now().minusYears(2))) {
-            LOGGER.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet", payload.getHendelseId(),
-                payload.getFødselsdato().get());
+        var fødselsdato = payload.getFødselsdato();
+        if (fødselsdato.isPresent() && fødselsdato.get().isBefore(LocalDate.now().minusYears(2))) {
+            LOG.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet", payload.getHendelseId(),
+                fødselsdato.get());
             return true;
         }
         return hendelseTjenesteHjelper.vurderOmHendelseKanForkastes(payload, this::payloadFraJsonString);
@@ -82,11 +83,11 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 resultat.setForeldre(foreldre.stream().map(AktørId::getId).collect(Collectors.toSet()));
                 return resultat;
             } else {
-                LOGGER.info("Fant ikke foreldre for hendelse {} med type {}", payload.getHendelseId(), payload.getHendelseType());
+                LOG.info("Fant ikke foreldre for hendelse {} med type {}", payload.getHendelseId(), payload.getHendelseType());
                 return new FødselKlarForSorteringResultat(false, true);
             }
         }
-        LOGGER.warn("Hendelse {} med type {} har ikke barns fødselsnummer", payload.getHendelseId(), payload.getHendelseType());
+        LOG.warn("Hendelse {} med type {} har ikke barns fødselsnummer", payload.getHendelseId(), payload.getHendelseType());
         return new FødselKlarForSorteringResultat(false, false);
     }
 
@@ -108,10 +109,11 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
             årsak = "Årsaken er at barnet fortsatt ikke har registrerte foreldre i PDL.";
             info = true; // Innvandring blir varslet som fødsel OPPRETTET, men mangler ofte foreldreopplysninger (gjelder primært voksne)
         }
+        var melding = basismelding + årsak;
         if (info) {
-            LOGGER.info(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+            LOG.info(melding, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         } else {
-            LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+            LOG.warn(melding, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         }
     }
 
@@ -124,7 +126,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 if (ENV.isProd()) {
                     throw e;
                 } else {
-                    LOGGER.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}",
+                    LOG.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}",
                         ENV.getCluster().clusterName(), e);
                 }
             }

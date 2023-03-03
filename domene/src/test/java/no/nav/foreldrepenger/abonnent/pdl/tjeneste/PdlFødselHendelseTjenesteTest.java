@@ -18,28 +18,26 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
-import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
 import no.nav.vedtak.exception.TekniskException;
 
-
-public class PdlFødselHendelseTjenesteTest {
+class PdlFødselHendelseTjenesteTest {
 
     private HendelseTjeneste hendelseTjeneste;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         hendelseTjeneste = new PdlFødselHendelseTjeneste();
     }
 
     @Test
-    public void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload() {
+    void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload() {
         // Arrange
-        PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding();
+        var fødselmelding = HendelseTestDataUtil.lagFødselsmelding();
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -51,12 +49,12 @@ public class PdlFødselHendelseTjenesteTest {
     }
 
     @Test
-    public void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_uten_ugyldige_aktørId_på_barn() {
+    void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_uten_ugyldige_aktørId_på_barn() {
         // Arrange
-        PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(of("26364656768", "234567"), of(AKTØR_ID_MOR, AKTØR_ID_FAR), FØDSELSDATO);
+        var fødselmelding = HendelseTestDataUtil.lagFødselsmelding(of("26364656768", "234567"), of(AKTØR_ID_MOR, AKTØR_ID_FAR), FØDSELSDATO);
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -68,14 +66,14 @@ public class PdlFødselHendelseTjenesteTest {
     }
 
     @Test
-    public void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_flere_identer_matcher_aktørId() {
+    void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_flere_identer_matcher_aktørId() {
         // Arrange
-        Set<String> aktørIdBarn = of("1234567890986", "1234567890987");
-        Set<String> aktørIdForeldre = of("1234567890989", "1234567890988", "1234567890990", "1234567890991");
-        PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(aktørIdBarn, aktørIdForeldre, FØDSELSDATO);
+        var aktørIdBarn = of("1234567890986", "1234567890987");
+        var aktørIdForeldre = of("1234567890989", "1234567890988", "1234567890990", "1234567890991");
+        var fødselmelding = HendelseTestDataUtil.lagFødselsmelding(aktørIdBarn, aktørIdForeldre, FØDSELSDATO);
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -89,13 +87,13 @@ public class PdlFødselHendelseTjenesteTest {
     }
 
     @Test
-    public void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_flere_identer_er_gyldig() {
+    void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_flere_identer_er_gyldig() {
         // Arrange
-        PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(of("26364656768", "1234567890987"),
+        var fødselmelding = HendelseTestDataUtil.lagFødselsmelding(of("26364656768", "1234567890987"),
             of("10018876555", "1234567890988", "30102040506", "1234567890989"), FØDSELSDATO);
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -107,12 +105,12 @@ public class PdlFødselHendelseTjenesteTest {
     }
 
     @Test
-    public void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_med_tomme_identer() {
+    void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_med_tomme_identer() {
         // Arrange
-        PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(Collections.emptySet(), Collections.emptySet(), null);
+        var fødselmelding = HendelseTestDataUtil.lagFødselsmelding(Collections.emptySet(), Collections.emptySet(), null);
 
         // Act
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -124,8 +122,7 @@ public class PdlFødselHendelseTjenesteTest {
     }
 
     @Test
-    public void skal_få_IO_exception_ved_konvertering_av_payload_med_syntaksfeil_i_payload() {
-
+    void skal_få_IO_exception_ved_konvertering_av_payload_med_syntaksfeil_i_payload() {
         assertThrows(TekniskException.class, () -> hendelseTjeneste.payloadFraJsonString("{{\"foo\":\"bar\"}"));
     }
 }

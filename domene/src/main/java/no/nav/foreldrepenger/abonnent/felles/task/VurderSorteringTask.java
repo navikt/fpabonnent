@@ -13,7 +13,6 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
@@ -49,15 +48,15 @@ public class VurderSorteringTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
-        String hendelseType = dataWrapper.getHendelseType().orElseThrow(AbonnentHendelserFeil::ukjentHendelseType);
-        HendelseTjeneste<HendelsePayload> hendelseTjeneste = getHendelseTjeneste(dataWrapper, hendelseType);
+        var dataWrapper = new HendelserDataWrapper(prosessTaskData);
+        var hendelseType = dataWrapper.getHendelseType().orElseThrow(AbonnentHendelserFeil::ukjentHendelseType);
+        var hendelseTjeneste = getHendelseTjeneste(dataWrapper, hendelseType);
 
-        Optional<Long> inngåendeHendelseId = dataWrapper.getInngåendeHendelseId();
-        inngåendeHendelseId.orElseThrow(() -> new IllegalStateException(
+        var inngåendeHendelseId = dataWrapper.getInngåendeHendelseId();
+        var hendelseId = inngåendeHendelseId.orElseThrow(() -> new IllegalStateException(
             "Prosesstask " + prosessTaskData.getId() + " peker ikke på en gyldig inngående hendelse og kan derfor ikke sorteres videre"));
-        InngåendeHendelse inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId.get());
-        HendelsePayload hendelsePayload = hendelseTjeneste.payloadFraJsonString(inngåendeHendelse.getPayload());
+        var inngåendeHendelse = hendelseRepository.finnEksaktHendelse(hendelseId);
+        var hendelsePayload = hendelseTjeneste.payloadFraJsonString(inngåendeHendelse.getPayload());
 
         if (hendelseTjeneste.vurderOmHendelseKanForkastes(hendelsePayload)) {
             ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse, true);
@@ -69,7 +68,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
             return;
         }
 
-        KlarForSorteringResultat klarForSorteringResultat = hendelseTjeneste.vurderOmKlarForSortering(hendelsePayload);
+        var klarForSorteringResultat = hendelseTjeneste.vurderOmKlarForSortering(hendelsePayload);
         if (klarForSorteringResultat.hendelseKlarForSortering()) {
             hendelseTjeneste.berikHendelseHvisNødvendig(inngåendeHendelse, klarForSorteringResultat);
             opprettSorteringTask(hendelsePayload.getHendelseId(), inngåendeHendelse, dataWrapper);
