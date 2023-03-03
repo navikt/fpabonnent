@@ -144,7 +144,8 @@ public class VurderSorteringTaskTest {
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
-        assertThat(vurderSorteringTask.getNesteKjøringEtter().toLocalDate()).isEqualTo(forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse).toLocalDate());
+        assertThat(vurderSorteringTask.getNesteKjøringEtter().toLocalDate()).isEqualTo(
+            forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse).toLocalDate());
 
         InngåendeHendelse hendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelse.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
@@ -180,13 +181,14 @@ public class VurderSorteringTaskTest {
     public void skal_ikke_grovsortere_fødselshendelse_med_fødselsdato_over_to_år_tilbake_i_tid() {
         // Arrange
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
-                .hendelseId("A")
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(LocalDateTime.now())
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusYears(10), PdlEndringstype.OPPRETTET, "A", null).build()))
-                .build();
+            .hendelseId("A")
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(LocalDateTime.now())
+            .payload(
+                JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusYears(10), PdlEndringstype.OPPRETTET, "A", null).build()))
+            .build();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseOpprettet);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
@@ -214,32 +216,32 @@ public class VurderSorteringTaskTest {
         when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
 
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
-                .hendelseId("A")
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(LocalDateTime.now())
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
-                .build();
+            .hendelseId("A")
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(LocalDateTime.now())
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
+            .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
         InngåendeHendelse hendelseKorrigert1 = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(null)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
-                .tidligereHendelseId("A")
-                .build();
+            .hendelseId("B")
+            .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+            .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+            .tidligereHendelseId("A")
+            .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert1);
         InngåendeHendelse hendelseKorrigert2 = InngåendeHendelse.builder()
-                .hendelseId("C")
-                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.KORRIGERT, "C", "B").build()))
-                .tidligereHendelseId("B")
-                .build();
+            .hendelseId("C")
+            .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.KORRIGERT, "C", "B").build()))
+            .tidligereHendelseId("B")
+            .build();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert2);
 
         ProsessTaskData vurderSorteringTask = ProsessTaskData.forProsessTask(VurderSorteringTask.class);
@@ -271,23 +273,23 @@ public class VurderSorteringTaskTest {
     public void skal_ikke_grovsortere_korrigering_da_en_tidligere_sendt_fødselshendelse_har_samme_fødselsdato() {
         // Arrange
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
-                .hendelseId("A")
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(LocalDateTime.now())
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
-                .build();
+            .hendelseId("A")
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(LocalDateTime.now())
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
+            .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(null)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
-                .tidligereHendelseId("A")
-                .build();
+            .hendelseId("B")
+            .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+            .tidligereHendelseId("A")
+            .build();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
@@ -313,33 +315,34 @@ public class VurderSorteringTaskTest {
     public void skal_ikke_grovsortere_korrigering_der_tidligere_fødselshendelser_ikke_ble_sendt_til_fpsak() {
         // Arrange
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
-                .hendelseId("A")
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(null)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now().minusDays(2), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
-                .build();
+            .hendelseId("A")
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(
+                JsonMapper.toJson(opprettFødsel(LocalDateTime.now().minusDays(2), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
+            .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
         InngåendeHendelse hendelseKorrigert1 = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(null)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now().minusDays(1), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
-                .tidligereHendelseId("A")
-                .build();
+            .hendelseId("B")
+            .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+            .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now().minusDays(1), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+            .tidligereHendelseId("A")
+            .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseKorrigert1);
         InngåendeHendelse hendelseKorrigert2 = InngåendeHendelse.builder()
-                .hendelseId("C")
-                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(null)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "C", "B").build()))
-                .tidligereHendelseId("B")
-                .build();
+            .hendelseId("C")
+            .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "C", "B").build()))
+            .tidligereHendelseId("B")
+            .build();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert2);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
@@ -365,14 +368,14 @@ public class VurderSorteringTaskTest {
     public void skal_ikke_grovsortere_korrigering_der_tidligere_fødselshendelse_ikke_finnes_i_vårt_system() {
         // Arrange
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(null)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
-                .tidligereHendelseId("A")
-                .build();
+            .hendelseId("B")
+            .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+            .tidligereHendelseId("A")
+            .build();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
@@ -398,14 +401,14 @@ public class VurderSorteringTaskTest {
     public void skal_ikke_grovsortere_annullering_der_tidligere_dødshendelse_ikke_finnes_i_vårt_system() {
         // Arrange
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseType(HendelseType.PDL_DØD_ANNULLERT)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .sendtTidspunkt(null)
-                .payload(JsonMapper.toJson(opprettDødAnnullert(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.ANNULLERT, "B", "A").build()))
-                .tidligereHendelseId("A")
-                .build();
+            .hendelseId("B")
+            .hendelseType(HendelseType.PDL_DØD_ANNULLERT)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(JsonMapper.toJson(opprettDødAnnullert(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.ANNULLERT, "B", "A").build()))
+            .tidligereHendelseId("A")
+            .build();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
@@ -432,23 +435,23 @@ public class VurderSorteringTaskTest {
         // Arrange
         LocalDateTime håndteresTidspunktA = LocalDateTime.now();
         InngåendeHendelse hendelseOpprettet = InngåendeHendelse.builder()
-                .hendelseId("A")
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
-                .håndteresEtterTidspunkt(håndteresTidspunktA)
-                .build();
+            .hendelseId("A")
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.OPPRETTET, "A", null).build()))
+            .håndteresEtterTidspunkt(håndteresTidspunktA)
+            .build();
         hendelseRepository.lagreInngåendeHendelse(hendelseOpprettet);
         InngåendeHendelse hendelseKorrigert = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .hendelseKilde(HendelseKilde.PDL)
-                .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
-                .tidligereHendelseId("A")
-                .håndteresEtterTidspunkt(håndteresTidspunktA.minusMinutes(2))
-                .build();
+            .hendelseId("B")
+            .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .payload(JsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now(), PdlEndringstype.KORRIGERT, "B", "A").build()))
+            .tidligereHendelseId("A")
+            .håndteresEtterTidspunkt(håndteresTidspunktA.minusMinutes(2))
+            .build();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         HendelserDataWrapper hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
@@ -479,13 +482,17 @@ public class VurderSorteringTaskTest {
     private InngåendeHendelse opprettInngåendeHendelse(LocalDateTime opprettetTid) {
         PdlFødsel.Builder pdlFødsel = opprettFødsel(opprettetTid, LocalDate.now(), PdlEndringstype.OPPRETTET, HENDELSE_ID, null);
         return InngåendeHendelse.builder()
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .payload(JsonMapper.toJson(pdlFødsel.build()))
-                .build();
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .payload(JsonMapper.toJson(pdlFødsel.build()))
+            .build();
     }
 
-    private PdlFødsel.Builder opprettFødsel(LocalDateTime opprettetTid, LocalDate fødselsdato, PdlEndringstype endringstype, String hendelseId, String tidligereHendelseID) {
+    private PdlFødsel.Builder opprettFødsel(LocalDateTime opprettetTid,
+                                            LocalDate fødselsdato,
+                                            PdlEndringstype endringstype,
+                                            String hendelseId,
+                                            String tidligereHendelseID) {
         PdlFødsel.Builder pdlFødsel = PdlFødsel.builder();
         pdlFødsel.medHendelseId(hendelseId);
         pdlFødsel.medHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET);
@@ -498,7 +505,11 @@ public class VurderSorteringTaskTest {
         return pdlFødsel;
     }
 
-    private PdlDød.Builder opprettDødAnnullert(LocalDateTime opprettetTid, LocalDate dødsdato, PdlEndringstype endringstype, String hendelseId, String tidligereHendelseID) {
+    private PdlDød.Builder opprettDødAnnullert(LocalDateTime opprettetTid,
+                                               LocalDate dødsdato,
+                                               PdlEndringstype endringstype,
+                                               String hendelseId,
+                                               String tidligereHendelseID) {
         PdlDød.Builder pdlDød = PdlDød.builder();
         pdlDød.medHendelseId(hendelseId);
         pdlDød.medHendelseType(HendelseType.PDL_DØD_ANNULLERT);

@@ -64,29 +64,29 @@ public class HendelseRepositoryTest {
     public void skal_returnere_hendelse_fra_PDL_som_er_grovsortert() {
         // Arrange
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
-                .hendelseId(HENDELSE_ID)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload1")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
+            .hendelseId(HENDELSE_ID)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload("payload1")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.GROVSORTERT)
+            .håndteresEtterTidspunkt(LocalDateTime.now())
+            .build();
         InngåendeHendelse hendelse3 = InngåendeHendelse.builder() // Feil hendelseId
-                .hendelseId(HENDELSE_ID + 1)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload3")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
+            .hendelseId(HENDELSE_ID + 1)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload("payload3")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.GROVSORTERT)
+            .håndteresEtterTidspunkt(LocalDateTime.now())
+            .build();
         InngåendeHendelse hendelse4 = InngåendeHendelse.builder() // Feil håndtertStatus
-                .hendelseId(HENDELSE_ID)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload4")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
+            .hendelseId(HENDELSE_ID)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload("payload4")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .håndteresEtterTidspunkt(LocalDateTime.now())
+            .build();
         hendelseRepository.lagreInngåendeHendelse(hendelse1);
         hendelseRepository.lagreInngåendeHendelse(hendelse3);
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse4);

@@ -70,17 +70,33 @@ public class PdlUtflyttingHendelsePayload extends HendelsePayload {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         PdlUtflyttingHendelsePayload payload = (PdlUtflyttingHendelsePayload) o;
 
-        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) return false;
-        if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) return false;
-        if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) return false;
-        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
-        if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) return false;
-        if (aktørId != null ? !aktørId.equals(payload.aktørId) : payload.aktørId != null) return false;
+        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) {
+            return false;
+        }
+        if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) {
+            return false;
+        }
+        if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) {
+            return false;
+        }
+        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) {
+            return false;
+        }
+        if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) {
+            return false;
+        }
+        if (aktørId != null ? !aktørId.equals(payload.aktørId) : payload.aktørId != null) {
+            return false;
+        }
         return utflyttingsdato != null ? utflyttingsdato.equals(payload.utflyttingsdato) : payload.utflyttingsdato == null;
     }
 

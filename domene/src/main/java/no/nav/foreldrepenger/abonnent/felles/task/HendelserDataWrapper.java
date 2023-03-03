@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.abonnent.felles.task;
 
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Properties;
-
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class HendelserDataWrapper {
 

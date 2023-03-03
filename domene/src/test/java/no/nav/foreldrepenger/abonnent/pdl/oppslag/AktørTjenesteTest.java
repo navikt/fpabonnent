@@ -35,7 +35,8 @@ public class AktørTjenesteTest {
     @Test
     public void skal_hente_aktør_for_fnr() {
         // Arrange
-        when(pdlMock.hentIdenter(any(), any())).thenReturn(new Identliste(List.of(new IdentInformasjon(AKTØR_ID.getId(), IdentGruppe.AKTORID, false))));
+        when(pdlMock.hentIdenter(any(), any())).thenReturn(
+            new Identliste(List.of(new IdentInformasjon(AKTØR_ID.getId(), IdentGruppe.AKTORID, false))));
 
         // Act
         Optional<AktørId> optAktørId = aktørTjeneste.hentAktørIdForPersonIdent(FNR);

@@ -26,7 +26,7 @@ public class DatabaseHealthCheck {
     public DatabaseHealthCheck() {
         this.jndiName = JDBC_DEFAULT_DS;
     }
-    
+
     DatabaseHealthCheck(String dsJndiName) {
         this.jndiName = dsJndiName;
     }

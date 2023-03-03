@@ -1,13 +1,13 @@
 package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
-import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ForeldreTjeneste {
@@ -26,8 +26,9 @@ public class ForeldreTjeneste {
     }
 
     public Set<AktørId> hentForeldre(PersonIdent barn) {
-        return fødselTjeneste.hentForeldreTil(barn).stream()
-                .flatMap(f -> aktørTjeneste.hentAktørIdForPersonIdent(f).stream())
-                .collect(Collectors.toSet());
+        return fødselTjeneste.hentForeldreTil(barn)
+            .stream()
+            .flatMap(f -> aktørTjeneste.hentAktørIdForPersonIdent(f).stream())
+            .collect(Collectors.toSet());
     }
 }

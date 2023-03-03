@@ -69,8 +69,7 @@ public enum HendelseType implements Kodeverdi {
             return null;
         }
         var kode = TempAvledeKode.getVerdi(HendelseType.class, node, "kode", kallCtx);
-        return Optional.ofNullable(kode).map(KODER::get)
-            .orElseThrow(() -> new IllegalArgumentException("Ukjent Hendelsetype: " + kode));
+        return Optional.ofNullable(kode).map(KODER::get).orElseThrow(() -> new IllegalArgumentException("Ukjent Hendelsetype: " + kode));
     }
 
 

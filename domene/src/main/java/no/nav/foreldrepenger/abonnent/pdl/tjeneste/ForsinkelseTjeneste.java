@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 /**
  * Tjenesten forsinker hendelser i minst 1 time pga oppførsel der det benyttes ANNULLERT+OPPRETTET til korrigeringer.
  * Det er ikke ønsket at ANNULLERT-hendelsen skal slippes før grunnlaget er klart med den korrigerte informasjonen.
- *
+ * <p>
  * Videre ønsker vi å unngå hendelser på faste stengt dager, helger, og natten når Oppdrag er stengt.
  */
 @ApplicationScoped
@@ -34,14 +34,8 @@ public class ForsinkelseTjeneste {
 
     private static final Set<DayOfWeek> HELGEDAGER = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 
-    private static final Set<MonthDay> FASTE_STENGT_DAGER = Set.of(
-            MonthDay.of(1, 1),
-            MonthDay.of(5, 1),
-            MonthDay.of(5, 17),
-            MonthDay.of(12, 25),
-            MonthDay.of(12, 26),
-            MonthDay.of(12, 31)
-    );
+    private static final Set<MonthDay> FASTE_STENGT_DAGER = Set.of(MonthDay.of(1, 1), MonthDay.of(5, 1), MonthDay.of(5, 17), MonthDay.of(12, 25),
+        MonthDay.of(12, 26), MonthDay.of(12, 31));
 
     private ForsinkelseKonfig forsinkelseKonfig;
     private HendelseRepository hendelseRepository;
@@ -71,17 +65,21 @@ public class ForsinkelseTjeneste {
 
     private Optional<LocalDateTime> sjekkOmHendelsenMåKjøreEtterTidligereHendelse(InngåendeHendelse inngåendeHendelse) {
         if (inngåendeHendelse.getTidligereHendelseId() != null) {
-            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(), inngåendeHendelse.getHendelseKilde());
+            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(),
+                inngåendeHendelse.getHendelseKilde());
             if (tidligereHendelse.isPresent() && !HåndtertStatusType.HÅNDTERT.equals(tidligereHendelse.get().getHåndtertStatus())) {
                 LocalDateTime tidspunktBasertPåTidligereHendelse = tidligereHendelse.get().getHåndteresEtterTidspunkt().plusMinutes(2);
                 if (LocalDateTime.now().isAfter(tidspunktBasertPåTidligereHendelse)) {
                     LocalDateTime nesteDagEtterRetryAll = LocalDateTime.now().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
-                    LOGGER.info("Hendelse {} har en tidligere hendelse {} som skulle vært håndtert {}, men ikke er det, og vil derfor bli forsøkt behandlet igjen i morgen etter retry all: {}",
-                            inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(), tidligereHendelse.get().getHåndteresEtterTidspunkt(), nesteDagEtterRetryAll);
+                    LOGGER.info(
+                        "Hendelse {} har en tidligere hendelse {} som skulle vært håndtert {}, men ikke er det, og vil derfor bli forsøkt behandlet igjen i morgen etter retry all: {}",
+                        inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
+                        tidligereHendelse.get().getHåndteresEtterTidspunkt(), nesteDagEtterRetryAll);
                     return Optional.of(nesteDagEtterRetryAll);
                 } else {
                     LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert {} og vil derfor bli behandlet {}",
-                            inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(), tidligereHendelse.get().getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
+                        inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
+                        tidligereHendelse.get().getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
                     return Optional.of(tidspunktBasertPåTidligereHendelse);
                 }
             }
@@ -121,8 +119,7 @@ public class ForsinkelseTjeneste {
     }
 
     private LocalDateTime getTidspunktMellom0630og0659(LocalDate utgangspunkt) {
-        return LocalDateTime.of(utgangspunkt,
-                OPPDRAG_VÅKNER.plusSeconds(LocalDateTime.now().getNano() % 1739));
+        return LocalDateTime.of(utgangspunkt, OPPDRAG_VÅKNER.plusSeconds(LocalDateTime.now().getNano() % 1739));
     }
 
     private boolean erFastRødDag(LocalDate dato) {

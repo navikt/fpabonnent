@@ -31,23 +31,19 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
     }
 
     @Inject
-    public PdlLeesahHendelseStream(@KonfigVerdi(value = "kafka.pdl.leesah.topic") String topicName,
-                                   PdlLeesahHendelseHåndterer håndterer) {
+    public PdlLeesahHendelseStream(@KonfigVerdi(value = "kafka.pdl.leesah.topic") String topicName, PdlLeesahHendelseHåndterer håndterer) {
         this.topic = Topic.createConfiguredTopic(topicName);
         this.stream = createKafkaStreams(topic, håndterer);
     }
 
     @SuppressWarnings("resource")
-    private static KafkaStreams createKafkaStreams(Topic<String, Personhendelse> topic,
-                                                   PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer) {
-        final Consumed<String, Personhendelse> consumed = Consumed
-                .<String, Personhendelse>with(Topology.AutoOffsetReset.LATEST)
-                .withKeySerde(topic.serdeKey())
-                .withValueSerde(topic.serdeValue());
+    private static KafkaStreams createKafkaStreams(Topic<String, Personhendelse> topic, PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer) {
+        final Consumed<String, Personhendelse> consumed = Consumed.<String, Personhendelse>with(Topology.AutoOffsetReset.LATEST)
+            .withKeySerde(topic.serdeKey())
+            .withValueSerde(topic.serdeValue());
 
         final StreamsBuilder builder = new StreamsBuilder();
-        builder.stream(topic.topic(), consumed)
-                .foreach(pdlLeesahHendelseHåndterer::handleMessage);
+        builder.stream(topic.topic(), consumed).foreach(pdlLeesahHendelseHåndterer::handleMessage);
 
         return new KafkaStreams(builder.build(), KafkaProperties.forStreamsGenericValue(APPLICATION_ID, topic.serdeValue()));
     }

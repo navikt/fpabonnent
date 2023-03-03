@@ -26,11 +26,12 @@ public class RestApiInputValideringAnnoteringTest extends RestApiTester {
         for (Method method : finnAlleRestMetoder()) {
             for (int i = 0; i < method.getParameterCount(); i++) {
                 assertThat(method.getParameterTypes()[i].isAssignableFrom(String.class)).as(
-                    "REST-metoder skal ikke har parameter som er String eller mer generelt. Bruk DTO-er og valider. " + printKlasseOgMetodeNavn.apply(method))
-                    .isFalse();
-                assertThat(isRequiredAnnotationPresent(method.getParameters()[i]))
-                    .as("Alle parameter for REST-metoder skal være annotert med @Valid. Var ikke det for " + printKlasseOgMetodeNavn.apply(method))
-                    .withFailMessage("Fant parametere som mangler @Valid annotation '" + method.getParameters()[i].toString() + "'").isTrue();
+                    "REST-metoder skal ikke har parameter som er String eller mer generelt. Bruk DTO-er og valider. " + printKlasseOgMetodeNavn.apply(
+                        method)).isFalse();
+                assertThat(isRequiredAnnotationPresent(method.getParameters()[i])).as(
+                        "Alle parameter for REST-metoder skal være annotert med @Valid. Var ikke det for " + printKlasseOgMetodeNavn.apply(method))
+                    .withFailMessage("Fant parametere som mangler @Valid annotation '" + method.getParameters()[i].toString() + "'")
+                    .isTrue();
             }
         }
     }

@@ -50,12 +50,12 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
-        String hendelseType = dataWrapper.getHendelseType()
-                .orElseThrow(AbonnentHendelserFeil::ukjentHendelseType);
+        String hendelseType = dataWrapper.getHendelseType().orElseThrow(AbonnentHendelserFeil::ukjentHendelseType);
         HendelseTjeneste<HendelsePayload> hendelseTjeneste = getHendelseTjeneste(dataWrapper, hendelseType);
 
         Optional<Long> inngåendeHendelseId = dataWrapper.getInngåendeHendelseId();
-        inngåendeHendelseId.orElseThrow(() -> new IllegalStateException("Prosesstask " + prosessTaskData.getId() + " peker ikke på en gyldig inngående hendelse og kan derfor ikke sorteres videre"));
+        inngåendeHendelseId.orElseThrow(() -> new IllegalStateException(
+            "Prosesstask " + prosessTaskData.getId() + " peker ikke på en gyldig inngående hendelse og kan derfor ikke sorteres videre"));
         InngåendeHendelse inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId.get());
         HendelsePayload hendelsePayload = hendelseTjeneste.payloadFraJsonString(inngåendeHendelse.getPayload());
 
@@ -84,10 +84,11 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     private boolean enTidligereHendelseLiggerUbehandlet(InngåendeHendelse inngåendeHendelse) {
         // Scenario som kanskje kan oppstå hvis hendelsene kommer samtidig på Kafka, og blir plukket av forskjellige noder samtidig
         if (inngåendeHendelse.getTidligereHendelseId() != null) {
-            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(), inngåendeHendelse.getHendelseKilde());
+            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(),
+                inngåendeHendelse.getHendelseKilde());
             if (tidligereHendelse.isPresent() && !HåndtertStatusType.HÅNDTERT.equals(tidligereHendelse.get().getHåndtertStatus())) {
                 LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert enda, og vil derfor vente til den er ferdig",
-                        inngåendeHendelse.getHendelseId(), tidligereHendelse.get().getHendelseId());
+                    inngåendeHendelse.getHendelseId(), tidligereHendelse.get().getHendelseId());
                 return true;
             }
         }
@@ -104,9 +105,10 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     }
 
     private void opprettVurderSorteringTask(HendelsePayload hendelsePayload, InngåendeHendelse inngåendeHendelse) {
-        LocalDateTime nesteKjøringEtter = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse);
-        LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}",
-                hendelsePayload.getHendelseId(), inngåendeHendelse.getHendelseType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
+        LocalDateTime nesteKjøringEtter = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(),
+            inngåendeHendelse);
+        LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}", hendelsePayload.getHendelseId(),
+            inngåendeHendelse.getHendelseType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
         hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, nesteKjøringEtter);
         HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
         vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
@@ -128,6 +130,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     }
 
     private HendelseTjeneste<HendelsePayload> getHendelseTjeneste(HendelserDataWrapper dataWrapper, String hendelseType) {
-        return hendelseTjenesteProvider.finnTjeneste(HendelseType.finnFraKode(hendelseType, "vurdersorter"), dataWrapper.getHendelseId().orElse(null));
+        return hendelseTjenesteProvider.finnTjeneste(HendelseType.finnFraKode(hendelseType, "vurdersorter"),
+            dataWrapper.getHendelseId().orElse(null));
     }
 }

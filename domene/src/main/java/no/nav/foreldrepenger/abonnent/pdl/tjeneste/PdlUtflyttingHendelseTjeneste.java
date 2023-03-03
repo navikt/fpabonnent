@@ -1,16 +1,5 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
-import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper.hentUtAktørIderFraString;
-
-import java.time.LocalDate;
-import java.util.Set;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
@@ -20,6 +9,17 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlUtflytting;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlUtflyttingHendelsePayload;
 import no.nav.foreldrepenger.abonnent.pdl.oppslag.UtflyttingsDatoTjeneste;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import java.time.LocalDate;
+import java.util.Set;
+
+import static no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper.hentUtAktørIderFraString;
 
 
 @ApplicationScoped
@@ -36,8 +36,7 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
     }
 
     @Inject
-    public PdlUtflyttingHendelseTjeneste(HendelseTjenesteHjelper hendelseTjenesteHjelper,
-                                         UtflyttingsDatoTjeneste utflyttingTjeneste) {
+    public PdlUtflyttingHendelseTjeneste(HendelseTjenesteHjelper hendelseTjenesteHjelper, UtflyttingsDatoTjeneste utflyttingTjeneste) {
         this.hendelseTjenesteHjelper = hendelseTjenesteHjelper;
         this.utflyttingTjeneste = utflyttingTjeneste;
     }
@@ -46,15 +45,14 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
     public PdlUtflyttingHendelsePayload payloadFraJsonString(String payload) {
         var pdlUtflytting = JsonMapper.fromJson(payload, PdlUtflytting.class);
 
-        return new PdlUtflyttingHendelsePayload.Builder()
-                .hendelseId(pdlUtflytting.getHendelseId())
-                .tidligereHendelseId(pdlUtflytting.getTidligereHendelseId())
-                .hendelseType(pdlUtflytting.getHendelseType().getKode())
-                .endringstype(pdlUtflytting.getEndringstype().name())
-                .hendelseOpprettetTid(pdlUtflytting.getOpprettet())
-                .aktørId(hentUtAktørIderFraString(pdlUtflytting.getPersonidenter(), pdlUtflytting.getHendelseId()))
-                .utflyttingsdato(pdlUtflytting.getUtflyttingsdato())
-                .build();
+        return new PdlUtflyttingHendelsePayload.Builder().hendelseId(pdlUtflytting.getHendelseId())
+            .tidligereHendelseId(pdlUtflytting.getTidligereHendelseId())
+            .hendelseType(pdlUtflytting.getHendelseType().getKode())
+            .endringstype(pdlUtflytting.getEndringstype().name())
+            .hendelseOpprettetTid(pdlUtflytting.getOpprettet())
+            .aktørId(hentUtAktørIderFraString(pdlUtflytting.getPersonidenter(), pdlUtflytting.getHendelseId()))
+            .utflyttingsdato(pdlUtflytting.getUtflyttingsdato())
+            .build();
     }
 
     @Override
@@ -72,8 +70,8 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
         var resultat = new UtflyttingKlarForSorteringResultat(true);
         if (payload.getUtflyttingsdato().isPresent() || PdlEndringstype.OPPRETTET.name().equals(payload.getEndringstype())) {
             var registerdato = utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get(), payload.getHendelseId());
-            var brukdato = payload.getUtflyttingsdato().filter(d -> d.isBefore(registerdato)).isPresent() ?
-                    payload.getUtflyttingsdato().orElseThrow() : registerdato;
+            var brukdato = payload.getUtflyttingsdato().filter(d -> d.isBefore(registerdato)).isPresent() ? payload.getUtflyttingsdato()
+                .orElseThrow() : registerdato;
             resultat.setUtflyttingsdato(brukdato);
         }
         return resultat;
@@ -81,7 +79,7 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
 
     @Override
     public void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {
-        var identifisertDato = ((UtflyttingKlarForSorteringResultat)klarForSorteringResultat).getUtflyttingsdato();
+        var identifisertDato = ((UtflyttingKlarForSorteringResultat) klarForSorteringResultat).getUtflyttingsdato();
         if (identifisertDato != null) {
             var utflytting = JsonMapper.fromJson(inngåendeHendelse.getPayload(), PdlUtflytting.class);
             utflytting.setUtflyttingsdato(identifisertDato);
@@ -93,11 +91,14 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
     public void loggFeiletHendelse(PdlUtflyttingHendelsePayload payload) {
         String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. {}";
         if (payload.getUtflyttingsdato().isEmpty()) {
-            LOGGER.info(basismelding, "Årsaken er at utflyttingsdato mangler på hendelsen.", payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+            LOGGER.info(basismelding, "Årsaken er at utflyttingsdato mangler på hendelsen.", payload.getHendelseId(), payload.getHendelseType(),
+                payload.getHendelseOpprettetTid());
         } else if (payload.getAktørId().isEmpty()) {
-            LOGGER.warn(basismelding, "Årsaken er at aktørId mangler på hendelsen.", payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+            LOGGER.warn(basismelding, "Årsaken er at aktørId mangler på hendelsen.", payload.getHendelseId(), payload.getHendelseType(),
+                payload.getHendelseOpprettetTid());
         } else {
-            LOGGER.warn(basismelding, "Årsaken er ukjent - bør undersøkes av utvikler.", payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+            LOGGER.warn(basismelding, "Årsaken er ukjent - bør undersøkes av utvikler.", payload.getHendelseId(), payload.getHendelseType(),
+                payload.getHendelseOpprettetTid());
         }
 
     }

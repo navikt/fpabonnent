@@ -14,7 +14,9 @@ public interface HendelseTjeneste<T extends HendelsePayload> {
 
     KlarForSorteringResultat vurderOmKlarForSortering(T payload);
 
-    default void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {}
+    default void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {
+    }
 
-    default void loggFeiletHendelse(T payload) {}
+    default void loggFeiletHendelse(T payload) {
+    }
 }

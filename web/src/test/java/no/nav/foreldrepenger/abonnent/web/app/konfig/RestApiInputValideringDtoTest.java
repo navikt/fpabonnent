@@ -1,47 +1,5 @@
 package no.nav.foreldrepenger.abonnent.web.app.konfig;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
-import javax.validation.Valid;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -49,6 +7,26 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.Kodeverdi;
 import no.nav.foreldrepenger.abonnent.web.app.IndexClasses;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RestApiInputValideringDtoTest extends RestApiTester {
 
@@ -64,8 +42,8 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
         validerRekursivt(validerteKlasser, dto, null);
     }
 
-    private static final Set<Class<? extends Object>> ALLOWED_ENUM_ANNOTATIONS = Set.of(JsonProperty.class,
-            JsonValue.class, JsonIgnore.class, Valid.class, Null.class, NotNull.class);
+    private static final Set<Class<? extends Object>> ALLOWED_ENUM_ANNOTATIONS = Set.of(JsonProperty.class, JsonValue.class, JsonIgnore.class,
+        Valid.class, Null.class, NotNull.class);
 
     @SuppressWarnings("rawtypes")
     private static final Map<Class, List<List<Class<? extends Annotation>>>> UNNTATT_FRA_VALIDERING = new HashMap<>() {
@@ -86,14 +64,12 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     @SuppressWarnings("rawtypes")
     private static final Map<Class, List<List<Class<? extends Annotation>>>> VALIDERINGSALTERNATIVER = new HashMap<>() {
         {
-            put(String.class,
-                    List.of(List.of(Pattern.class, Size.class), List.of(Pattern.class), List.of(Digits.class)));
+            put(String.class, List.of(List.of(Pattern.class, Size.class), List.of(Pattern.class), List.of(Digits.class)));
             put(Long.class, List.of(List.of(Min.class, Max.class), List.of(Digits.class)));
             put(long.class, List.of(List.of(Min.class, Max.class), List.of(Digits.class)));
             put(Integer.class, List.of(List.of(Min.class, Max.class)));
             put(int.class, List.of(List.of(Min.class, Max.class)));
-            put(BigDecimal.class, List.of(List.of(Min.class, Max.class, Digits.class),
-                    List.of(DecimalMin.class, DecimalMax.class, Digits.class)));
+            put(BigDecimal.class, List.of(List.of(Min.class, Max.class, Digits.class), List.of(DecimalMin.class, DecimalMax.class, Digits.class)));
 
             putAll(UNNTATT_FRA_VALIDERING);
         }
@@ -146,9 +122,7 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
         return filtreteParametre;
     }
 
-    private static void validerRekursivt(Set<Class<?>> besøkteKlasser,
-                                         Class<?> klasse,
-                                         Class<?> forrigeKlasse) throws URISyntaxException {
+    private static void validerRekursivt(Set<Class<?>> besøkteKlasser, Class<?> klasse, Class<?> forrigeKlasse) throws URISyntaxException {
         if (erKodeverk(klasse)) {
             return;
         }
@@ -165,13 +139,11 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
 
         besøkteKlasser.add(klasse);
         if (klasse.getAnnotation(Entity.class) != null || klasse.getAnnotation(MappedSuperclass.class) != null) {
-            throw new AssertionError(
-                    "Klassen " + klasse + " er en entitet, kan ikke brukes som DTO. Brukes i " + forrigeKlasse);
+            throw new AssertionError("Klassen " + klasse + " er en entitet, kan ikke brukes som DTO. Brukes i " + forrigeKlasse);
         }
 
         URL klasseLocation = codeSource.getLocation();
-        for (Class<?> subklasse : IndexClasses.getIndexFor(klasseLocation.toURI())
-                .getSubClassesWithAnnotation(klasse, JsonTypeName.class)) {
+        for (Class<?> subklasse : IndexClasses.getIndexFor(klasseLocation.toURI()).getSubClassesWithAnnotation(klasse, JsonTypeName.class)) {
             validerRekursivt(besøkteKlasser, subklasse, forrigeKlasse);
         }
         for (Field field : getRelevantFields(klasse)) {
@@ -186,7 +158,7 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
                 validerRiktigAnnotert(field); // har konfigurert opp spesifikk validering
             } else if (field.getType().getName().startsWith("java")) {
                 throw new AssertionError(
-                        "Feltet " + field + " har ikke påkrevde annoteringer. Trenger evt. utvidelse av denne testen for å akseptere denne typen.");
+                    "Feltet " + field + " har ikke påkrevde annoteringer. Trenger evt. utvidelse av denne testen for å akseptere denne typen.");
             } else {
                 validerHarValidAnnotering(field);
                 validerRekursivt(besøkteKlasser, field.getType(), forrigeKlasse);
@@ -205,9 +177,9 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
             validerRiktigAnnotert(field);
         }
         List<Annotation> illegal = List.of(field.getAnnotations())
-                .stream()
-                .filter(a -> !ALLOWED_ENUM_ANNOTATIONS.contains(a.annotationType()))
-                .collect(Collectors.toList());
+            .stream()
+            .filter(a -> !ALLOWED_ENUM_ANNOTATIONS.contains(a.annotationType()))
+            .collect(Collectors.toList());
         if (!illegal.isEmpty()) {
             throw new AssertionError("Ugyldige annotasjoner funnet på [" + field + "]: " + illegal);
         }

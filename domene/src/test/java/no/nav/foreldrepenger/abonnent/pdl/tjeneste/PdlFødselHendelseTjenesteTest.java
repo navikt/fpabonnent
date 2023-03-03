@@ -53,8 +53,7 @@ public class PdlFødselHendelseTjenesteTest {
     @Test
     public void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_uten_ugyldige_aktørId_på_barn() {
         // Arrange
-        PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(of("26364656768", "234567"),
-                of(AKTØR_ID_MOR, AKTØR_ID_FAR), FØDSELSDATO);
+        PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(of("26364656768", "234567"), of(AKTØR_ID_MOR, AKTØR_ID_FAR), FØDSELSDATO);
 
         // Act
         PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
@@ -93,7 +92,7 @@ public class PdlFødselHendelseTjenesteTest {
     public void skal_mappe_fra_payload_json_til_PdlFødselHendelsePayload_flere_identer_er_gyldig() {
         // Arrange
         PdlFødsel fødselmelding = HendelseTestDataUtil.lagFødselsmelding(of("26364656768", "1234567890987"),
-                of("10018876555", "1234567890988", "30102040506", "1234567890989"), FØDSELSDATO);
+            of("10018876555", "1234567890988", "30102040506", "1234567890989"), FØDSELSDATO);
 
         // Act
         PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));

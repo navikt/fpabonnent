@@ -1,5 +1,17 @@
 FP-Abonnent
 ===============
+[![Bygg og deploy](https://github.com/navikt/fpabonnent/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/navikt/fpabonnent/actions/workflows/build.yml)
+[![Promote](https://github.com/navikt/fpabonnent/actions/workflows/promote.yml/badge.svg?branch=master)](https://github.com/navikt/fpabonnent/actions/workflows/promote.yml)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=navikt_fpabonnent)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=coverage)](https://sonarcloud.io/summary/new_code?id=navikt_fpabonnent)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=alert_status)](https://sonarcloud.io/dashboard?id=navikt_fpabonnent)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=bugs)](https://sonarcloud.io/dashboard?id=navikt_fpabonnent)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=navikt_fpabonnent)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=navikt_fpabonnent)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=navikt_fpabonnent)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=sqale_index)](https://sonarcloud.io/dashboard?id=navikt_fpabonnent)
+
 Applikasjonen tar inn hendelser fra potensielt flere kilder og videresender disse til FP-Sak, dersom aktuelle aktører har en fagsak der. Pr april 2021 er det kun lesing av fødsel, død og dødfødsel fra PDL/LEESAH Kafka topicen pdl-leesah-v1 som er implementert, men kjernen i applikasjonen er laget for at det skal være mulig å lese fra flere kilder i fremtiden, uten å endre noe særlig på den eksisterende koden.
 
 ### Virkemåte

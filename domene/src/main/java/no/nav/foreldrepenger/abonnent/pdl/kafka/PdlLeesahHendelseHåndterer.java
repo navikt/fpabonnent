@@ -53,9 +53,9 @@ public class PdlLeesahHendelseHåndterer {
 
     @Inject
     public PdlLeesahHendelseHåndterer(HendelseRepository hendelseRepository,
-            PdlLeesahOversetter pdlLeesahOversetter,
-            ProsessTaskTjeneste prosessTaskTjeneste,
-            ForsinkelseTjeneste forsinkelseTjeneste) {
+                                      PdlLeesahOversetter pdlLeesahOversetter,
+                                      ProsessTaskTjeneste prosessTaskTjeneste,
+                                      ForsinkelseTjeneste forsinkelseTjeneste) {
         this.hendelseRepository = hendelseRepository;
         this.oversetter = pdlLeesahOversetter;
         this.prosessTaskTjeneste = prosessTaskTjeneste;
@@ -66,12 +66,12 @@ public class PdlLeesahHendelseHåndterer {
         setCallIdForHendelse(payload);
 
         Optional<InngåendeHendelse> inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(),
-                HendelseKilde.PDL);
+            HendelseKilde.PDL);
         if (inngåendeHendelse.isPresent()) {
             LOG.info(
-                    "FPABONNENT mottok duplikat hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}. Tiltak: Sjekk om det skjedde en deploy/restart av Fpabonnent i det samme tidsrommet - i så fall kan dette ignoreres.",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
-                    payload.getTidligereHendelseId());
+                "FPABONNENT mottok duplikat hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}. Tiltak: Sjekk om det skjedde en deploy/restart av Fpabonnent i det samme tidsrommet - i så fall kan dette ignoreres.",
+                payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                payload.getTidligereHendelseId());
             return;
         }
 
@@ -85,9 +85,9 @@ public class PdlLeesahHendelseHåndterer {
             håndterUtflytting(payload);
         } else {
             LOG.info(
-                    "FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
-                    payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
-                    payload.getTidligereHendelseId());
+                "FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
+                payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+                payload.getTidligereHendelseId());
         }
     }
 
@@ -137,14 +137,14 @@ public class PdlLeesahHendelseHåndterer {
 
     private void loggMottakMedDato(Personhendelse payload, String hendelse, String datofelt, LocalDate dato) {
         LOG.info("FPABONNENT mottok {}: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={} {}={}",
-                hendelse, payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
-                payload.getTidligereHendelseId(), datofelt, dato);
+            hendelse, payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+            payload.getTidligereHendelseId(), datofelt, dato);
     }
 
     private void loggMottakUtenDato(Personhendelse payload, String hendelse) {
-        LOG.info("FPABONNENT mottok {}: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
-                hendelse, payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
-                payload.getTidligereHendelseId());
+        LOG.info("FPABONNENT mottok {}: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}", hendelse,
+            payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
+            payload.getTidligereHendelseId());
     }
 
     private void setCallIdForHendelse(Personhendelse payload) {
@@ -178,13 +178,13 @@ public class PdlLeesahHendelseHåndterer {
             LOG.warn("Tom payload for objekt {}", personhendelse);
         }
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
-                .hendelseType(personhendelse.getHendelseType())
-                .hendelseId(personhendelse.getHendelseId())
-                .tidligereHendelseId(personhendelse.getTidligereHendelseId())
-                .payload(jsonPayload)
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(håndtertStatusType)
-                .build();
+            .hendelseType(personhendelse.getHendelseType())
+            .hendelseId(personhendelse.getHendelseId())
+            .tidligereHendelseId(personhendelse.getTidligereHendelseId())
+            .payload(jsonPayload)
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(håndtertStatusType)
+            .build();
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
         return inngåendeHendelse;
     }

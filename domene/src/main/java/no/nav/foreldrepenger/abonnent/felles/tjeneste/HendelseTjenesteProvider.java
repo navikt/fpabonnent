@@ -34,7 +34,8 @@ public class HendelseTjenesteProvider {
         }
         HendelseTjeneste<? extends HendelsePayload> minInstans = selected.get();
         if (minInstans.getClass().isAnnotationPresent(Dependent.class)) {
-            throw new IllegalStateException("Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + minInstans.getClass());
+            throw new IllegalStateException(
+                "Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + minInstans.getClass());
         }
         return (HendelseTjeneste<T>) minInstans;
     }

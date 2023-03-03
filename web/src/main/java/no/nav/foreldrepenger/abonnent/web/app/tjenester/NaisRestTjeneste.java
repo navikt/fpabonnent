@@ -38,15 +38,9 @@ public class NaisRestTjeneste {
     @Operation(description = "sjekker om poden lever", tags = "nais", hidden = true)
     public Response isAlive() {
         if (starterService.isKafkaAlive()) {
-            return Response
-                    .ok(RESPONSE_OK)
-                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                    .build();
+            return Response.ok(RESPONSE_OK).header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL).build();
         } else {
-            return Response
-                    .serverError()
-                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                    .build();
+            return Response.serverError().header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL).build();
         }
     }
 
@@ -55,15 +49,9 @@ public class NaisRestTjeneste {
     @Operation(description = "sjekker om poden er klar", tags = "nais", hidden = true)
     public Response isReady() {
         if (starterService.isKafkaAlive() && databaseHealthCheck.isReady()) {
-            return Response
-                    .ok(RESPONSE_OK)
-                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                    .build();
+            return Response.ok(RESPONSE_OK).header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL).build();
         } else {
-            return Response
-                    .status(Response.Status.SERVICE_UNAVAILABLE)
-                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                    .build();
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE).header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL).build();
         }
     }
 

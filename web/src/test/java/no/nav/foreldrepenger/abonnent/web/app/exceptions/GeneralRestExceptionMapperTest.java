@@ -125,7 +125,7 @@ public class GeneralRestExceptionMapperTest {
     }
 
     private static ManglerTilgangException manglerTilgangFeil() {
-        return new ManglerTilgangException("MANGLER_TILGANG_FEIL","ManglerTilgangFeilmeldingKode");
+        return new ManglerTilgangException("MANGLER_TILGANG_FEIL", "ManglerTilgangFeilmeldingKode");
     }
 
 }

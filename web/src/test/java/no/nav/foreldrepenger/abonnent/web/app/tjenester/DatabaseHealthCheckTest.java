@@ -1,10 +1,10 @@
 package no.nav.foreldrepenger.abonnent.web.app.tjenester;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import no.nav.foreldrepenger.abonnent.dbstøtte.Databaseskjemainitialisering;
 
 import org.junit.jupiter.api.Test;
 
-import no.nav.foreldrepenger.abonnent.dbstøtte.Databaseskjemainitialisering;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DatabaseHealthCheckTest {
 

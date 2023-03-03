@@ -18,7 +18,7 @@ public class HendelseTestDataUtil {
 
     public static final HendelseType MELDINGSTYPE = HendelseType.PDL_FØDSEL_OPPRETTET;
     public static final String HENDELSE_ID = UUID.randomUUID().toString();
-    public static final LocalDate FØDSELSDATO = LocalDate.of(2018, 1,30);
+    public static final LocalDate FØDSELSDATO = LocalDate.of(2018, 1, 30);
     public static final String AKTØR_ID_BARN = "1678462152535";
     public static final String AKTØR_ID_MOR = "1678462152536";
     public static final String AKTØR_ID_FAR = "1678462152537";
@@ -57,23 +57,22 @@ public class HendelseTestDataUtil {
 
     public static PdlFødselHendelsePayload lagFødselsHendelsePayload() {
         PdlFødselHendelsePayload.Builder builder = new PdlFødselHendelsePayload.Builder();
-        return builder
-                .hendelseId(HENDELSE_ID)
-                .hendelseType(MELDINGSTYPE.getKode())
-                .endringstype("OPPRETTET")
-                .aktørIdBarn(new HashSet<>(List.of(AKTØR_ID_BARN)))
-                .aktørIdForeldre(Set.of(AKTØR_ID_MOR, AKTØR_ID_FAR))
-                .fødselsdato(FØDSELSDATO)
-                .build();
+        return builder.hendelseId(HENDELSE_ID)
+            .hendelseType(MELDINGSTYPE.getKode())
+            .endringstype("OPPRETTET")
+            .aktørIdBarn(new HashSet<>(List.of(AKTØR_ID_BARN)))
+            .aktørIdForeldre(Set.of(AKTØR_ID_MOR, AKTØR_ID_FAR))
+            .fødselsdato(FØDSELSDATO)
+            .build();
     }
 
     public static InngåendeHendelse lagInngåendeFødselsHendelse(String hendelseId, HåndtertStatusType håndtertStatus) {
         return InngåendeHendelse.builder()
-                .hendelseId(hendelseId)
-                .hendelseType(MELDINGSTYPE)
-                .payload("payload")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(håndtertStatus)
-                .build();
+            .hendelseId(hendelseId)
+            .hendelseType(MELDINGSTYPE)
+            .payload("payload")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(håndtertStatus)
+            .build();
     }
 }

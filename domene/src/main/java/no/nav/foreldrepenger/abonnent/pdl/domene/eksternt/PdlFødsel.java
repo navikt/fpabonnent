@@ -11,9 +11,8 @@ public class PdlFødsel extends PdlPersonhendelse {
     private Set<String> aktørIdForeldre;
 
     public boolean erRelevantForFpsak() {
-        return HendelseType.PDL_FØDSEL_OPPRETTET.equals(getHendelseType())
-                || HendelseType.PDL_FØDSEL_ANNULLERT.equals(getHendelseType())
-                || HendelseType.PDL_FØDSEL_KORRIGERT.equals(getHendelseType());
+        return HendelseType.PDL_FØDSEL_OPPRETTET.equals(getHendelseType()) || HendelseType.PDL_FØDSEL_ANNULLERT.equals(getHendelseType())
+            || HendelseType.PDL_FØDSEL_KORRIGERT.equals(getHendelseType());
     }
 
     public LocalDate getFødselsdato() {
@@ -30,10 +29,7 @@ public class PdlFødsel extends PdlPersonhendelse {
 
     @Override
     public String toString() {
-        return "PdlFødsel{" + toStringInnhold() +
-                ", fødselsdato=" + fødselsdato +
-                ", aktørIdForeldre=" + aktørIdForeldre +
-                '}';
+        return "PdlFødsel{" + toStringInnhold() + ", fødselsdato=" + fødselsdato + ", aktørIdForeldre=" + aktørIdForeldre + '}';
     }
 
     public static Builder builder() {

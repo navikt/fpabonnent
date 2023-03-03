@@ -78,7 +78,9 @@ public class PdlLeesahHendelseHåndtererTest {
 
         // Assert
         InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
-        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"DOEDSFALL_V1\"", "\"endringstype\":\"OPPRETTET\"", "\"hendelseType\":\"PDL_DOED_OPPRETTET\"");
+        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]",
+            "\"master\":\"Freg\"", "\"opplysningstype\":\"DOEDSFALL_V1\"", "\"endringstype\":\"OPPRETTET\"",
+            "\"hendelseType\":\"PDL_DOED_OPPRETTET\"");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
         assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
@@ -89,7 +91,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
-                forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
+            forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_DØD_OPPRETTET.getKode());
     }
 
@@ -126,7 +128,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
-                forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
+            forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_UTFLYTTING_OPPRETTET.getKode());
     }
 
@@ -150,7 +152,9 @@ public class PdlLeesahHendelseHåndtererTest {
 
         // Assert
         InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
-        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]", "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"", "\"hendelseType\":\"PDL_FOEDSEL_ANNULLERT\"");
+        assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]",
+            "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"",
+            "\"hendelseType\":\"PDL_FOEDSEL_ANNULLERT\"");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
         assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
@@ -161,7 +165,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
-                forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
+            forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT.getKode());
     }
 

@@ -70,7 +70,8 @@ public class SorterHendelseTaskTest {
     public void setup(EntityManager em) {
         this.entityManager = em;
         this.hendelseRepository = new HendelseRepository(em);
-        this.inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, new HendelseTjenesteProvider(new UnitTestLookupInstanceImpl<>(new PdlFødselHendelseTjeneste())));
+        this.inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository,
+            new HendelseTjenesteProvider(new UnitTestLookupInstanceImpl<>(new PdlFødselHendelseTjeneste())));
         sorterHendelseTask = new SorterHendelseTask(prosessTaskTjeneste, inngåendeHendelseTjeneste, hendelser);
         prosessTaskData = ProsessTaskData.forProsessTask(SorterHendelseTask.class);
     }
@@ -172,17 +173,17 @@ public class SorterHendelseTaskTest {
 
     private InngåendeHendelse lagInngåendeHendelse() {
         return InngåendeHendelse.builder()
-                .hendelseId(FMELDING.getHendelseId())
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload(JsonMapper.toJson(FMELDING))
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.SENDT_TIL_SORTERING)
-                .build();
+            .hendelseId(FMELDING.getHendelseId())
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload(JsonMapper.toJson(FMELDING))
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.SENDT_TIL_SORTERING)
+            .build();
     }
 
     public InngåendeHendelse finnHendelseMedHendelseId(String hendelseId) {
-        TypedQuery<InngåendeHendelse> query = entityManager.createQuery(
-                "from InngåendeHendelse where hendelseId = :hendelseId ", InngåendeHendelse.class); //$NON-NLS-1$
+        TypedQuery<InngåendeHendelse> query = entityManager.createQuery("from InngåendeHendelse where hendelseId = :hendelseId ",
+            InngåendeHendelse.class); //$NON-NLS-1$
         query.setParameter("hendelseId", hendelseId);
         return query.getSingleResult();
     }

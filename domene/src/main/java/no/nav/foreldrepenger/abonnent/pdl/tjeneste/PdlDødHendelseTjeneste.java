@@ -38,15 +38,14 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
     public PdlDødHendelsePayload payloadFraJsonString(String payload) {
         PdlDød pdlDød = JsonMapper.fromJson(payload, PdlDød.class);
 
-        return new PdlDødHendelsePayload.Builder()
-                .hendelseId(pdlDød.getHendelseId())
-                .tidligereHendelseId(pdlDød.getTidligereHendelseId())
-                .hendelseType(pdlDød.getHendelseType().getKode())
-                .endringstype(pdlDød.getEndringstype().name())
-                .hendelseOpprettetTid(pdlDød.getOpprettet())
-                .aktørId(hentUtAktørIderFraString(pdlDød.getPersonidenter(), pdlDød.getHendelseId()))
-                .dødsdato(pdlDød.getDødsdato())
-                .build();
+        return new PdlDødHendelsePayload.Builder().hendelseId(pdlDød.getHendelseId())
+            .tidligereHendelseId(pdlDød.getTidligereHendelseId())
+            .hendelseType(pdlDød.getHendelseType().getKode())
+            .endringstype(pdlDød.getEndringstype().name())
+            .hendelseOpprettetTid(pdlDød.getOpprettet())
+            .aktørId(hentUtAktørIderFraString(pdlDød.getPersonidenter(), pdlDød.getHendelseId()))
+            .dødsdato(pdlDød.getDødsdato())
+            .build();
     }
 
     @Override
@@ -57,7 +56,7 @@ public class PdlDødHendelseTjeneste implements HendelseTjeneste<PdlDødHendelse
     @Override
     public KlarForSorteringResultat vurderOmKlarForSortering(PdlDødHendelsePayload payload) {
         if (payload.getAktørId().isPresent() && (payload.getDødsdato().isPresent()
-                || payload.getDødsdato().isEmpty() && PdlEndringstype.ANNULLERT.name().equals(payload.getEndringstype()))) {
+            || payload.getDødsdato().isEmpty() && PdlEndringstype.ANNULLERT.name().equals(payload.getEndringstype()))) {
             return new KlarForSorteringResultat(true);
         }
         return new KlarForSorteringResultat(false);

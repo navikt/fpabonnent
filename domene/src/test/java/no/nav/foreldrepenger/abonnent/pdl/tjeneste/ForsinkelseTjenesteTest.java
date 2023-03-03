@@ -1,14 +1,9 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
+import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
+import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
+import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,10 +13,12 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
-import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
-import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ForsinkelseTjenesteTest {
@@ -71,8 +68,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 6, 6, 30),
-                LocalDateTime.of(2020, 1, 6, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 6, 6, 30), LocalDateTime.of(2020, 1, 6, 6, 59));
     }
 
     @Test
@@ -84,8 +80,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 9, 6, 30),
-                LocalDateTime.of(2020, 1, 9, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 9, 6, 30), LocalDateTime.of(2020, 1, 9, 6, 59));
     }
 
     @Test
@@ -97,8 +92,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30),
-                LocalDateTime.of(2020, 1, 13, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30), LocalDateTime.of(2020, 1, 13, 6, 59));
     }
 
     @Test
@@ -110,8 +104,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30),
-                LocalDateTime.of(2020, 1, 13, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30), LocalDateTime.of(2020, 1, 13, 6, 59));
     }
 
     @Test
@@ -123,8 +116,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2019, 5, 20, 6, 30),
-                LocalDateTime.of(2019, 5, 20, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2019, 5, 20, 6, 30), LocalDateTime.of(2019, 5, 20, 6, 59));
     }
 
     @Test
@@ -136,8 +128,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2027, 5, 18, 6, 30),
-                LocalDateTime.of(2027, 5, 18, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2027, 5, 18, 6, 30), LocalDateTime.of(2027, 5, 18, 6, 59));
     }
 
     @Test
@@ -149,8 +140,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2017, 12, 27, 6, 30),
-                LocalDateTime.of(2017, 12, 27, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2017, 12, 27, 6, 30), LocalDateTime.of(2017, 12, 27, 6, 59));
     }
 
     @Test
@@ -162,8 +152,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 7, 6, 30),
-                LocalDateTime.of(2020, 1, 7, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 7, 6, 30), LocalDateTime.of(2020, 1, 7, 6, 59));
     }
 
     @Test
@@ -175,8 +164,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30),
-                LocalDateTime.of(2020, 1, 13, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30), LocalDateTime.of(2020, 1, 13, 6, 59));
     }
 
     @Test
@@ -188,8 +176,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30),
-                LocalDateTime.of(2020, 1, 13, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30), LocalDateTime.of(2020, 1, 13, 6, 59));
     }
 
     @Test
@@ -201,8 +188,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2021, 1, 4, 6, 30),
-                LocalDateTime.of(2021, 1, 4, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2021, 1, 4, 6, 30), LocalDateTime.of(2021, 1, 4, 6, 59));
     }
 
     @Test
@@ -214,8 +200,7 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2023, 5, 2, 6, 30),
-                LocalDateTime.of(2023, 5, 2, 6, 59));
+        assertThat(resultat).isBetween(LocalDateTime.of(2023, 5, 2, 6, 30), LocalDateTime.of(2023, 5, 2, 6, 59));
     }
 
     @Test
@@ -224,17 +209,17 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime tidspunktA = LocalDateTime.now().plusDays(2);
 
         InngåendeHendelse hendelseA = InngåendeHendelse.builder()
-                .hendelseId("A")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(tidspunktA)
-                .build();
+            .hendelseId("A")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .håndteresEtterTidspunkt(tidspunktA)
+            .build();
         InngåendeHendelse hendelseB = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .tidligereHendelseId("A")
-                .build();
+            .hendelseId("B")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .tidligereHendelseId("A")
+            .build();
 
         when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq("A"), eq(HendelseKilde.PDL))).thenReturn(Optional.of(hendelseA));
 
@@ -253,17 +238,17 @@ public class ForsinkelseTjenesteTest {
         LocalDateTime tidspunktA = LocalDateTime.now().minusDays(2);
 
         InngåendeHendelse hendelseA = InngåendeHendelse.builder()
-                .hendelseId("A")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(tidspunktA)
-                .build();
+            .hendelseId("A")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .håndteresEtterTidspunkt(tidspunktA)
+            .build();
         InngåendeHendelse hendelseB = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .tidligereHendelseId("A")
-                .build();
+            .hendelseId("B")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .tidligereHendelseId("A")
+            .build();
 
         when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq("A"), eq(HendelseKilde.PDL))).thenReturn(Optional.of(hendelseA));
 
@@ -285,17 +270,17 @@ public class ForsinkelseTjenesteTest {
         settTid(innsendingstidspunkt);
 
         InngåendeHendelse hendelseA = InngåendeHendelse.builder()
-                .hendelseId("A")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.HÅNDTERT)
-                .håndteresEtterTidspunkt(tidspunktA)
-                .build();
+            .hendelseId("A")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+            .håndteresEtterTidspunkt(tidspunktA)
+            .build();
         InngåendeHendelse hendelseB = InngåendeHendelse.builder()
-                .hendelseId("B")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .tidligereHendelseId("A")
-                .build();
+            .hendelseId("B")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .tidligereHendelseId("A")
+            .build();
 
         when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq("A"), eq(HendelseKilde.PDL))).thenReturn(Optional.of(hendelseA));
 
@@ -305,8 +290,7 @@ public class ForsinkelseTjenesteTest {
 
         // Assert
         assertThat(resultat1).isEqualTo(innsendingstidspunkt.plusHours(1));
-        assertThat(resultat2).isBetween(LocalDateTime.of(2023, 5, 2, 6, 30),
-                LocalDateTime.of(2023, 5, 2, 6, 59));
+        assertThat(resultat2).isBetween(LocalDateTime.of(2023, 5, 2, 6, 30), LocalDateTime.of(2023, 5, 2, 6, 59));
     }
 
     @Test

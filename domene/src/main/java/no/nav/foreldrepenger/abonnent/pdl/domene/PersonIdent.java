@@ -59,8 +59,8 @@ public class PersonIdent implements Comparable<PersonIdent> {
         if (checksumTo == FNR_LENGDE) {
             checksumTo = 0;
         }
-        return checksumEn == Character.digit(foedselsnummer.charAt(FNR_LENGDE - 2), 10)
-                && checksumTo == Character.digit(foedselsnummer.charAt(FNR_LENGDE - 1), 10);
+        return checksumEn == Character.digit(foedselsnummer.charAt(FNR_LENGDE - 2), 10) && checksumTo == Character.digit(
+            foedselsnummer.charAt(FNR_LENGDE - 1), 10);
     }
 
     public static PersonIdent fra(String ident) {

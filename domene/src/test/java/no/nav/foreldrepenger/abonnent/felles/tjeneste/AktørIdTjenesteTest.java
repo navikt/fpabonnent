@@ -1,14 +1,14 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
+import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AktørIdTjenesteTest {
 

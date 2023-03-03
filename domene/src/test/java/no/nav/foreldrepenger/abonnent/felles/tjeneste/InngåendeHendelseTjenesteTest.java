@@ -1,29 +1,20 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
+import no.nav.foreldrepenger.abonnent.felles.domene.*;
+import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
+import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
+import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
-import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
-import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
-import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
-import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
-import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 public class InngåendeHendelseTjenesteTest {
 
@@ -53,7 +44,7 @@ public class InngåendeHendelseTjenesteTest {
         assertThat(resultat.getHendelseId()).isEqualTo("1");
         assertThat(resultat).isInstanceOf(PdlFødselHendelsePayload.class);
     }
-    
+
     @Test
     public void skal_markere_hendelse_som_håndtert_og_fjerne_payload() {
         // Arrange
@@ -64,10 +55,8 @@ public class InngåendeHendelseTjenesteTest {
 
         // Assert
         ArgumentCaptor<InngåendeHendelse> argumentCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
-        verify(hendelseRepository, times(1))
-                .oppdaterHåndtertStatus(argumentCaptor.capture(), eq(HåndtertStatusType.HÅNDTERT));
-        verify(hendelseRepository, times(1))
-                .fjernPayload(argumentCaptor.capture());
+        verify(hendelseRepository, times(1)).oppdaterHåndtertStatus(argumentCaptor.capture(), eq(HåndtertStatusType.HÅNDTERT));
+        verify(hendelseRepository, times(1)).fjernPayload(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().getHendelseId()).isEqualTo("1");
     }
 
@@ -95,11 +84,10 @@ public class InngåendeHendelseTjenesteTest {
 
         String inngåendeHendelsePayload = JsonMapper.toJson(fødselsmelding.build());
 
-        return new InngåendeHendelse.Builder()
-                .hendelseId(hendelseId)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload(inngåendeHendelsePayload)
-                .hendelseKilde(HendelseKilde.PDL)
-                .build();
+        return new InngåendeHendelse.Builder().hendelseId(hendelseId)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload(inngåendeHendelsePayload)
+            .hendelseKilde(HendelseKilde.PDL)
+            .build();
     }
 }

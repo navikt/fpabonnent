@@ -32,16 +32,17 @@ public class FødselTjeneste {
     public List<PersonIdent> hentForeldreTil(PersonIdent barn) {
         var request = new HentPersonQueryRequest();
         request.setIdent(barn.getIdent());
-        var projection = new PersonResponseProjection()
-                .forelderBarnRelasjon(new ForelderBarnRelasjonResponseProjection().relatertPersonsIdent().relatertPersonsRolle());
+        var projection = new PersonResponseProjection().forelderBarnRelasjon(
+            new ForelderBarnRelasjonResponseProjection().relatertPersonsIdent().relatertPersonsRolle());
 
         var person = pdlKlient.hentPerson(request, projection);
 
-        return person.getForelderBarnRelasjon().stream()
-                .filter(f -> !ForelderBarnRelasjonRolle.BARN.equals(f.getRelatertPersonsRolle()))
-                .map(ForelderBarnRelasjon::getRelatertPersonsIdent)
-                .filter(Objects::nonNull)
-                .map(PersonIdent::fra)
-                .collect(Collectors.toList());
+        return person.getForelderBarnRelasjon()
+            .stream()
+            .filter(f -> !ForelderBarnRelasjonRolle.BARN.equals(f.getRelatertPersonsRolle()))
+            .map(ForelderBarnRelasjon::getRelatertPersonsIdent)
+            .filter(Objects::nonNull)
+            .map(PersonIdent::fra)
+            .collect(Collectors.toList());
     }
 }

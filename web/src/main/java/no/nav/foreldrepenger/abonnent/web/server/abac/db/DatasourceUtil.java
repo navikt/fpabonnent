@@ -1,18 +1,19 @@
 package no.nav.foreldrepenger.abonnent.web.server.abac.db;
 
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import io.micrometer.core.instrument.Metrics;
 import no.nav.foreldrepenger.konfig.Environment;
 
+import javax.sql.DataSource;
+
+import java.util.Properties;
+
 public class DatasourceUtil {
 
-    private DatasourceUtil() {}
+    private DatasourceUtil() {
+    }
 
     private static final Environment ENV = Environment.current();
 

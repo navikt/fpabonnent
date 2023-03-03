@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.abonnent.testutilities;
 
+import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -8,8 +10,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 
 
 /**
@@ -50,17 +50,23 @@ public class FiktiveFnr {
         return PersonIdent.fra(nesteFnr());
     }
 
-    /** Returnerer FNR for mann > 18 år */
+    /**
+     * Returnerer FNR for mann > 18 år
+     */
     public String nesteMannFnr() {
         return neste("mann");
     }
 
-    /** Returnerer FNR for kvinne > 18 år */
+    /**
+     * Returnerer FNR for kvinne > 18 år
+     */
     public String nesteKvinneFnr() {
         return neste("kvinne");
     }
 
-    /** Returnerer FNR for barn (tilfeldig kjønn) < 18 år */
+    /**
+     * Returnerer FNR for barn (tilfeldig kjønn) < 18 år
+     */
     public String nesteBarnFnr() {
         return neste("barn");
     }
@@ -75,8 +81,7 @@ public class FiktiveFnr {
 
     private static List<String> readFile(String fil) {
         List<String> list = new ArrayList<>();
-        try (InputStream is = FiktiveFnr.class.getResourceAsStream(fil);
-             Scanner scanner = new Scanner(is)) {
+        try (InputStream is = FiktiveFnr.class.getResourceAsStream(fil); Scanner scanner = new Scanner(is)) {
             while (scanner.hasNextLine()) {
                 list.add(scanner.nextLine());
             }

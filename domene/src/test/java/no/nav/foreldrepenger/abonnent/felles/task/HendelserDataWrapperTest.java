@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.abonnent.felles.task;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.TaskType;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HendelserDataWrapperTest {
 

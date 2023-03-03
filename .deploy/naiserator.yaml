@@ -8,24 +8,29 @@ metadata:
 spec:
   image: {{image}}
   port: 8080
-  team: teamforeldrepenger
+  ingresses:
+{{#each ingresses as |url|}}
+    - {{url}}
+{{/each}}
   liveness:
     path: /fpabonnent/internal/health/isAlive
-    initialDelay: 30
-    timeout: 5
+    initialDelay: 10
     periodSeconds: 10
-    failureThreshold: 27
+    failureThreshold: 20
+    timeout: 3
   readiness:
     path: /fpabonnent/internal/health/isReady
-    initialDelay: 30
-    timeout: 5
+    initialDelay: 10
     periodSeconds: 10
-    failureThreshold: 27
+    failureThreshold: 20
+    timeout: 3
+  preStopHook:
+    http:
+      path: /fpabonnent/internal/health/preStop
   replicas:
     min: {{minReplicas}}
     max: {{maxReplicas}}
     cpuThresholdPercentage: 80
-  preStopHookPath: /fpabonnent/internal/health/preStop
   prometheus:
     enabled: true
     path: /fpabonnent/internal/metrics/prometheus
@@ -36,10 +41,6 @@ spec:
     requests:
       cpu: "600m"
       memory: "1024Mi"
-  ingresses:
-{{#each ingresses as |url|}}
-    - {{url}}
-{{/each}}
   kafka:
     pool: {{kafkaPool}}
   vault:

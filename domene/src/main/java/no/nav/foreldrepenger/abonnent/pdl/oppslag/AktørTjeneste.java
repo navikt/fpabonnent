@@ -48,8 +48,7 @@ public class AktørTjeneste {
         request.setIdent(personIdent.getIdent());
         request.setGrupper(List.of(IdentGruppe.AKTORID));
         request.setHistorikk(Boolean.FALSE);
-        var projection = new IdentlisteResponseProjection()
-                .identer(new IdentInformasjonResponseProjection().ident());
+        var projection = new IdentlisteResponseProjection().identer(new IdentInformasjonResponseProjection().ident());
 
         final Identliste identliste;
 
@@ -63,7 +62,8 @@ public class AktørTjeneste {
         }
 
         var aktørId = identliste.getIdenter().stream().findFirst().map(IdentInformasjon::getIdent).map(AktørId::new);
-        aktørId.ifPresent(a -> cacheIdentTilAktørId.put(personIdent, a)); // Kan ikke legge til i cache aktørId -> ident ettersom ident kan være ikke-current
+        aktørId.ifPresent(
+            a -> cacheIdentTilAktørId.put(personIdent, a)); // Kan ikke legge til i cache aktørId -> ident ettersom ident kan være ikke-current
         return aktørId;
     }
 }

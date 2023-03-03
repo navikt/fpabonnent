@@ -65,8 +65,7 @@ public enum HendelseKilde implements Kodeverdi {
             if (kode == null) {
                 return null;
             }
-            return Optional.ofNullable(KODER.get(kode))
-                .orElseThrow(() -> new IllegalArgumentException("Ukjent HendelseKilde: " + kode));
+            return Optional.ofNullable(KODER.get(kode)).orElseThrow(() -> new IllegalArgumentException("Ukjent HendelseKilde: " + kode));
         }
     }
 }

@@ -68,8 +68,7 @@ public enum HåndtertStatusType implements Kodeverdi {
             if (kode == null) {
                 return null;
             }
-            return Optional.ofNullable(KODER.get(kode))
-                .orElseThrow(() -> new IllegalArgumentException("Ukjent HåndtertStatusType: " + kode));
+            return Optional.ofNullable(KODER.get(kode)).orElseThrow(() -> new IllegalArgumentException("Ukjent HåndtertStatusType: " + kode));
         }
     }
 }

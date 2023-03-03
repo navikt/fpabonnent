@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.abonnent.pdl.kafka.test;
 
-import org.apache.avro.Schema;
-
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import no.nav.person.pdl.leesah.Personhendelse;
+
+import org.apache.avro.Schema;
 
 public class VtpKafkaAvroDeserializer extends KafkaAvroDeserializer {
 

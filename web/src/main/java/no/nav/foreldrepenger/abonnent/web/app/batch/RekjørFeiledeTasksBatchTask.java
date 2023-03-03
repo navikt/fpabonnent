@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.abonnent.web.app.batch;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 

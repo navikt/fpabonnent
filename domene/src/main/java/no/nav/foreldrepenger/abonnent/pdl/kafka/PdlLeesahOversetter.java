@@ -132,7 +132,8 @@ public class PdlLeesahOversetter {
             }
         }
 
-        LOG.info("Mottok ukjent hendelsestype opplysningstype={} med endringstype={} på hendelseId={}", personhendelse.getOpplysningstype(), personhendelse.getEndringstype(), personhendelse.getHendelseId());
+        LOG.info("Mottok ukjent hendelsestype opplysningstype={} med endringstype={} på hendelseId={}", personhendelse.getOpplysningstype(),
+            personhendelse.getEndringstype(), personhendelse.getHendelseId());
         return HendelseType.UDEFINERT;
     }
 }

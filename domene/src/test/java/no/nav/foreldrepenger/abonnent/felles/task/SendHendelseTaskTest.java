@@ -77,12 +77,12 @@ public class SendHendelseTaskTest {
         PdlFødsel fødsel = fødselBuilder.build();
         fødsel.setAktørIdForeldre(Set.of("3333333333333", "4444444444444", "5555555555555", "6666666666666"));
         InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
-                .id(INNGÅENDE_HENDELSE_ID)
-                .hendelseId(HENDELSE_ID)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
-                .payload(JsonMapper.toJson(fødsel))
-                .build();
+            .id(INNGÅENDE_HENDELSE_ID)
+            .hendelseId(HENDELSE_ID)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.GROVSORTERT)
+            .payload(JsonMapper.toJson(fødsel))
+            .build();
         when(hendelseRepository.finnEksaktHendelse(1L)).thenReturn(inngåendeHendelse);
         when(hendelseRepository.finnGrovsortertHendelse(HendelseKilde.PDL, HENDELSE_ID)).thenReturn(Optional.of(inngåendeHendelse));
 

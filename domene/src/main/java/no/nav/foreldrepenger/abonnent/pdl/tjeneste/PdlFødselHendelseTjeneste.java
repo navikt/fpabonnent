@@ -24,8 +24,8 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.pdl.oppslag.ForeldreTjeneste;
-import no.nav.vedtak.exception.TekniskException;
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_FØDSEL_HENDELSE)
@@ -51,24 +51,23 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     public PdlFødselHendelsePayload payloadFraJsonString(String payload) {
         PdlFødsel pdlFødsel = JsonMapper.fromJson(payload, PdlFødsel.class);
 
-        return new PdlFødselHendelsePayload.Builder()
-                .hendelseId(pdlFødsel.getHendelseId())
-                .tidligereHendelseId(pdlFødsel.getTidligereHendelseId())
-                .hendelseType(pdlFødsel.getHendelseType().getKode())
-                .endringstype(pdlFødsel.getEndringstype().name())
-                .hendelseOpprettetTid(pdlFødsel.getOpprettet())
-                .fnrBarn(hentUtFødselsnumreFraString(pdlFødsel.getPersonidenter()))
-                .aktørIdBarn(hentUtAktørIderFraString(pdlFødsel.getPersonidenter(), pdlFødsel.getHendelseId()))
-                .aktørIdForeldre(pdlFødsel.getAktørIdForeldre())
-                .fødselsdato(pdlFødsel.getFødselsdato())
-                .build();
+        return new PdlFødselHendelsePayload.Builder().hendelseId(pdlFødsel.getHendelseId())
+            .tidligereHendelseId(pdlFødsel.getTidligereHendelseId())
+            .hendelseType(pdlFødsel.getHendelseType().getKode())
+            .endringstype(pdlFødsel.getEndringstype().name())
+            .hendelseOpprettetTid(pdlFødsel.getOpprettet())
+            .fnrBarn(hentUtFødselsnumreFraString(pdlFødsel.getPersonidenter()))
+            .aktørIdBarn(hentUtAktørIderFraString(pdlFødsel.getPersonidenter(), pdlFødsel.getHendelseId()))
+            .aktørIdForeldre(pdlFødsel.getAktørIdForeldre())
+            .fødselsdato(pdlFødsel.getFødselsdato())
+            .build();
     }
 
     @Override
     public boolean vurderOmHendelseKanForkastes(PdlFødselHendelsePayload payload) {
         if (payload.getFødselsdato().isPresent() && payload.getFødselsdato().get().isBefore(LocalDate.now().minusYears(2))) {
-            LOGGER.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet",
-                    payload.getHendelseId(), payload.getFødselsdato().get());
+            LOGGER.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet", payload.getHendelseId(),
+                payload.getFødselsdato().get());
             return true;
         }
         return hendelseTjenesteHjelper.vurderOmHendelseKanForkastes(payload, this::payloadFraJsonString);
@@ -94,7 +93,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     @Override
     public void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {
         PdlFødsel pdlFødsel = JsonMapper.fromJson(inngåendeHendelse.getPayload(), PdlFødsel.class);
-        pdlFødsel.setAktørIdForeldre(((FødselKlarForSorteringResultat)klarForSorteringResultat).getForeldre());
+        pdlFødsel.setAktørIdForeldre(((FødselKlarForSorteringResultat) klarForSorteringResultat).getForeldre());
         inngåendeHendelse.setPayload(JsonMapper.toJson(pdlFødsel));
     }
 
@@ -125,7 +124,8 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 if (ENV.isProd()) {
                     throw e;
                 } else {
-                    LOGGER.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}", ENV.getCluster().clusterName(), e);
+                    LOGGER.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}",
+                        ENV.getCluster().clusterName(), e);
                 }
             }
         }

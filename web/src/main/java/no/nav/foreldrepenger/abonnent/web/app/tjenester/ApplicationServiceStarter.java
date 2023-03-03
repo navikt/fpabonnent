@@ -68,8 +68,8 @@ public class ApplicationServiceStarter {
 
     public boolean isKafkaAlive() {
         return serviceMap.entrySet()
-                .stream()
-                .filter(it -> it.getKey() instanceof KafkaIntegration)
-                .allMatch(it -> ((KafkaIntegration) it.getKey()).isAlive());
+            .stream()
+            .filter(it -> it.getKey() instanceof KafkaIntegration)
+            .allMatch(it -> ((KafkaIntegration) it.getKey()).isAlive());
     }
 }
