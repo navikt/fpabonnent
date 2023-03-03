@@ -25,11 +25,13 @@ public class VtpKafkaAvroSerde<T extends SpecificRecord> implements Serde<T> {
         return this.inner.deserializer();
     }
 
+    @Override
     public void configure(Map<String, ?> serdeConfig, boolean isSerdeForRecordKeys) {
         this.inner.serializer().configure(serdeConfig, isSerdeForRecordKeys);
         this.inner.deserializer().configure(serdeConfig, isSerdeForRecordKeys);
     }
 
+    @Override
     public void close() {
         this.inner.serializer().close();
         this.inner.deserializer().close();

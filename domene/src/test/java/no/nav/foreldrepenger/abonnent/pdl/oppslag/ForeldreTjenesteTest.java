@@ -19,7 +19,7 @@ import no.nav.pdl.ForelderBarnRelasjonRolle;
 import no.nav.pdl.Person;
 import no.nav.vedtak.felles.integrasjon.person.Persondata;
 
-public class ForeldreTjenesteTest {
+class ForeldreTjenesteTest {
     private static final PersonIdent BARN_FNR = new PersonIdent(new FiktiveFnr().nesteBarnFnr());
     private static final PersonIdent MOR_FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
     private static final PersonIdent FAR_FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
@@ -29,12 +29,12 @@ public class ForeldreTjenesteTest {
     private Persondata pdlMock = mock(Persondata.class);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         fødselTjeneste = new FødselTjeneste(pdlMock);
     }
 
     @Test
-    public void skal_hente_foreldre_for_fnr() {
+    void skal_hente_foreldre_for_fnr() {
         // Arrange
         Person person = new Person();
         ForelderBarnRelasjon familierelasjonMor = new ForelderBarnRelasjon(MOR_FNR.getIdent(), ForelderBarnRelasjonRolle.MOR,

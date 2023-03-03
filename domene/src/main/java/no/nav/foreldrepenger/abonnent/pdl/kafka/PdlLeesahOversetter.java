@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.abonnent.pdl.kafka;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlUtflytting;
-import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
 
 @ApplicationScoped
@@ -72,14 +71,14 @@ public class PdlLeesahOversetter {
 
     private void oversettPersonhendelse(Personhendelse personhendelse, PdlPersonhendelse.PdlPersonhendelseBuilder builder) {
         builder.medHendelseId(personhendelse.getHendelseId().toString());
-        for (CharSequence ident : personhendelse.getPersonidenter()) {
+        for (var ident : personhendelse.getPersonidenter()) {
             builder.leggTilPersonident(ident.toString());
         }
         if (personhendelse.getMaster() != null) {
             builder.medMaster(personhendelse.getMaster().toString());
         }
         if (personhendelse.getOpprettet() != null) {
-            builder.medOpprettet(LocalDateTime.ofInstant(personhendelse.getOpprettet(), ZoneOffset.systemDefault()));
+            builder.medOpprettet(LocalDateTime.ofInstant(personhendelse.getOpprettet(), ZoneId.systemDefault()));
         }
         if (personhendelse.getOpplysningstype() != null) {
             builder.medOpplysningstype(personhendelse.getOpplysningstype().toString());
@@ -95,43 +94,47 @@ public class PdlLeesahOversetter {
 
     private HendelseType oversettHendelseType(Personhendelse personhendelse) {
         if (personhendelse.getOpplysningstype() != null && personhendelse.getEndringstype() != null) {
-            String opplysningstype = personhendelse.getOpplysningstype().toString();
-            Endringstype endringstype = personhendelse.getEndringstype();
+            var opplysningstype = personhendelse.getOpplysningstype().toString();
+            var endringstype = personhendelse.getEndringstype();
 
             switch (opplysningstype) {
-                case FØDSEL:
+                case FØDSEL -> {
                     return switch (endringstype) {
                         case OPPRETTET -> HendelseType.PDL_FØDSEL_OPPRETTET;
                         case ANNULLERT -> HendelseType.PDL_FØDSEL_ANNULLERT;
                         case KORRIGERT -> HendelseType.PDL_FØDSEL_KORRIGERT;
                         case OPPHOERT -> HendelseType.PDL_FØDSEL_OPPHØRT;
                     };
-                case DØD:
+                }
+                case DØD -> {
                     return switch (endringstype) {
                         case OPPRETTET -> HendelseType.PDL_DØD_OPPRETTET;
                         case ANNULLERT -> HendelseType.PDL_DØD_ANNULLERT;
                         case KORRIGERT -> HendelseType.PDL_DØD_KORRIGERT;
                         case OPPHOERT -> HendelseType.PDL_DØD_OPPHØRT;
                     };
-                case DØDFØDSEL:
+                }
+                case DØDFØDSEL -> {
                     return switch (endringstype) {
                         case OPPRETTET -> HendelseType.PDL_DØDFØDSEL_OPPRETTET;
                         case ANNULLERT -> HendelseType.PDL_DØDFØDSEL_ANNULLERT;
                         case KORRIGERT -> HendelseType.PDL_DØDFØDSEL_KORRIGERT;
                         case OPPHOERT -> HendelseType.PDL_DØDFØDSEL_OPPHØRT;
                     };
-                case UTFLYTTING:
+                }
+                case UTFLYTTING -> {
                     return switch (endringstype) {
                         case OPPRETTET -> HendelseType.PDL_UTFLYTTING_OPPRETTET;
                         case ANNULLERT -> HendelseType.PDL_UTFLYTTING_ANNULLERT;
                         case KORRIGERT -> HendelseType.PDL_UTFLYTTING_KORRIGERT;
                         case OPPHOERT -> HendelseType.PDL_UTFLYTTING_OPPHØRT;
                     };
-                default:
-                    break;
+                }
+                default -> {
+                    return HendelseType.UDEFINERT;
+                }
             }
         }
-
         LOG.info("Mottok ukjent hendelsestype opplysningstype={} med endringstype={} på hendelseId={}", personhendelse.getOpplysningstype(),
             personhendelse.getEndringstype(), personhendelse.getHendelseId());
         return HendelseType.UDEFINERT;

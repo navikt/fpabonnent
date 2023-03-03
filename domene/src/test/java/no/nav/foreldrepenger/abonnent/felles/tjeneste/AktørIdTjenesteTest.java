@@ -10,18 +10,18 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AktørIdTjenesteTest {
+class AktørIdTjenesteTest {
 
     private static final String GYLDIG = "1000017373893";
     private static final String UGYLDIG = "x000017373893";
 
     @Test
-    public void skal_bare_returnere_gyldige_aktørIder() {
+    void skal_bare_returnere_gyldige_aktørIder() {
         // Arrange
         HendelsePayload hendelse = new PdlFødselHendelsePayload.Builder().aktørIdForeldre(Set.of(GYLDIG, UGYLDIG)).build();
 
         // Act
-        List<String> aktørIderForSortering = AktørIdTjeneste.getAktørIderForSortering(hendelse);
+        var aktørIderForSortering = AktørIdTjeneste.getAktørIderForSortering(hendelse);
 
         // Assert
         assertThat(aktørIderForSortering).containsOnly(GYLDIG);

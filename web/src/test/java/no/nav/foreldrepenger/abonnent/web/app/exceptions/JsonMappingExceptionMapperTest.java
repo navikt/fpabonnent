@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 
-public class JsonMappingExceptionMapperTest {
+class JsonMappingExceptionMapperTest {
 
     @Test
-    public void skal_mappe_InvalidTypeIdException() {
+    void skal_mappe_InvalidTypeIdException() {
         JsonMappingExceptionMapper mapper = new JsonMappingExceptionMapper();
         Response resultat = mapper.toResponse(new InvalidTypeIdException(null, "Ukjent type-kode", null, "23525"));
         FeilDto dto = (FeilDto) resultat.getEntity();

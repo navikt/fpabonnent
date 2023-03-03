@@ -69,11 +69,12 @@ public class SorterHendelseTask implements ProsessTaskHandler {
     }
 
     private String getHendelseId(HendelserDataWrapper dataWrapper) {
-        if (dataWrapper.getHendelseId().isEmpty()) {
+        var hendelseId = dataWrapper.getHendelseId();
+        if (hendelseId.isEmpty()) {
             throw AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(dataWrapper.getProsessTaskData().getTaskType(),
                 HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId());
         }
-        return dataWrapper.getHendelseId().get();
+        return hendelseId.get();
     }
 
     private void opprettSendHendelseTask(HendelserDataWrapper dataWrapper, HendelsePayload hendelsePayload) {

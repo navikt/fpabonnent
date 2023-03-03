@@ -57,7 +57,7 @@ public abstract class PdlPersonhendelse {
             + '\'' + ", hendelseType=" + hendelseType;
     }
 
-    public static abstract class PdlPersonhendelseBuilder {
+    public abstract static class PdlPersonhendelseBuilder {
         protected PdlPersonhendelse mal;
 
         public PdlPersonhendelseBuilder medHendelseId(String hendelseId) {

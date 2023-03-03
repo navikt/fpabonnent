@@ -17,10 +17,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 class PdlFødselHendelseTjenesteTest {
 
@@ -37,7 +37,7 @@ class PdlFødselHendelseTjenesteTest {
         var fødselmelding = HendelseTestDataUtil.lagFødselsmelding();
 
         // Act
-        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(DefaultJsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -54,7 +54,7 @@ class PdlFødselHendelseTjenesteTest {
         var fødselmelding = HendelseTestDataUtil.lagFødselsmelding(of("26364656768", "234567"), of(AKTØR_ID_MOR, AKTØR_ID_FAR), FØDSELSDATO);
 
         // Act
-        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(DefaultJsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -73,7 +73,7 @@ class PdlFødselHendelseTjenesteTest {
         var fødselmelding = HendelseTestDataUtil.lagFødselsmelding(aktørIdBarn, aktørIdForeldre, FØDSELSDATO);
 
         // Act
-        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(DefaultJsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -93,7 +93,7 @@ class PdlFødselHendelseTjenesteTest {
             of("10018876555", "1234567890988", "30102040506", "1234567890989"), FØDSELSDATO);
 
         // Act
-        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(DefaultJsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();
@@ -110,7 +110,7 @@ class PdlFødselHendelseTjenesteTest {
         var fødselmelding = HendelseTestDataUtil.lagFødselsmelding(Collections.emptySet(), Collections.emptySet(), null);
 
         // Act
-        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(JsonMapper.toJson(fødselmelding));
+        var payload = (PdlFødselHendelsePayload) hendelseTjeneste.payloadFraJsonString(DefaultJsonMapper.toJson(fødselmelding));
 
         // Assert
         assertThat(payload).isNotNull();

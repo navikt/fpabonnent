@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
@@ -36,7 +35,7 @@ public class PdlDødfødselHendelsePayload extends HendelsePayload {
 
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
-        DødfødselHendelseDto dto = new DødfødselHendelseDto();
+        var dto = new DødfødselHendelseDto();
         dto.setId(DødfødselHendelseDto.HENDELSE_TYPE + "_" + getHendelseId());
         dto.setEndringstype(Endringstype.valueOf(endringstype));
         dto.setAktørId(finnAktørId(this));
@@ -45,10 +44,7 @@ public class PdlDødfødselHendelsePayload extends HendelsePayload {
     }
 
     private List<AktørIdDto> finnAktørId(PdlDødfødselHendelsePayload payload) {
-        if (payload.getAktørId().isPresent()) {
-            return payload.getAktørId().get().stream().map(AktørIdDto::new).collect(Collectors.toList());
-        }
-        return List.of();
+        return payload.getAktørId().map(ids -> ids.stream().map(AktørIdDto::new).toList()).orElseGet(List::of);
     }
 
     public Optional<Set<String>> getAktørId() {
@@ -87,7 +83,7 @@ public class PdlDødfødselHendelsePayload extends HendelsePayload {
             return false;
         }
 
-        PdlDødfødselHendelsePayload payload = (PdlDødfødselHendelsePayload) o;
+        var payload = (PdlDødfødselHendelsePayload) o;
 
         if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) {
             return false;

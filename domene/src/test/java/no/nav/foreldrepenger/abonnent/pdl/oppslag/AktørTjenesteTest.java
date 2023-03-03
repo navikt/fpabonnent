@@ -19,7 +19,7 @@ import no.nav.pdl.IdentInformasjon;
 import no.nav.pdl.Identliste;
 import no.nav.vedtak.felles.integrasjon.person.Persondata;
 
-public class AktørTjenesteTest {
+class AktørTjenesteTest {
     private static final PersonIdent FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
     private static final AktørId AKTØR_ID = AktørId.dummy();
 
@@ -28,12 +28,12 @@ public class AktørTjenesteTest {
     private Persondata pdlMock = mock(Persondata.class);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         aktørTjeneste = new AktørTjeneste(pdlMock);
     }
 
     @Test
-    public void skal_hente_aktør_for_fnr() {
+    void skal_hente_aktør_for_fnr() {
         // Arrange
         when(pdlMock.hentIdenter(any(), any())).thenReturn(
             new Identliste(List.of(new IdentInformasjon(AKTØR_ID.getId(), IdentGruppe.AKTORID, false))));
@@ -42,7 +42,6 @@ public class AktørTjenesteTest {
         Optional<AktørId> optAktørId = aktørTjeneste.hentAktørIdForPersonIdent(FNR);
 
         // Assert
-        assertThat(optAktørId).isPresent();
-        assertThat(optAktørId).hasValueSatisfying(v -> assertThat(v).isEqualTo(AKTØR_ID));
+        assertThat(optAktørId).isPresent().hasValueSatisfying(v -> assertThat(v).isEqualTo(AKTØR_ID));
     }
 }

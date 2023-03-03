@@ -31,12 +31,8 @@ public enum HåndtertStatusType implements Kodeverdi {
         // Hibernate trenger den
     }
 
-    private HåndtertStatusType(String kode) {
+    HåndtertStatusType(String kode) {
         this.kode = kode;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(KODER.keySet());
     }
 
     @Override

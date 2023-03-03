@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,7 +15,7 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
 
-public class FødselTjenesteTest {
+class FødselTjenesteTest {
 
     private static final PersonIdent BARN_FNR = new PersonIdent(new FiktiveFnr().nesteBarnFnr());
     private static final PersonIdent MOR_FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
@@ -29,16 +28,16 @@ public class FødselTjenesteTest {
     private ForeldreTjeneste foreldreTjeneste;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         foreldreTjeneste = new ForeldreTjeneste(fødselTjeneste, aktørTjeneste);
     }
 
     @Test
-    public void skal_hente_foreldre_for_fnr() {
+    void skal_hente_foreldre_for_fnr() {
         // Arrange
-        when(fødselTjeneste.hentForeldreTil(eq(BARN_FNR))).thenReturn(List.of(MOR_FNR, FAR_FNR));
-        when(aktørTjeneste.hentAktørIdForPersonIdent(eq(MOR_FNR))).thenReturn(Optional.of(MOR_AKTØR_ID));
-        when(aktørTjeneste.hentAktørIdForPersonIdent(eq(FAR_FNR))).thenReturn(Optional.of(FAR_AKTØR_ID));
+        when(fødselTjeneste.hentForeldreTil(BARN_FNR)).thenReturn(List.of(MOR_FNR, FAR_FNR));
+        when(aktørTjeneste.hentAktørIdForPersonIdent(MOR_FNR)).thenReturn(Optional.of(MOR_AKTØR_ID));
+        when(aktørTjeneste.hentAktørIdForPersonIdent(FAR_FNR)).thenReturn(Optional.of(FAR_AKTØR_ID));
 
         // Act
         Set<AktørId> foreldre = foreldreTjeneste.hentForeldre(BARN_FNR);

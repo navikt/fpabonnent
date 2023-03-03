@@ -6,6 +6,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Objects;
 
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
@@ -53,6 +54,23 @@ public @interface HendelseTypeRef {
         @Override
         public String value() {
             return navn;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            var that = (HendelseTypeRefLiteral) o;
+            return Objects.equals(navn, that.navn);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), navn);
         }
     }
 }

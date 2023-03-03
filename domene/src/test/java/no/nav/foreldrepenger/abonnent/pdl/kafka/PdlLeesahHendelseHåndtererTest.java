@@ -32,7 +32,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-public class PdlLeesahHendelseHåndtererTest {
+class PdlLeesahHendelseHåndtererTest {
 
     private HendelseRepository hendelseRepository;
     private ProsessTaskTjeneste prosessTaskTjeneste;
@@ -45,10 +45,10 @@ public class PdlLeesahHendelseHåndtererTest {
     private static final LocalDate UTFLYTTINGSDATO = LocalDate.now().minusDays(1);
 
     @BeforeEach
-    public void before() {
+    void before() {
         hendelseRepository = mock(HendelseRepository.class);
         prosessTaskTjeneste = mock(ProsessTaskTjeneste.class);
-        ForsinkelseKonfig forsinkelseKonfig = mock(ForsinkelseKonfig.class);
+        var forsinkelseKonfig = mock(ForsinkelseKonfig.class);
         when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
         forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
 
@@ -56,28 +56,28 @@ public class PdlLeesahHendelseHåndtererTest {
     }
 
     @Test
-    public void skal_lagre_oversatt_dødshendelse_og_opprette_vurder_sortering_task() {
+    void skal_lagre_oversatt_dødshendelse_og_opprette_vurder_sortering_task() {
         // Arrange
-        Personhendelse payload = new Personhendelse();
+        var payload = new Personhendelse();
         payload.setHendelseId("ABC");
         payload.setPersonidenter(List.of("1111111111111", "22222222222"));
         payload.setMaster("Freg");
         payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
         payload.setOpplysningstype("DOEDSFALL_V1");
         payload.setEndringstype(Endringstype.OPPRETTET);
-        Doedsfall doedsfall = new Doedsfall();
+        var doedsfall = new Doedsfall();
         doedsfall.setDoedsdato(DØDSDATO);
         payload.setDoedsfall(doedsfall);
-        ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
+        var hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
-        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        var taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
         doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
 
         // Assert
-        InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
+        var inngåendeHendelse = hendelseCaptor.getValue();
         assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]",
             "\"master\":\"Freg\"", "\"opplysningstype\":\"DOEDSFALL_V1\"", "\"endringstype\":\"OPPRETTET\"",
             "\"hendelseType\":\"PDL_DOED_OPPRETTET\"");
@@ -86,7 +86,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
         assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_DØD_OPPRETTET);
 
-        ProsessTaskData prosessTaskData = taskCaptor.getValue();
+        var prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
@@ -96,34 +96,34 @@ public class PdlLeesahHendelseHåndtererTest {
     }
 
     @Test
-    public void skal_lagre_oversatt_utflyttingshendelse_og_opprette_vurder_sortering_task() {
+    void skal_lagre_oversatt_utflyttingshendelse_og_opprette_vurder_sortering_task() {
         // Arrange
-        Personhendelse payload = new Personhendelse();
+        var payload = new Personhendelse();
         payload.setHendelseId("ABC");
         payload.setPersonidenter(List.of("1111111111111", "22222222222"));
         payload.setMaster("Freg");
         payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
         payload.setOpplysningstype("UTFLYTTING_FRA_NORGE");
         payload.setEndringstype(Endringstype.OPPRETTET);
-        UtflyttingFraNorge utflyttingFraNorge = new UtflyttingFraNorge();
+        var utflyttingFraNorge = new UtflyttingFraNorge();
         utflyttingFraNorge.setUtflyttingsdato(UTFLYTTINGSDATO);
         payload.setUtflyttingFraNorge(utflyttingFraNorge);
-        ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
+        var hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
-        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        var taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
         doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
 
         // Assert
-        InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
+        var inngåendeHendelse = hendelseCaptor.getValue();
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
         assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
         assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_UTFLYTTING_OPPRETTET);
 
-        ProsessTaskData prosessTaskData = taskCaptor.getValue();
+        var prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
@@ -133,25 +133,25 @@ public class PdlLeesahHendelseHåndtererTest {
     }
 
     @Test
-    public void skal_lagre_annullert_fødselshendelse_og_opprette_vurder_sortering_task() {
+    void skal_lagre_annullert_fødselshendelse_og_opprette_vurder_sortering_task() {
         // Arrange
-        Personhendelse payload = new Personhendelse();
+        var payload = new Personhendelse();
         payload.setHendelseId("ABC");
         payload.setPersonidenter(List.of("1111111111111", "22222222222"));
         payload.setMaster("Freg");
         payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
         payload.setOpplysningstype("FOEDSEL_V1");
         payload.setEndringstype(Endringstype.ANNULLERT);
-        ArgumentCaptor<InngåendeHendelse> hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
+        var hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
-        ArgumentCaptor<ProsessTaskData> taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        var taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
         doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
 
         // Assert
-        InngåendeHendelse inngåendeHendelse = hendelseCaptor.getValue();
+        var inngåendeHendelse = hendelseCaptor.getValue();
         assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]",
             "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"",
             "\"hendelseType\":\"PDL_FOEDSEL_ANNULLERT\"");
@@ -160,7 +160,7 @@ public class PdlLeesahHendelseHåndtererTest {
         assertThat(inngåendeHendelse.getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
         assertThat(inngåendeHendelse.getHendelseType()).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT);
 
-        ProsessTaskData prosessTaskData = taskCaptor.getValue();
+        var prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");

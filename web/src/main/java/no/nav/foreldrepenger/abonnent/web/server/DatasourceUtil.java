@@ -1,4 +1,8 @@
-package no.nav.foreldrepenger.abonnent.web.server.abac.db;
+package no.nav.foreldrepenger.abonnent.web.server;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -6,19 +10,15 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.instrument.Metrics;
 import no.nav.foreldrepenger.konfig.Environment;
 
-import javax.sql.DataSource;
-
-import java.util.Properties;
-
-public class DatasourceUtil {
+class DatasourceUtil {
 
     private DatasourceUtil() {
     }
 
     private static final Environment ENV = Environment.current();
 
-    public static DataSource createDatasource(int maxPoolSize) {
-        HikariConfig config = new HikariConfig();
+    static DataSource createDatasource(int maxPoolSize) {
+        var config = new HikariConfig();
         config.setJdbcUrl(ENV.getRequiredProperty("defaultDS.url"));
         config.setUsername(ENV.getRequiredProperty("defaultDS.username"));
         config.setPassword(ENV.getRequiredProperty("defaultDS.password"));
@@ -29,7 +29,7 @@ public class DatasourceUtil {
         config.setDriverClassName("oracle.jdbc.OracleDriver");
         config.setMetricRegistry(Metrics.globalRegistry);
 
-        Properties dsProperties = new Properties();
+        var dsProperties = new Properties();
         config.setDataSourceProperties(dsProperties);
 
         return new HikariDataSource(config);

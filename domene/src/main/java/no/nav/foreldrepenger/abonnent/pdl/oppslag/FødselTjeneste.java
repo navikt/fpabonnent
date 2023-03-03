@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -43,6 +42,6 @@ public class FødselTjeneste {
             .map(ForelderBarnRelasjon::getRelatertPersonsIdent)
             .filter(Objects::nonNull)
             .map(PersonIdent::fra)
-            .collect(Collectors.toList());
+            .toList();
     }
 }

@@ -12,8 +12,8 @@ import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.server.ServerProperties;
 
-import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.GenericOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -36,16 +36,16 @@ public class ApiConfig extends Application {
     public static final String API_URI = "/api";
 
     public ApiConfig() {
-        OpenAPI oas = new OpenAPI();
-        Info info = new Info().title("Vedtaksløsningen - Abonnent").version("1.0").description("REST grensesnitt for fp-abonnent.");
+        var oas = new OpenAPI();
+        var info = new Info().title("Vedtaksløsningen - Abonnent").version("1.0").description("REST grensesnitt for fp-abonnent.");
 
         oas.info(info).addServersItem(new Server().url(ENV.getProperty("context.path", "/fpabonnent")));
 
-        SwaggerConfiguration oasConfig = new SwaggerConfiguration().openAPI(oas)
+        var oasConfig = new SwaggerConfiguration().openAPI(oas)
             .prettyPrint(true)
             .resourceClasses(getClasses().stream().map(Class::getName).collect(Collectors.toSet()));
         try {
-            new JaxrsOpenApiContextBuilder<>().openApiConfiguration(oasConfig).buildContext(true).read();
+            new GenericOpenApiContextBuilder<>().openApiConfiguration(oasConfig).buildContext(true).read();
         } catch (OpenApiConfigurationException e) {
             throw new TekniskException("OPEN-API", e.getMessage(), e);
         }

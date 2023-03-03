@@ -1,19 +1,18 @@
 package no.nav.foreldrepenger.abonnent.pdl.domene.internt;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
-import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
-import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
-import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.DødHendelseDto;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
+import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.DødHendelseDto;
 
 public class PdlDødHendelsePayload extends HendelsePayload {
 
@@ -36,7 +35,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
-        DødHendelseDto dto = new DødHendelseDto();
+        var dto = new DødHendelseDto();
         dto.setId(DødHendelseDto.HENDELSE_TYPE + "_" + getHendelseId());
         dto.setEndringstype(Endringstype.valueOf(endringstype));
         dto.setAktørId(finnAktørId(this));
@@ -45,10 +44,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
     }
 
     private List<AktørIdDto> finnAktørId(PdlDødHendelsePayload payload) {
-        if (payload.getAktørId().isPresent()) {
-            return payload.getAktørId().get().stream().map(AktørIdDto::new).collect(Collectors.toList());
-        }
-        return List.of();
+        return payload.getAktørId().map(strings -> strings.stream().map(AktørIdDto::new).toList()).orElseGet(List::of);
     }
 
     public Optional<Set<String>> getAktørId() {

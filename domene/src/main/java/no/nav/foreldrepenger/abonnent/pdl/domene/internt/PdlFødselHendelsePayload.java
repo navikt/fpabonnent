@@ -1,5 +1,11 @@
 package no.nav.foreldrepenger.abonnent.pdl.domene.internt;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
@@ -7,13 +13,6 @@ import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.Endringstype;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.HendelseWrapperDto;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.pdl.FødselHendelseDto;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class PdlFødselHendelsePayload extends HendelsePayload {
 
@@ -42,11 +41,11 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
 
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
-        FødselHendelseDto dto = new FødselHendelseDto();
+        var dto = new FødselHendelseDto();
         dto.setId(FødselHendelseDto.HENDELSE_TYPE + "_" + getHendelseId());
         dto.setEndringstype(Endringstype.valueOf(endringstype));
         this.getFødselsdato().ifPresent(dto::setFødselsdato);
-        this.getAktørIdForeldre().ifPresent(foreldre -> dto.setAktørIdForeldre(foreldre.stream().map(AktørIdDto::new).collect(Collectors.toList())));
+        this.getAktørIdForeldre().ifPresent(foreldre -> dto.setAktørIdForeldre(foreldre.stream().map(AktørIdDto::new).toList()));
         return new HendelseWrapperDto(dto);
     }
 
@@ -100,7 +99,7 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
             return false;
         }
 
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) o;
+        var payload = (PdlFødselHendelsePayload) o;
 
         if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) {
             return false;

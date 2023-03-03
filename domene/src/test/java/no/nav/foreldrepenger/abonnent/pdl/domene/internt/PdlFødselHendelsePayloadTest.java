@@ -12,20 +12,20 @@ import org.junit.jupiter.api.Test;
 import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PdlFødselHendelsePayloadTest {
+class PdlFødselHendelsePayloadTest {
 
     @Test
-    public void skal_mappe_til_FødselHendelseDto() {
+    void skal_mappe_til_FødselHendelseDto() {
         // Act
-        HendelseWrapperDto hendelseWrapperDto = HendelseTestDataUtil.lagFødselsHendelsePayload().mapPayloadTilDto();
+        var hendelseWrapperDto = HendelseTestDataUtil.lagFødselsHendelsePayload().mapPayloadTilDto();
 
         // Assert
         assertThat(hendelseWrapperDto).isNotNull();
-        HendelseDto hendelseDto = hendelseWrapperDto.getHendelse();
+        var hendelseDto = hendelseWrapperDto.getHendelse();
         assertThat(hendelseDto.getId()).isEqualTo(FødselHendelseDto.HENDELSE_TYPE + "_" + HENDELSE_ID);
         assertThat(hendelseDto.getHendelsetype()).isEqualTo(FødselHendelseDto.HENDELSE_TYPE);
         assertThat(hendelseDto.getEndringstype()).isEqualTo(Endringstype.OPPRETTET);
-        FødselHendelseDto fødselHendelseDto = (FødselHendelseDto) hendelseDto;
+        var fødselHendelseDto = (FødselHendelseDto) hendelseDto;
         assertThat(fødselHendelseDto.getFødselsdato()).isEqualTo(FØDSELSDATO);
         assertThat(fødselHendelseDto.getAktørIdForeldre()).containsExactlyInAnyOrder(new AktørIdDto(AKTØR_ID_FAR), new AktørIdDto(AKTØR_ID_MOR));
     }

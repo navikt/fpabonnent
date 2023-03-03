@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import no.nav.vedtak.exception.TekniskException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +75,7 @@ public class HendelseRepository {
     private Optional<InngåendeHendelse> queryTilOptional(String hendelseId, TypedQuery<InngåendeHendelse> query) {
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.fantMerEnnEnHendelse(hendelseId).getMessage());
+            LOGGER.warn(new TekniskException("FP-164340", String.format("Fant mer enn en InngåendeHendelse med hendelseId=%s.", hendelseId)).getMessage());
         } else if (resultater.isEmpty()) {
             return Optional.empty();
         }
@@ -116,10 +118,14 @@ public class HendelseRepository {
 
         List<InngåendeHendelse> resultater = query.getResultList();
         if (resultater.size() > 1) {
-            LOGGER.warn(HendelseRepositoryFeil.fantMerEnnEnHendelseMedStatus(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT)
+            LOGGER.warn(new TekniskException("FP-164339",
+                String.format("Fant mer enn en InngåendeHendelse med hendelseKilde=%s, hendelseId=%s og håndtertStatus=%s.", hendelseKilde.getKode(),
+                    hendelseId, HåndtertStatusType.GROVSORTERT))
                 .getMessage());
         } else if (resultater.isEmpty()) {
-            LOGGER.warn(HendelseRepositoryFeil.fantIkkeHendelse(hendelseKilde.getKode(), hendelseId, HåndtertStatusType.GROVSORTERT).getMessage());
+            LOGGER.warn(new TekniskException("FP-264339",
+                String.format("Fant ikke InngåendeHendelse med hendelseKilde=%s, hendelseId=%s og håndtertStatus=%s.", hendelseKilde.getKode(),
+                    hendelseId, HåndtertStatusType.GROVSORTERT)).getMessage());
             return Optional.empty();
         }
         return Optional.of(resultater.get(0));

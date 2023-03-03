@@ -35,7 +35,7 @@ public class UtflyttingsDatoTjeneste {
         this.pdlKlient = pdlKlient;
     }
 
-    public LocalDate finnUtflyttingsdato(String aktørId, String hendelseId) {
+    public LocalDate finnUtflyttingsdato(String aktørId) {
         var idag = LocalDate.now();
         var query = new HentPersonQueryRequest();
         query.setIdent(aktørId);
@@ -72,7 +72,7 @@ public class UtflyttingsDatoTjeneste {
     }
 
     private static LocalDate personstatusGyldigFra(Folkeregisterpersonstatus status) {
-        var ajourFom = status.getFolkeregistermetadata().getAjourholdstidspunkt(); // TODO evaluer
+        var ajourFom = status.getFolkeregistermetadata().getAjourholdstidspunkt();
         var gyldigFom = status.getFolkeregistermetadata().getGyldighetstidspunkt();
         Date brukFom;
         if (ajourFom != null && gyldigFom != null) {

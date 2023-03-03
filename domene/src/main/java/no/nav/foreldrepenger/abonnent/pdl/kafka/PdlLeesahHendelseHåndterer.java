@@ -7,7 +7,6 @@ import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.UTFLY
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
@@ -23,17 +22,13 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.task.VurderSorteringTask;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
-import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDød;
-import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDødfødsel;
-import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
-import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlUtflytting;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.mdc.MDCOperations;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @Transactional
 @ActivateRequestContext
@@ -65,7 +60,7 @@ public class PdlLeesahHendelseHåndterer {
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
         setCallIdForHendelse(payload);
 
-        Optional<InngåendeHendelse> inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(),
+        var inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(),
             HendelseKilde.PDL);
         if (inngåendeHendelse.isPresent()) {
             LOG.info(
@@ -98,7 +93,7 @@ public class PdlLeesahHendelseHåndterer {
         } else {
             loggMottakUtenDato(payload, "fødsel");
         }
-        PdlFødsel pdlFødsel = oversetter.oversettFødsel(payload);
+        var pdlFødsel = oversetter.oversettFødsel(payload);
         prosesserHendelseVidereHvisRelevant(pdlFødsel);
     }
 
@@ -109,7 +104,7 @@ public class PdlLeesahHendelseHåndterer {
         } else {
             loggMottakUtenDato(payload, "dødsfall");
         }
-        PdlDød pdlDød = oversetter.oversettDød(payload);
+        var pdlDød = oversetter.oversettDød(payload);
         prosesserHendelseVidereHvisRelevant(pdlDød);
     }
 
@@ -120,7 +115,7 @@ public class PdlLeesahHendelseHåndterer {
         } else {
             loggMottakUtenDato(payload, "dødfødtBarn");
         }
-        PdlDødfødsel pdlDødfødsel = oversetter.oversettDødfødsel(payload);
+        var pdlDødfødsel = oversetter.oversettDødfødsel(payload);
         prosesserHendelseVidereHvisRelevant(pdlDødfødsel);
     }
 
@@ -131,7 +126,7 @@ public class PdlLeesahHendelseHåndterer {
         } else {
             loggMottakUtenDato(payload, "utflyttingFraNorge");
         }
-        PdlUtflytting pdlUtflytting = oversetter.oversettUtflytting(payload);
+        var pdlUtflytting = oversetter.oversettUtflytting(payload);
         prosesserHendelseVidereHvisRelevant(pdlUtflytting);
     }
 
@@ -159,9 +154,9 @@ public class PdlLeesahHendelseHåndterer {
     private void prosesserHendelseVidereHvisRelevant(PdlPersonhendelse personhendelse) {
         if (personhendelse.erRelevantForFpsak()) {
             LOG.info("Lagrer");
-            InngåendeHendelse inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
+            var inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
             LOG.info("Finner neste");
-            LocalDateTime håndteresEtterTidspunkt = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse);
+            var håndteresEtterTidspunkt = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse);
             LOG.info("Opppdaterer");
             hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, håndteresEtterTidspunkt);
             LOG.info("Oppretter");
@@ -173,11 +168,11 @@ public class PdlLeesahHendelseHåndterer {
     }
 
     private InngåendeHendelse lagreInngåendeHendelse(PdlPersonhendelse personhendelse, HåndtertStatusType håndtertStatusType) {
-        var jsonPayload = JsonMapper.toJson(personhendelse);
+        var jsonPayload = DefaultJsonMapper.toJson(personhendelse);
         if (jsonPayload == null) {
             LOG.warn("Tom payload for objekt {}", personhendelse);
         }
-        InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
+        var inngåendeHendelse = InngåendeHendelse.builder()
             .hendelseType(personhendelse.getHendelseType())
             .hendelseId(personhendelse.getHendelseId())
             .tidligereHendelseId(personhendelse.getTidligereHendelseId())
@@ -190,7 +185,7 @@ public class PdlLeesahHendelseHåndterer {
     }
 
     private void opprettVurderSorteringTask(PdlPersonhendelse personhendelse, Long inngåendeHendelseId, LocalDateTime håndteresEtterTidspunkt) {
-        HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
+        var vurderSorteringTask = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
         vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelseId);
         vurderSorteringTask.setHendelseId(personhendelse.getHendelseId());
         vurderSorteringTask.setNesteKjøringEtter(håndteresEtterTidspunkt);

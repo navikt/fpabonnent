@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +20,6 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTypeRef;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
@@ -49,7 +50,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
     @Override
     public PdlFødselHendelsePayload payloadFraJsonString(String payload) {
-        PdlFødsel pdlFødsel = JsonMapper.fromJson(payload, PdlFødsel.class);
+        var pdlFødsel = DefaultJsonMapper.fromJson(payload, PdlFødsel.class);
 
         return new PdlFødselHendelsePayload.Builder().hendelseId(pdlFødsel.getHendelseId())
             .tidligereHendelseId(pdlFødsel.getTidligereHendelseId())
@@ -77,9 +78,9 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     @Override
     public KlarForSorteringResultat vurderOmKlarForSortering(PdlFødselHendelsePayload payload) {
         if (!payload.getFnrBarn().isEmpty()) {
-            Set<AktørId> foreldre = getForeldre(payload.getFnrBarn());
+            var foreldre = getForeldre(payload.getFnrBarn());
             if (!foreldre.isEmpty()) {
-                FødselKlarForSorteringResultat resultat = new FødselKlarForSorteringResultat(true);
+                var resultat = new FødselKlarForSorteringResultat(true);
                 resultat.setForeldre(foreldre.stream().map(AktørId::getId).collect(Collectors.toSet()));
                 return resultat;
             } else {
@@ -93,16 +94,16 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
     @Override
     public void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {
-        PdlFødsel pdlFødsel = JsonMapper.fromJson(inngåendeHendelse.getPayload(), PdlFødsel.class);
+        var pdlFødsel = DefaultJsonMapper.fromJson(inngåendeHendelse.getPayload(), PdlFødsel.class);
         pdlFødsel.setAktørIdForeldre(((FødselKlarForSorteringResultat) klarForSorteringResultat).getForeldre());
-        inngåendeHendelse.setPayload(JsonMapper.toJson(pdlFødsel));
+        inngåendeHendelse.setPayload(DefaultJsonMapper.toJson(pdlFødsel));
     }
 
     @Override
     public void loggFeiletHendelse(PdlFødselHendelsePayload payload) {
-        String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
-        String årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
-        boolean info = false;
+        var basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
+        var årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
+        var info = false;
         if (payload.getFnrBarn().isEmpty()) {
             årsak = "Årsaken er at barnets fødselsnummer mangler på hendelsen.";
         } else if (getForeldre(payload.getFnrBarn()).isEmpty()) {
@@ -119,7 +120,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
     private Set<AktørId> getForeldre(Set<PersonIdent> fnrBarn) {
         Set<AktørId> foreldre = new HashSet<>();
-        for (PersonIdent fnr : fnrBarn) {
+        for (var fnr : fnrBarn) {
             try {
                 foreldre.addAll(foreldreTjeneste.hentForeldre(fnr));
             } catch (TekniskException e) {
@@ -134,7 +135,7 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
         return foreldre;
     }
 
-    private class FødselKlarForSorteringResultat extends KlarForSorteringResultat {
+    private static class FødselKlarForSorteringResultat extends KlarForSorteringResultat {
 
         private Set<String> foreldre;
 

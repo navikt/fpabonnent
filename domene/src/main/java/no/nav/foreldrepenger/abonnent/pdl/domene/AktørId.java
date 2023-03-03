@@ -83,7 +83,7 @@ public class AktørId implements Serializable, Comparable<AktørId> {
         return aktørId != null && VALID.matcher(aktørId).matches();
     }
 
-    private static AtomicLong DUMMY_AKTØRID = new AtomicLong(1000000000000L);
+    private static final AtomicLong DUMMY_AKTØRID = new AtomicLong(1000000000000L);
 
     /**
      * Genererer dummy aktørid unikt for test.

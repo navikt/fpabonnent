@@ -28,12 +28,8 @@ public enum HendelseKilde implements Kodeverdi {
         // Hibernate trenger den
     }
 
-    private HendelseKilde(String kode) {
+    HendelseKilde(String kode) {
         this.kode = kode;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(KODER.keySet());
     }
 
     @Override

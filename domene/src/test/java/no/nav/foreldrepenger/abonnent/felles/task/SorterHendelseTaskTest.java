@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,6 @@ import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelserKlient;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
 import no.nav.vedtak.exception.TekniskException;
@@ -41,10 +39,11 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.testutilities.cdi.UnitTestLookupInstanceImpl;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(JpaExtension.class)
-public class SorterHendelseTaskTest {
+class SorterHendelseTaskTest {
 
     private static final LocalDate FØDSELSDATO = LocalDate.of(2018, 1, 25);
 
@@ -67,7 +66,7 @@ public class SorterHendelseTaskTest {
     private ProsessTaskTjeneste prosessTaskTjeneste;
 
     @BeforeEach
-    public void setup(EntityManager em) {
+    void setup(EntityManager em) {
         this.entityManager = em;
         this.hendelseRepository = new HendelseRepository(em);
         this.inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository,
@@ -77,16 +76,15 @@ public class SorterHendelseTaskTest {
     }
 
     @Test
-    public void skal_kaste_teknisk_exception_hvis_påkreved_parameter_mangler() {
-
+    void skal_kaste_teknisk_exception_hvis_påkreved_parameter_mangler() {
         // Act
         assertThrows(TekniskException.class, () -> sorterHendelseTask.doTask(prosessTaskData));
     }
 
     @Test
-    public void skal_ikke_opprette_task_når_ingen_hendelser_kommer_inn() {
+    void skal_ikke_opprette_task_når_ingen_hendelser_kommer_inn() {
         // Arrange
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
+        var dataWrapper = lagDefaultDataWrapper();
         lenient().when(hendelser.grovsorterAktørIder(anyList())).thenReturn(List.of());
 
         // Act
@@ -97,14 +95,14 @@ public class SorterHendelseTaskTest {
     }
 
     @Test
-    public void skal_ikke_opprette_SendHendelseTask_når_grovsortering_returnerer_tom_liste() {
+    void skal_ikke_opprette_SendHendelseTask_når_grovsortering_returnerer_tom_liste() {
         // Arrange
         when(hendelser.grovsorterAktørIder(anyList())).thenReturn(List.of());
 
-        InngåendeHendelse hendelse = lagInngåendeHendelse();
+        var hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
 
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
+        var dataWrapper = lagDefaultDataWrapper();
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
         // Act
@@ -112,23 +110,23 @@ public class SorterHendelseTaskTest {
 
         // Assert
         verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
-        InngåendeHendelse inngåendeHendelse = finnHendelseMedHendelseId(HENDELSE_ID);
+        var inngåendeHendelse = finnHendelseMedHendelseId();
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
     }
 
     @Test
-    public void skal_opprette_SendHendelseTask() {
+    void skal_opprette_SendHendelseTask() {
         // Arrange
         List<String> eksisterendeAktørIder = List.of(FORELDER1, FORELDER2);
 
-        InngåendeHendelse hendelse = lagInngåendeHendelse();
+        var hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
 
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
+        var dataWrapper = lagDefaultDataWrapper();
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
         when(hendelser.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
-        ArgumentCaptor<ProsessTaskData> argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        var argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
 
         // Act
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
@@ -136,24 +134,24 @@ public class SorterHendelseTaskTest {
         // Assert
         verify(prosessTaskTjeneste).lagre(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().taskType()).isEqualTo(TaskType.forProsessTask(SendHendelseTask.class));
-        HendelserDataWrapper data = new HendelserDataWrapper(argumentCaptor.getValue());
+        var data = new HendelserDataWrapper(argumentCaptor.getValue());
         assertThat(data.getHendelseType()).isPresent().hasValue(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         assertThat(data.getHendelseId()).isPresent().hasValue(FMELDING.getHendelseId());
-        InngåendeHendelse inngåendeHendelse = finnHendelseMedHendelseId(HENDELSE_ID);
+        var inngåendeHendelse = finnHendelseMedHendelseId();
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
         assertThat(data.getInngåendeHendelseId()).isPresent().hasValue(inngåendeHendelse.getId());
     }
 
     @Test
-    public void skal_ikke_opprette_SendHendelseTask_for_ikke_relevant_aktørid() {
+    void skal_ikke_opprette_SendHendelseTask_for_ikke_relevant_aktørid() {
         // Arrange
-        List<String> eksisterendeAktørIder = List.of("12", "13");
+        var eksisterendeAktørIder = List.of("12", "13");
         when(hendelser.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
 
-        InngåendeHendelse hendelse = lagInngåendeHendelse();
+        var hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
 
-        HendelserDataWrapper dataWrapper = lagDefaultDataWrapper();
+        var dataWrapper = lagDefaultDataWrapper();
         dataWrapper.setInngåendeHendelseId(hendelse.getId());
 
         // Act
@@ -161,12 +159,12 @@ public class SorterHendelseTaskTest {
 
         // Assert
         verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
-        InngåendeHendelse inngåendeHendelse = finnHendelseMedHendelseId(HENDELSE_ID);
+        var inngåendeHendelse = finnHendelseMedHendelseId();
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
     }
 
     private HendelserDataWrapper lagDefaultDataWrapper() {
-        HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
+        var dataWrapper = new HendelserDataWrapper(prosessTaskData);
         dataWrapper.setHendelseId(HENDELSE_ID);
         return dataWrapper;
     }
@@ -175,16 +173,16 @@ public class SorterHendelseTaskTest {
         return InngåendeHendelse.builder()
             .hendelseId(FMELDING.getHendelseId())
             .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-            .payload(JsonMapper.toJson(FMELDING))
+            .payload(DefaultJsonMapper.toJson(FMELDING))
             .hendelseKilde(HendelseKilde.PDL)
             .håndtertStatus(HåndtertStatusType.SENDT_TIL_SORTERING)
             .build();
     }
 
-    public InngåendeHendelse finnHendelseMedHendelseId(String hendelseId) {
-        TypedQuery<InngåendeHendelse> query = entityManager.createQuery("from InngåendeHendelse where hendelseId = :hendelseId ",
+    InngåendeHendelse finnHendelseMedHendelseId() {
+        var query = entityManager.createQuery("from InngåendeHendelse where hendelseId = :hendelseId ",
             InngåendeHendelse.class); //$NON-NLS-1$
-        query.setParameter("hendelseId", hendelseId);
+        query.setParameter("hendelseId", SorterHendelseTaskTest.HENDELSE_ID);
         return query.getSingleResult();
     }
 }

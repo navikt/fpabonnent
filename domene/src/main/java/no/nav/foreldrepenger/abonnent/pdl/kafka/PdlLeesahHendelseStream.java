@@ -1,9 +1,13 @@
 package no.nav.foreldrepenger.abonnent.pdl.kafka;
 
+import static org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
+
 import java.time.Duration;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
+import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
 
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -14,11 +18,11 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.person.pdl.leesah.Personhendelse;
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.kafka.KafkaProperties;
+import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
-public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegration {
+public class PdlLeesahHendelseStream implements LiveAndReadinessAware, Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseStream.class);
 
@@ -38,7 +42,7 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
 
     @SuppressWarnings("resource")
     private static KafkaStreams createKafkaStreams(Topic<String, Personhendelse> topic, PdlLeesahHendelseHåndterer pdlLeesahHendelseHåndterer) {
-        final Consumed<String, Personhendelse> consumed = Consumed.<String, Personhendelse>with(Topology.AutoOffsetReset.LATEST)
+        final var consumed = Consumed.<String, Personhendelse>with(Topology.AutoOffsetReset.LATEST)
             .withKeySerde(topic.serdeKey())
             .withValueSerde(topic.serdeValue());
 
@@ -51,6 +55,11 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
     @Override
     public boolean isAlive() {
         return (stream != null) && stream.state().isRunningOrRebalancing();
+    }
+
+    @Override
+    public boolean isReady() {
+        return isAlive();
     }
 
     @Override
@@ -82,9 +91,9 @@ public class PdlLeesahHendelseStream implements AppServiceHandler, KafkaIntegrat
                 stop();
             }
         });
-        stream.setUncaughtExceptionHandler((t, e) -> {
-            LOG.error("{} :: Caught exception in stream, exiting", getTopicName(), e);
-            stop();
+        stream.setUncaughtExceptionHandler(ex -> {
+            LOG.error("{} :: Caught exception in stream, exiting", getTopicName(), ex);
+            return SHUTDOWN_CLIENT;
         });
     }
 }

@@ -4,6 +4,9 @@ import no.nav.vedtak.exception.TekniskException;
 
 public class AbonnentHendelserFeil {
 
+    private AbonnentHendelserFeil() {
+    }
+
     public static TekniskException prosesstaskPreconditionManglerProperty(String taskname, String property, Long taskId) {
         return new TekniskException("FP-690327",
             String.format("Prosessering av preconditions for %s mangler %s. TaskId: %s", taskname, property, taskId));

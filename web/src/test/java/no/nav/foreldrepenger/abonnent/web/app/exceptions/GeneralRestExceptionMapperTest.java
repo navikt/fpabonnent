@@ -17,24 +17,24 @@ import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.log.util.MemoryAppender;
 
 @Execution(ExecutionMode.SAME_THREAD)
-public class GeneralRestExceptionMapperTest {
+class GeneralRestExceptionMapperTest {
 
     private static MemoryAppender logSniffer;
 
     private final GeneralRestExceptionMapper exceptionMapper = new GeneralRestExceptionMapper();
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         logSniffer = MemoryAppender.sniff(GeneralRestExceptionMapper.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         logSniffer.reset();
     }
 
     @Test
-    public void skalIkkeMappeManglerTilgangFeil() {
+    void skalIkkeMappeManglerTilgangFeil() {
         var response = exceptionMapper.toResponse(manglerTilgangFeil());
 
         assertThat(response.getStatus()).isEqualTo(403);
@@ -47,7 +47,7 @@ public class GeneralRestExceptionMapperTest {
     }
 
     @Test
-    public void skalMappeFunksjonellFeil() {
+    void skalMappeFunksjonellFeil() {
         var response = exceptionMapper.toResponse(funksjonellFeil());
 
         assertThat(response.getEntity()).isInstanceOf(FeilDto.class);
@@ -60,7 +60,7 @@ public class GeneralRestExceptionMapperTest {
     }
 
     @Test
-    public void skalMappeVLException() {
+    void skalMappeVLException() {
         var response = exceptionMapper.toResponse(tekniskFeil());
 
         assertThat(response.getEntity()).isInstanceOf(FeilDto.class);
@@ -72,7 +72,7 @@ public class GeneralRestExceptionMapperTest {
     }
 
     @Test
-    public void skalMappeWrappedGenerellFeil() {
+    void skalMappeWrappedGenerellFeil() {
         String feilmelding = "en helt generell feil";
         RuntimeException generellFeil = new RuntimeException(feilmelding);
 
@@ -87,7 +87,7 @@ public class GeneralRestExceptionMapperTest {
     }
 
     @Test
-    public void skalMappeWrappedFeilUtenCause() {
+    void skalMappeWrappedFeilUtenCause() {
         String feilmelding = "en helt generell feil";
 
         Response response = exceptionMapper.toResponse(new TekniskException("KODE", feilmelding));
@@ -101,7 +101,7 @@ public class GeneralRestExceptionMapperTest {
     }
 
     @Test
-    public void skalMappeGenerellFeil() {
+    void skalMappeGenerellFeil() {
         String feilmelding = "en helt generell feil";
         RuntimeException generellFeil = new IllegalArgumentException(feilmelding);
 
