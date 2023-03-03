@@ -31,12 +31,8 @@ public enum HåndtertStatusType implements Kodeverdi {
         // Hibernate trenger den
     }
 
-    private HåndtertStatusType(String kode) {
+    HåndtertStatusType(String kode) {
         this.kode = kode;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(KODER.keySet());
     }
 
     @Override
@@ -68,8 +64,7 @@ public enum HåndtertStatusType implements Kodeverdi {
             if (kode == null) {
                 return null;
             }
-            return Optional.ofNullable(KODER.get(kode))
-                .orElseThrow(() -> new IllegalArgumentException("Ukjent HåndtertStatusType: " + kode));
+            return Optional.ofNullable(KODER.get(kode)).orElseThrow(() -> new IllegalArgumentException("Ukjent HåndtertStatusType: " + kode));
         }
     }
 }

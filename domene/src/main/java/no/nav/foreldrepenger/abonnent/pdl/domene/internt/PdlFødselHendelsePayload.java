@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
@@ -42,11 +41,11 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
 
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
-        FødselHendelseDto dto = new FødselHendelseDto();
+        var dto = new FødselHendelseDto();
         dto.setId(FødselHendelseDto.HENDELSE_TYPE + "_" + getHendelseId());
         dto.setEndringstype(Endringstype.valueOf(endringstype));
         this.getFødselsdato().ifPresent(dto::setFødselsdato);
-        this.getAktørIdForeldre().ifPresent(foreldre -> dto.setAktørIdForeldre(foreldre.stream().map(AktørIdDto::new).collect(Collectors.toList())));
+        this.getAktørIdForeldre().ifPresent(foreldre -> dto.setAktørIdForeldre(foreldre.stream().map(AktørIdDto::new).toList()));
         return new HendelseWrapperDto(dto);
     }
 
@@ -93,19 +92,39 @@ public class PdlFødselHendelsePayload extends HendelsePayload {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        PdlFødselHendelsePayload payload = (PdlFødselHendelsePayload) o;
+        var payload = (PdlFødselHendelsePayload) o;
 
-        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) return false;
-        if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) return false;
-        if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) return false;
-        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
-        if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) return false;
-        if (fnrBarn != null ? !fnrBarn.equals(payload.fnrBarn) : payload.fnrBarn != null) return false;
-        if (aktørIdBarn != null ? !aktørIdBarn.equals(payload.aktørIdBarn) : payload.aktørIdBarn != null) return false;
-        if (aktørIdForeldre != null ? !aktørIdForeldre.equals(payload.aktørIdForeldre) : payload.aktørIdForeldre != null) return false;
+        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) {
+            return false;
+        }
+        if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) {
+            return false;
+        }
+        if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) {
+            return false;
+        }
+        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) {
+            return false;
+        }
+        if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) {
+            return false;
+        }
+        if (fnrBarn != null ? !fnrBarn.equals(payload.fnrBarn) : payload.fnrBarn != null) {
+            return false;
+        }
+        if (aktørIdBarn != null ? !aktørIdBarn.equals(payload.aktørIdBarn) : payload.aktørIdBarn != null) {
+            return false;
+        }
+        if (aktørIdForeldre != null ? !aktørIdForeldre.equals(payload.aktørIdForeldre) : payload.aktørIdForeldre != null) {
+            return false;
+        }
         return fødselsdato != null ? fødselsdato.equals(payload.fødselsdato) : payload.fødselsdato == null;
     }
 

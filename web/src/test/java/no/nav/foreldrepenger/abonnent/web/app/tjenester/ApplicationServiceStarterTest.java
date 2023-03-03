@@ -13,38 +13,30 @@ import javax.enterprise.inject.Instance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.testutilities.cdi.UnitTestLookupInstanceImpl;
+import no.nav.vedtak.log.metrics.Controllable;
 
 @ExtendWith(MockitoExtension.class)
-public class ApplicationServiceStarterTest {
+class ApplicationServiceStarterTest {
 
     private ApplicationServiceStarter serviceStarter;
 
-    private AppServiceHandler serviceMock = mock(AppServiceHandler.class);
-    private Instance<AppServiceHandler> testInstance = new UnitTestLookupInstanceImpl<>(serviceMock);
-    private Instance<AppServiceHandler> instanceSpied = spy(testInstance);
-
-    private Iterator<AppServiceHandler> iteratorMock = mock(Iterator.class);
+    @Mock
+    private Controllable service;
 
     @BeforeEach
     public void setup() {
-        when(iteratorMock.hasNext()).thenReturn(true, false);
-        when(iteratorMock.next()).thenReturn(serviceMock);
-        doReturn(iteratorMock).when(instanceSpied).iterator();
-
-        serviceStarter = new ApplicationServiceStarter(instanceSpied);
+        serviceStarter = new ApplicationServiceStarter(service);
     }
 
     @Test
-    public void test_skal_kalle_AppServiceHandler_start_og_stop() {
+    void test_skal_kalle_Controllable_start_og_stop() {
         serviceStarter.startServices();
         serviceStarter.stopServices();
-
-        verify(serviceMock).start();
-        verify(serviceMock).start();
+        verify(service).start();
+        verify(service).stop();
     }
-
 }

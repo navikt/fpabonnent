@@ -1,17 +1,13 @@
 package no.nav.foreldrepenger.abonnent.extensions;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import no.nav.vedtak.felles.testutilities.cdi.CdiAwareExtension;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.vedtak.felles.testutilities.cdi.CdiAwareExtension;
+import java.lang.annotation.*;
 
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @ExtendWith(CdiAwareExtension.class)

@@ -19,19 +19,19 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil;
 
 @ExtendWith(JpaExtension.class)
-public class HendelseRepositoryTest {
+class HendelseRepositoryTest {
 
     private static final String HENDELSE_ID = "1000";
 
     private HendelseRepository hendelseRepository;
 
     @BeforeEach
-    public void before(EntityManager em) {
+    void before(EntityManager em) {
         hendelseRepository = new HendelseRepository(em);
     }
 
     @Test
-    public void skal_returnere_hendelse_som_er_sendt_til_sortering() {
+    void skal_returnere_hendelse_som_er_sendt_til_sortering() {
         // Arrange
         InngåendeHendelse hendelse = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID, HåndtertStatusType.SENDT_TIL_SORTERING);
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
@@ -45,7 +45,7 @@ public class HendelseRepositoryTest {
     }
 
     @Test
-    public void skal_returnere_hendelse_fra_angitt_kilde() {
+    void skal_returnere_hendelse_fra_angitt_kilde() {
         // Arrange
         InngåendeHendelse hendelse1 = HendelseTestDataUtil.lagInngåendeFødselsHendelse(HENDELSE_ID + "1", HåndtertStatusType.MOTTATT);
         hendelseRepository.lagreInngåendeHendelse(hendelse1);
@@ -61,32 +61,32 @@ public class HendelseRepositoryTest {
     }
 
     @Test
-    public void skal_returnere_hendelse_fra_PDL_som_er_grovsortert() {
+    void skal_returnere_hendelse_fra_PDL_som_er_grovsortert() {
         // Arrange
         InngåendeHendelse hendelse1 = InngåendeHendelse.builder()
-                .hendelseId(HENDELSE_ID)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload1")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
+            .hendelseId(HENDELSE_ID)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload("payload1")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.GROVSORTERT)
+            .håndteresEtterTidspunkt(LocalDateTime.now())
+            .build();
         InngåendeHendelse hendelse3 = InngåendeHendelse.builder() // Feil hendelseId
-                .hendelseId(HENDELSE_ID + 1)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload3")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
+            .hendelseId(HENDELSE_ID + 1)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload("payload3")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.GROVSORTERT)
+            .håndteresEtterTidspunkt(LocalDateTime.now())
+            .build();
         InngåendeHendelse hendelse4 = InngåendeHendelse.builder() // Feil håndtertStatus
-                .hendelseId(HENDELSE_ID)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .payload("payload4")
-                .hendelseKilde(HendelseKilde.PDL)
-                .håndtertStatus(HåndtertStatusType.MOTTATT)
-                .håndteresEtterTidspunkt(LocalDateTime.now())
-                .build();
+            .hendelseId(HENDELSE_ID)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload("payload4")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .håndteresEtterTidspunkt(LocalDateTime.now())
+            .build();
         hendelseRepository.lagreInngåendeHendelse(hendelse1);
         hendelseRepository.lagreInngåendeHendelse(hendelse3);
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse4);

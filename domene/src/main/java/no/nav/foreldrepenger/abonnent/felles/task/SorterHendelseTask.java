@@ -57,8 +57,8 @@ public class SorterHendelseTask implements ProsessTaskHandler {
         var filtrertAktørIdList = hendelser.grovsorterAktørIder(aktørIderForSortering);
 
         if (!hendelseErRelevant(filtrertAktørIdList, hendelsePayload)) {
-            LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK",
-                    hendelsePayload.getHendelseId(), hendelsePayload.getHendelseType());
+            LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK", hendelsePayload.getHendelseId(),
+                hendelsePayload.getHendelseType());
             inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(inngåendeHendelse.get());
             return;
         }
@@ -69,10 +69,12 @@ public class SorterHendelseTask implements ProsessTaskHandler {
     }
 
     private String getHendelseId(HendelserDataWrapper dataWrapper) {
-        if (dataWrapper.getHendelseId().isEmpty()) {
-            throw AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(dataWrapper.getProsessTaskData().getTaskType(), HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId());
+        var hendelseId = dataWrapper.getHendelseId();
+        if (hendelseId.isEmpty()) {
+            throw AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(dataWrapper.getProsessTaskData().getTaskType(),
+                HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId());
         }
-        return dataWrapper.getHendelseId().get();
+        return hendelseId.get();
     }
 
     private void opprettSendHendelseTask(HendelserDataWrapper dataWrapper, HendelsePayload hendelsePayload) {
@@ -89,7 +91,6 @@ public class SorterHendelseTask implements ProsessTaskHandler {
     @Override
     public String toString() {
         return getClass().getSimpleName() + " [prosessTaskRepository=" + prosessTaskTjeneste + ", inngåendeHendelseTjeneste="
-                + inngåendeHendelseTjeneste
-                + ", hendelser=" + hendelser + "]";
+            + inngåendeHendelseTjeneste + ", hendelser=" + hendelser + "]";
     }
 }

@@ -26,15 +26,15 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
-public class SendHendelseTaskTest {
+class SendHendelseTaskTest {
 
     private static final HendelseType HENDELSE_TYPE = HendelseType.PDL_FØDSEL_OPPRETTET;
     private static final LocalDate FØDSELSDATO = LocalDate.parse("2018-01-01");
@@ -50,8 +50,8 @@ public class SendHendelseTaskTest {
     private SendHendelseTask sendHendelseTask;
 
     @BeforeEach
-    public void setup() {
-        HendelseTjenesteProvider hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
+    void setup() {
+        var hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
         HendelseTjeneste fødselHendelseTjeneste = new PdlFødselHendelseTjeneste();
         when(hendelseTjenesteProvider.finnTjeneste(eq(HENDELSE_TYPE), anyString())).thenReturn(fødselHendelseTjeneste);
 
@@ -64,9 +64,9 @@ public class SendHendelseTaskTest {
     }
 
     @Test
-    public void skal_sende_fødselshendelse() {
+    void skal_sende_fødselshendelse() {
         // Arrange
-        PdlFødsel.Builder fødselBuilder = PdlFødsel.builder();
+        var fødselBuilder = PdlFødsel.builder();
         fødselBuilder.medHendelseId(HENDELSE_ID);
         fødselBuilder.medHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET);
         fødselBuilder.medEndringstype(PdlEndringstype.OPPRETTET);
@@ -74,32 +74,32 @@ public class SendHendelseTaskTest {
         fødselBuilder.leggTilPersonident("2222222222222");
         fødselBuilder.leggTilPersonident("77777777777"); //fnr
         fødselBuilder.medFødselsdato(FØDSELSDATO);
-        PdlFødsel fødsel = fødselBuilder.build();
+        var fødsel = fødselBuilder.build();
         fødsel.setAktørIdForeldre(Set.of("3333333333333", "4444444444444", "5555555555555", "6666666666666"));
-        InngåendeHendelse inngåendeHendelse = InngåendeHendelse.builder()
-                .id(INNGÅENDE_HENDELSE_ID)
-                .hendelseId(HENDELSE_ID)
-                .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-                .håndtertStatus(HåndtertStatusType.GROVSORTERT)
-                .payload(JsonMapper.toJson(fødsel))
-                .build();
+        var inngåendeHendelse = InngåendeHendelse.builder()
+            .id(INNGÅENDE_HENDELSE_ID)
+            .hendelseId(HENDELSE_ID)
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.GROVSORTERT)
+            .payload(DefaultJsonMapper.toJson(fødsel))
+            .build();
         when(hendelseRepository.finnEksaktHendelse(1L)).thenReturn(inngåendeHendelse);
         when(hendelseRepository.finnGrovsortertHendelse(HendelseKilde.PDL, HENDELSE_ID)).thenReturn(Optional.of(inngåendeHendelse));
 
-        HendelserDataWrapper hendelse = new HendelserDataWrapper(prosessTaskData);
+        var hendelse = new HendelserDataWrapper(prosessTaskData);
         hendelse.setInngåendeHendelseId(INNGÅENDE_HENDELSE_ID);
         hendelse.setHendelseId(HENDELSE_ID);
         hendelse.setHendelseType(HENDELSE_TYPE.getKode());
 
-        ArgumentCaptor<PdlFødselHendelsePayload> payloadCaptor = ArgumentCaptor.forClass(PdlFødselHendelsePayload.class);
-        ArgumentCaptor<InngåendeHendelse> ihCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
+        var payloadCaptor = ArgumentCaptor.forClass(PdlFødselHendelsePayload.class);
+        var ihCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
 
         // Act
         sendHendelseTask.doTask(hendelse.getProsessTaskData());
 
         // Assert
         verify(mockHendelseConsumer, times(1)).sendHendelse(payloadCaptor.capture());
-        PdlFødselHendelsePayload payload = payloadCaptor.getValue();
+        var payload = payloadCaptor.getValue();
         assertThat(payload.getHendelseId()).isEqualTo(HENDELSE_ID);
         assertThat(payload.getHendelseType()).isEqualTo(HENDELSE_TYPE.getKode());
         assertThat(payload.getAktørIdBarn()).isPresent();
@@ -113,13 +113,15 @@ public class SendHendelseTaskTest {
     }
 
     @Test
-    public void skal_kaste_feil_for_ukjent_inngående_hendelse() {
+    void skal_kaste_feil_for_ukjent_inngående_hendelse() {
         // Arrange
-        HendelserDataWrapper dataWrapper = new HendelserDataWrapper(prosessTaskData);
+        var dataWrapper = new HendelserDataWrapper(prosessTaskData);
         dataWrapper.setHendelseId(HENDELSE_ID);
         dataWrapper.setInngåendeHendelseId(null);
 
+        var task = dataWrapper.getProsessTaskData();
+        
         // Act
-        assertThrows(TekniskException.class, () -> sendHendelseTask.doTask(dataWrapper.getProsessTaskData()));
+        assertThrows(TekniskException.class, () -> sendHendelseTask.doTask(task));
     }
 }

@@ -1,10 +1,10 @@
 package no.nav.foreldrepenger.abonnent.pdl.domene.eksternt;
 
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 
 public abstract class PdlPersonhendelse {
 
@@ -52,17 +52,12 @@ public abstract class PdlPersonhendelse {
     }
 
     protected String toStringInnhold() {
-        return "hendelseId='" + hendelseId + '\'' +
-                ", personidenter=" + personidenter +
-                ", master='" + master + '\'' +
-                ", opprettet=" + opprettet +
-                ", opplysningstype='" + opplysningstype + '\'' +
-                ", endringstype=" + endringstype +
-                ", tidligereHendelseId='" + tidligereHendelseId + '\'' +
-                ", hendelseType=" + hendelseType;
+        return "hendelseId='" + hendelseId + '\'' + ", personidenter=" + personidenter + ", master='" + master + '\'' + ", opprettet=" + opprettet
+            + ", opplysningstype='" + opplysningstype + '\'' + ", endringstype=" + endringstype + ", tidligereHendelseId='" + tidligereHendelseId
+            + '\'' + ", hendelseType=" + hendelseType;
     }
 
-    public static abstract class PdlPersonhendelseBuilder {
+    public abstract static class PdlPersonhendelseBuilder {
         protected PdlPersonhendelse mal;
 
         public PdlPersonhendelseBuilder medHendelseId(String hendelseId) {

@@ -1,10 +1,5 @@
 package no.nav.foreldrepenger.abonnent.web.server;
 
-import java.sql.SQLException;
-
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.FlywayException;
-
 import no.nav.foreldrepenger.konfig.Environment;
 
 public class JettyDevServer extends JettyServer {

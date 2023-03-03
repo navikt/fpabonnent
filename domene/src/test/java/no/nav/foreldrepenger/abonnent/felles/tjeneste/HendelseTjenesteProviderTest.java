@@ -9,20 +9,19 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
 import no.nav.vedtak.felles.testutilities.cdi.UnitTestLookupInstanceImpl;
 
-public class HendelseTjenesteProviderTest {
+class HendelseTjenesteProviderTest {
 
 
     private HendelseTjenesteProvider hendelseTjenesteProvider;
 
     @Test
-    public void skal_finne_hendelsetjeneste() {
+    void skal_finne_hendelsetjeneste() {
         // Act
         hendelseTjenesteProvider = new HendelseTjenesteProvider(new UnitTestLookupInstanceImpl<>(new PdlFødselHendelseTjeneste()));
         HendelseTjeneste<HendelsePayload> hendelseTjeneste = hendelseTjenesteProvider.finnTjeneste(HendelseType.PDL_FØDSEL_OPPRETTET, "1");
 
         // Assert
-        assertThat(hendelseTjeneste).isNotNull();
-        assertThat(hendelseTjeneste).isInstanceOf(PdlFødselHendelseTjeneste.class);
+        assertThat(hendelseTjeneste).isNotNull().isInstanceOf(PdlFødselHendelseTjeneste.class);
     }
 
 }

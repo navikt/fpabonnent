@@ -9,9 +9,8 @@ public class PdlDødfødsel extends PdlPersonhendelse {
     private LocalDate dødfødselsdato;
 
     public boolean erRelevantForFpsak() {
-        return (HendelseType.PDL_DØDFØDSEL_OPPRETTET.equals(getHendelseType())
-                || HendelseType.PDL_DØDFØDSEL_ANNULLERT.equals(getHendelseType())
-                || HendelseType.PDL_DØDFØDSEL_KORRIGERT.equals(getHendelseType()));
+        return (HendelseType.PDL_DØDFØDSEL_OPPRETTET.equals(getHendelseType()) || HendelseType.PDL_DØDFØDSEL_ANNULLERT.equals(getHendelseType())
+            || HendelseType.PDL_DØDFØDSEL_KORRIGERT.equals(getHendelseType()));
     }
 
     public LocalDate getDødfødselsdato() {
@@ -20,9 +19,7 @@ public class PdlDødfødsel extends PdlPersonhendelse {
 
     @Override
     public String toString() {
-        return "PdlDødfødsel{" + toStringInnhold() +
-                ", dødfødselsdato=" + dødfødselsdato +
-                '}';
+        return "PdlDødfødsel{" + toStringInnhold() + ", dødfødselsdato=" + dødfødselsdato + '}';
     }
 
     public static Builder builder() {

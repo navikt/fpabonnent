@@ -11,7 +11,7 @@
     <artifactId>fpabonnent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
-    <name>fpabonnent :: Root</name>
+    <name>FP-Abonnent :: Root</name>
 
     <modules>
         <module>migreringer</module>
@@ -20,12 +20,12 @@
     </modules>
 
     <properties>
-        <revision>4.0-SNAPSHOT</revision>
+        <revision>1.0-SNAPSHOT</revision>
 
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>4.2.28</felles.version>
+        <felles.version>4.2.30</felles.version>
         <prosesstask.version>3.1.21</prosesstask.version>
         <fp-kontrakter.version>6.2.11</fp-kontrakter.version>
 

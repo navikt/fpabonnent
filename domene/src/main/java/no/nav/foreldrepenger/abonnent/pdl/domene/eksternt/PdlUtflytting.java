@@ -10,8 +10,7 @@ public class PdlUtflytting extends PdlPersonhendelse {
     private LocalDate utflyttingsdato;
 
     public boolean erRelevantForFpsak() {
-        return (HendelseType.PDL_UTFLYTTING_OPPRETTET.equals(getHendelseType())
-                || HendelseType.PDL_UTFLYTTING_ANNULLERT.equals(getHendelseType()));
+        return (HendelseType.PDL_UTFLYTTING_OPPRETTET.equals(getHendelseType()) || HendelseType.PDL_UTFLYTTING_ANNULLERT.equals(getHendelseType()));
     }
 
     public LocalDate getUtflyttingsdato() {
@@ -24,9 +23,7 @@ public class PdlUtflytting extends PdlPersonhendelse {
 
     @Override
     public String toString() {
-        return "PdlUtflytting{" + toStringInnhold() +
-                ", utflyttingsdato=" + utflyttingsdato +
-                '}';
+        return "PdlUtflytting{" + toStringInnhold() + ", utflyttingsdato=" + utflyttingsdato + '}';
     }
 
     public static Builder builder() {

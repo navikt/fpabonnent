@@ -45,16 +45,16 @@ public class HendelseTjenesteHjelper {
      * - Endringstypen er KORRIGERT og datoen for hendelsen er samme som i siste sendte tidligere hendelse.
      * - Annullert utflytting som er mer enn 1 uke etter tidligere hendelse (unngå revurderinger i utide)
      *
-     * @param payload HendelsePayload som skal vurderes
+     * @param payload              HendelsePayload som skal vurderes
      * @param payloadFraJsonString Referanse til funksjonen i HendelseTjeneste som oversetter fra JSON til HendelsePayload
      * @return true hvis hendelsen kan forkastes
      */
     public boolean vurderOmHendelseKanForkastes(HendelsePayload payload, Function<String, HendelsePayload> payloadFraJsonString) {
         Optional<InngåendeHendelse> tidligereHendelse = getTidligereHendelse(payload.getTidligereHendelseId());
         if (of(PdlEndringstype.ANNULLERT.name(), PdlEndringstype.KORRIGERT.name()).contains(payload.getEndringstype())
-                && tidligereHendelse.isEmpty()) {
+            && tidligereHendelse.isEmpty()) {
             LOGGER.info("Hendelse {} av type {} vil bli forkastet da endringstypen er {}, uten at vi har mottatt tidligere hendelse {}",
-                    payload.getHendelseId(), payload.getHendelseType(), payload.getEndringstype(), payload.getTidligereHendelseId());
+                payload.getHendelseId(), payload.getHendelseType(), payload.getEndringstype(), payload.getTidligereHendelseId());
             return true;
         } else if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && tidligereHendelse.isPresent()) {
             return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, tidligereHendelse, payloadFraJsonString);
@@ -64,19 +64,23 @@ public class HendelseTjenesteHjelper {
         return false;
     }
 
-    private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(HendelsePayload payload, Optional<InngåendeHendelse> tidligereHendelse, Function<String, HendelsePayload> payloadFraJsonString) {
+    private boolean sjekkOmHendelseHarSammeVerdiOgErSendt(HendelsePayload payload,
+                                                          Optional<InngåendeHendelse> tidligereHendelse,
+                                                          Function<String, HendelsePayload> payloadFraJsonString) {
         if (tidligereHendelse.isEmpty()) {
             return false;
         } else if (tidligereHendelse.get().erSendtTilFpsak()) {
-            boolean harSammeDato = payload.getHendelseDato().isPresent() && payload.getHendelseDato().equals(payloadFraJsonString.apply(tidligereHendelse.get().getPayload()).getHendelseDato());
+            boolean harSammeDato = payload.getHendelseDato().isPresent() && payload.getHendelseDato()
+                .equals(payloadFraJsonString.apply(tidligereHendelse.get().getPayload()).getHendelseDato());
             if (harSammeDato) {
-                LOGGER.info("Hendelse {} av type {} vil bli forkastet da endringstypen er KORRIGERT, uten at datoen {} er endret siden hendelse {}, som er forrige hendelse som ble sendt til FPSAK",
-                        payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseDato(), tidligereHendelse.get().getHendelseId());
+                LOGGER.info(
+                    "Hendelse {} av type {} vil bli forkastet da endringstypen er KORRIGERT, uten at datoen {} er endret siden hendelse {}, som er forrige hendelse som ble sendt til FPSAK",
+                    payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseDato(), tidligereHendelse.get().getHendelseId());
             }
             return harSammeDato;
         } else if (tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() == null) {
             LOGGER.info("Hendelse {} av type {} vil bli forkastet da endringstypen er {}, uten at vi har sendt tidligere hendelse {}",
-                    payload.getHendelseId(), payload.getHendelseType(), payload.getEndringstype(), tidligereHendelse.get().getHendelseId());
+                payload.getHendelseId(), payload.getHendelseType(), payload.getEndringstype(), tidligereHendelse.get().getHendelseId());
             return true;
         } else if (tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() != null) {
             // Gjøre sammenlikningen mot neste tidligere hendelse i stedet, i tilfelle den er sendt til Fpsak
@@ -87,15 +91,14 @@ public class HendelseTjenesteHjelper {
     }
 
     private Optional<InngåendeHendelse> getTidligereHendelse(String tidligereHendelseId) {
-        return tidligereHendelseId != null ?
-                hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, HendelseKilde.PDL) :
-                Optional.empty();
+        return
+            tidligereHendelseId != null ? hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, HendelseKilde.PDL) : Optional.empty();
     }
 
     /**
      * Identer inneholder flere identer for en person. fnr/dnr, aktørid osv.
      * Vi må hente ut det som er fnr fra dette settet.
-     *
+     * <p>
      * En person kan ha flere fødselsnumre, gjerne der en av dem er et D-nummer.
      *
      * @param identer liste av forskjellige identer for en person(fnr, dnr, aktørid).
@@ -106,16 +109,13 @@ public class HendelseTjenesteHjelper {
             return null; // NOSONAR - ønsker ikke å returnere tomt Set, for da må man sjekke !isEmpty() i tillegg til isPresent()
         }
 
-        return identer.stream()
-                .filter(PersonIdent::erGyldigFnr)
-                .map(PersonIdent::new)
-                .collect(Collectors.toSet());
+        return identer.stream().filter(PersonIdent::erGyldigFnr).map(PersonIdent::new).collect(Collectors.toSet());
     }
 
     /**
      * Identer inneholder flere identer for en person. fnr/dnr, aktørid osv.
      * Vi må hente ut det som er aktørId fra dette settet.
-     *
+     * <p>
      * En person kan ha flere aktørIder, gjerne der en av dem er knyttet til et D-nummer.
      *
      * @param identer liste av forskjellige identer for en person(fnr, dnr, aktørid).
@@ -126,9 +126,7 @@ public class HendelseTjenesteHjelper {
             return null; // NOSONAR - ønsker ikke å returnere tomt Set, for da må man sjekke !isEmpty() i tillegg til isPresent()
         }
 
-        Set<String> aktørIder = identer.stream()
-                .filter(HendelseTjenesteHjelper::erAktørId)
-                .collect(Collectors.toSet());
+        Set<String> aktørIder = identer.stream().filter(HendelseTjenesteHjelper::erAktørId).collect(Collectors.toSet());
 
         validerResultat(hendelseId, aktørIder);
 

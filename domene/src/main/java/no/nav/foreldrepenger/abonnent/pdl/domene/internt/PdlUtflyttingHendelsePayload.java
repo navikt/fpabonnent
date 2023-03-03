@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
@@ -22,6 +22,7 @@ public class PdlUtflyttingHendelsePayload extends HendelsePayload {
     private LocalDate utflyttingsdato;
 
     public PdlUtflyttingHendelsePayload() {
+        // CDI
     }
 
     @Override
@@ -35,10 +36,7 @@ public class PdlUtflyttingHendelsePayload extends HendelsePayload {
     }
 
     private List<AktørIdDto> finnAktørId(PdlUtflyttingHendelsePayload payload) {
-        if (payload.getAktørId().isPresent()) {
-            return payload.getAktørId().get().stream().map(AktørIdDto::new).collect(Collectors.toList());
-        }
-        return List.of();
+        return payload.getAktørId().map(strings -> strings.stream().map(AktørIdDto::new).toList()).orElseGet(List::of);
     }
 
     public Optional<Set<String>> getAktørId() {
@@ -70,18 +68,34 @@ public class PdlUtflyttingHendelsePayload extends HendelsePayload {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        PdlUtflyttingHendelsePayload payload = (PdlUtflyttingHendelsePayload) o;
+        var payload = (PdlUtflyttingHendelsePayload) o;
 
-        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) return false;
-        if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) return false;
-        if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) return false;
-        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
-        if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) return false;
-        if (aktørId != null ? !aktørId.equals(payload.aktørId) : payload.aktørId != null) return false;
-        return utflyttingsdato != null ? utflyttingsdato.equals(payload.utflyttingsdato) : payload.utflyttingsdato == null;
+        if (!Objects.equals(hendelseId, payload.hendelseId)) {
+            return false;
+        }
+        if (!Objects.equals(tidligereHendelseId, payload.tidligereHendelseId)) {
+            return false;
+        }
+        if (!Objects.equals(hendelseType, payload.hendelseType)) {
+            return false;
+        }
+        if (!Objects.equals(endringstype, payload.endringstype)) {
+            return false;
+        }
+        if (!Objects.equals(hendelseOpprettetTid, payload.hendelseOpprettetTid)) {
+            return false;
+        }
+        if (!Objects.equals(aktørId, payload.aktørId)) {
+            return false;
+        }
+        return Objects.equals(utflyttingsdato, payload.utflyttingsdato);
     }
 
     @Override
@@ -97,7 +111,7 @@ public class PdlUtflyttingHendelsePayload extends HendelsePayload {
     }
 
     public static class Builder {
-        private PdlUtflyttingHendelsePayload kladd = new PdlUtflyttingHendelsePayload();
+        private final PdlUtflyttingHendelsePayload kladd = new PdlUtflyttingHendelsePayload();
 
         public Builder hendelseId(String hendelseId) {
             this.kladd.hendelseId = hendelseId;

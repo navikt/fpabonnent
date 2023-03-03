@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -32,8 +31,8 @@ public class AktørIdTjeneste {
     }
 
     private static List<String> filtrerBortUgyldigeAktørIder(List<String> aktørIder) {
-        Validator validator = validatorFactory.getValidator();
-        return aktørIder.stream().filter(a -> erGyldig(a, validator)).collect(Collectors.toList());
+        var validator = validatorFactory.getValidator();
+        return aktørIder.stream().filter(a -> erGyldig(a, validator)).toList();
     }
 
     private static boolean erGyldig(String aktørId, Validator validator) {
@@ -41,7 +40,7 @@ public class AktørIdTjeneste {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(new AktørIdDto(aktørId));
 
         if (!constraintViolations.isEmpty()) {
-            String feilmelding = byggFeilmelding(constraintViolations);
+            var feilmelding = byggFeilmelding(constraintViolations);
             LOGGER.warn("Validering av aktørId '{}' feilet: {}.", aktørId, feilmelding);
             return false;
         }
@@ -49,7 +48,7 @@ public class AktørIdTjeneste {
     }
 
     private static String byggFeilmelding(Set<ConstraintViolation<Object>> constraintViolations) {
-        StringBuilder feilmelding = new StringBuilder();
+        var feilmelding = new StringBuilder();
         constraintViolations.forEach(cv -> feilmelding.append(cv.getMessage()));
         return feilmelding.toString();
     }

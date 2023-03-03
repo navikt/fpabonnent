@@ -55,7 +55,7 @@ public enum HendelseType implements Kodeverdi {
         // Hibernate trenger den
     }
 
-    private HendelseType(String kode) {
+    HendelseType(String kode) {
         this.kode = kode;
     }
 
@@ -69,13 +69,7 @@ public enum HendelseType implements Kodeverdi {
             return null;
         }
         var kode = TempAvledeKode.getVerdi(HendelseType.class, node, "kode", kallCtx);
-        return Optional.ofNullable(kode).map(KODER::get)
-            .orElseThrow(() -> new IllegalArgumentException("Ukjent Hendelsetype: " + kode));
-    }
-
-
-    public static void main(String[] args) {
-        System.out.println(KODER.keySet());
+        return Optional.ofNullable(kode).map(KODER::get).orElseThrow(() -> new IllegalArgumentException("Ukjent Hendelsetype: " + kode));
     }
 
     @Override

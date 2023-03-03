@@ -1,16 +1,16 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
-import static no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType.HÅNDTERT;
-
-import java.util.Objects;
-import java.util.Optional;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
+import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
+import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
-import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
-import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
+import java.util.Objects;
+import java.util.Optional;
+
+import static no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType.HÅNDTERT;
 
 @ApplicationScoped
 public class InngåendeHendelseTjeneste {

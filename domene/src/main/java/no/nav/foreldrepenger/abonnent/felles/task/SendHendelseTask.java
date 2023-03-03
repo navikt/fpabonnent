@@ -26,9 +26,7 @@ public class SendHendelseTask implements ProsessTaskHandler {
     private HendelseRepository hendelseRepository;
 
     @Inject
-    public SendHendelseTask(HendelserKlient hendelser,
-                            InngåendeHendelseTjeneste inngåendeHendelseTjeneste,
-                            HendelseRepository hendelseRepository) {
+    public SendHendelseTask(HendelserKlient hendelser, InngåendeHendelseTjeneste inngåendeHendelseTjeneste, HendelseRepository hendelseRepository) {
         this.hendelser = hendelser;
         this.inngåendeHendelseTjeneste = inngåendeHendelseTjeneste;
         this.hendelseRepository = hendelseRepository;
@@ -46,8 +44,8 @@ public class SendHendelseTask implements ProsessTaskHandler {
 
     private HendelsePayload getHendelsePayload(HendelserDataWrapper dataWrapper) {
         Long inngåendeHendelseId = dataWrapper.getInngåendeHendelseId()
-                .orElseThrow(() -> AbonnentHendelserFeil.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(),
-                        dataWrapper.getProsessTaskData().getId()));
+            .orElseThrow(() -> AbonnentHendelserFeil.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(),
+                dataWrapper.getProsessTaskData().getId()));
         var inngåendeHendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelseId);
         return inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
     }
@@ -55,6 +53,6 @@ public class SendHendelseTask implements ProsessTaskHandler {
     @Override
     public String toString() {
         return getClass().getSimpleName() + " [hendelser=" + hendelser + ", inngåendeHendelseTjeneste=" + inngåendeHendelseTjeneste
-                + ", hendelseRepository=" + hendelseRepository + "]";
+            + ", hendelseRepository=" + hendelseRepository + "]";
     }
 }

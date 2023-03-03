@@ -4,16 +4,22 @@ import no.nav.vedtak.exception.TekniskException;
 
 public class AbonnentHendelserFeil {
 
+    private AbonnentHendelserFeil() {
+    }
+
     public static TekniskException prosesstaskPreconditionManglerProperty(String taskname, String property, Long taskId) {
-        return new TekniskException("FP-690327", String.format("Prosessering av preconditions for %s mangler %s. TaskId: %s", taskname, property, taskId));
+        return new TekniskException("FP-690327",
+            String.format("Prosessering av preconditions for %s mangler %s. TaskId: %s", taskname, property, taskId));
     }
 
     public static TekniskException ukjentMeldingtypeKanIkkeFinneHendelseTjeneste(String hendelseType, String hendelseId) {
-        return new TekniskException("FP-309345", String.format("Ukjent hendelsestype - kan ikke finne hendelsestjeneste. hendelseType=%s, hendelseId=%s", hendelseType, hendelseId));
+        return new TekniskException("FP-309345",
+            String.format("Ukjent hendelsestype - kan ikke finne hendelsestjeneste. hendelseType=%s, hendelseId=%s", hendelseType, hendelseId));
     }
 
     public static TekniskException merEnnEnHendelseTjenesteFunnet(String hendelseType, String hendelseId) {
-        return new TekniskException("FP-125639", String.format("Mer enn en hendelsestjeneste funnet. hendelseType=%s, hendelseId=%s", hendelseType, hendelseId));
+        return new TekniskException("FP-125639",
+            String.format("Mer enn en hendelsestjeneste funnet. hendelseType=%s, hendelseId=%s", hendelseType, hendelseId));
     }
 
     public static TekniskException ukjentHendelseType() {
@@ -29,6 +35,7 @@ public class AbonnentHendelserFeil {
     }
 
     public static TekniskException manglerInngåendeHendelseIdPåProsesstask(String prosesstaskType, Long taskId) {
-        return new TekniskException("FP-144656", String.format("InngåendeHendelse ID mangler på prosess task %s med TaskId=%s", prosesstaskType, taskId));
+        return new TekniskException("FP-144656",
+            String.format("InngåendeHendelse ID mangler på prosess task %s med TaskId=%s", prosesstaskType, taskId));
     }
 }

@@ -17,12 +17,12 @@ public class JsonParseExceptionMapper implements ExceptionMapper<JsonParseExcept
 
     @Override
     public Response toResponse(JsonParseException exception) {
-        TekniskException tekniskException = new TekniskException("FP-299955", String.format("JSON-parsing feil: %s", exception.getMessage()), exception);
+        TekniskException tekniskException = new TekniskException("FP-299955", String.format("JSON-parsing feil: %s", exception.getMessage()),
+            exception);
         LOG.warn(tekniskException.getMessage());
-        return Response
-                .status(Response.Status.BAD_REQUEST)
-                .entity(new FeilDto(tekniskException.getMessage()))
-                .type(MediaType.APPLICATION_JSON)
-                .build();
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity(new FeilDto(tekniskException.getMessage()))
+            .type(MediaType.APPLICATION_JSON)
+            .build();
     }
 }

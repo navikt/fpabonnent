@@ -16,11 +16,11 @@ public class VtpKafkaAvroDeserializer extends KafkaAvroDeserializer {
         return super.deserialize(topic, bytes);
     }
 
-    private static SchemaRegistryClient getMockClient(final Schema schema$) {
+    private static SchemaRegistryClient getMockClient(final Schema schema) {
         return new MockSchemaRegistryClient() {
             @Override
             public synchronized AvroSchema getSchemaBySubjectAndId(String subject, int id) {
-                return new AvroSchema(schema$);
+                return new AvroSchema(schema);
             }
         };
     }

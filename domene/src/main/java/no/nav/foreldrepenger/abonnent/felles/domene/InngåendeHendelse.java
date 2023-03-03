@@ -19,7 +19,7 @@ public class InngåendeHendelse extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_INNGAAENDE_HENDELSE")
     @Column(name = "id")
     private Long id;
-    
+
     @Column(name = "hendelse_id")
     private String hendelseId;
 
@@ -27,22 +27,22 @@ public class InngåendeHendelse extends BaseEntitet {
     private String tidligereHendelseId;
 
     @Convert(converter = HendelseKilde.KodeverdiConverter.class)
-    @Column(name="kilde", nullable = false)
+    @Column(name = "kilde", nullable = false)
     private HendelseKilde hendelseKilde;
 
     @Convert(converter = HendelseType.KodeverdiConverter.class)
-    @Column(name="type", nullable = false)
+    @Column(name = "type", nullable = false)
     private HendelseType hendelseType;
 
     @Lob
     @Column(name = "payload")
     private String payload;
-    
+
     @Column(name = "haandteres_etter")
     private LocalDateTime håndteresEtterTidspunkt;
 
     @Convert(converter = HåndtertStatusType.KodeverdiConverter.class)
-    @Column(name="haandtert_status", nullable = false)
+    @Column(name = "haandtert_status", nullable = false)
     private HåndtertStatusType håndtertStatus = HåndtertStatusType.MOTTATT;
 
     @Column(name = "sendt_tid")
@@ -67,7 +67,7 @@ public class InngåendeHendelse extends BaseEntitet {
     public Long getId() {
         return id;
     }
-    
+
     public String getHendelseId() {
         return hendelseId;
     }
@@ -86,7 +86,7 @@ public class InngåendeHendelse extends BaseEntitet {
 
     public String getPayload() {
         return payload;
-    }   
+    }
 
     public LocalDateTime getHåndteresEtterTidspunkt() {
         return håndteresEtterTidspunkt;
@@ -139,7 +139,7 @@ public class InngåendeHendelse extends BaseEntitet {
             this.id = id;
             return this;
         }
-        
+
         public Builder hendelseId(String hendelseId) {
             this.hendelseId = hendelseId;
             return this;

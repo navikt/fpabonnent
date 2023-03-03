@@ -19,7 +19,7 @@ public abstract class HendelsePayload {
 
     protected LocalDateTime hendelseOpprettetTid;
 
-    public HendelsePayload() {
+    protected HendelsePayload() {
     }
 
     public String getHendelseId() {

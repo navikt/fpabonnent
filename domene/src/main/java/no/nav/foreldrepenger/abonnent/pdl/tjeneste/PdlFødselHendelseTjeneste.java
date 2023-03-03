@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,20 +20,19 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTypeRef;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.JsonMapper;
 import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.pdl.oppslag.ForeldreTjeneste;
-import no.nav.vedtak.exception.TekniskException;
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 @HendelseTypeRef(HendelseTypeRef.PDL_FØDSEL_HENDELSE)
 public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHendelsePayload> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PdlFødselHendelseTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PdlFødselHendelseTjeneste.class);
     private static final Environment ENV = Environment.current();
 
     private HendelseTjenesteHjelper hendelseTjenesteHjelper;
@@ -49,26 +50,26 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
     @Override
     public PdlFødselHendelsePayload payloadFraJsonString(String payload) {
-        PdlFødsel pdlFødsel = JsonMapper.fromJson(payload, PdlFødsel.class);
+        var pdlFødsel = DefaultJsonMapper.fromJson(payload, PdlFødsel.class);
 
-        return new PdlFødselHendelsePayload.Builder()
-                .hendelseId(pdlFødsel.getHendelseId())
-                .tidligereHendelseId(pdlFødsel.getTidligereHendelseId())
-                .hendelseType(pdlFødsel.getHendelseType().getKode())
-                .endringstype(pdlFødsel.getEndringstype().name())
-                .hendelseOpprettetTid(pdlFødsel.getOpprettet())
-                .fnrBarn(hentUtFødselsnumreFraString(pdlFødsel.getPersonidenter()))
-                .aktørIdBarn(hentUtAktørIderFraString(pdlFødsel.getPersonidenter(), pdlFødsel.getHendelseId()))
-                .aktørIdForeldre(pdlFødsel.getAktørIdForeldre())
-                .fødselsdato(pdlFødsel.getFødselsdato())
-                .build();
+        return new PdlFødselHendelsePayload.Builder().hendelseId(pdlFødsel.getHendelseId())
+            .tidligereHendelseId(pdlFødsel.getTidligereHendelseId())
+            .hendelseType(pdlFødsel.getHendelseType().getKode())
+            .endringstype(pdlFødsel.getEndringstype().name())
+            .hendelseOpprettetTid(pdlFødsel.getOpprettet())
+            .fnrBarn(hentUtFødselsnumreFraString(pdlFødsel.getPersonidenter()))
+            .aktørIdBarn(hentUtAktørIderFraString(pdlFødsel.getPersonidenter(), pdlFødsel.getHendelseId()))
+            .aktørIdForeldre(pdlFødsel.getAktørIdForeldre())
+            .fødselsdato(pdlFødsel.getFødselsdato())
+            .build();
     }
 
     @Override
     public boolean vurderOmHendelseKanForkastes(PdlFødselHendelsePayload payload) {
-        if (payload.getFødselsdato().isPresent() && payload.getFødselsdato().get().isBefore(LocalDate.now().minusYears(2))) {
-            LOGGER.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet",
-                    payload.getHendelseId(), payload.getFødselsdato().get());
+        var fødselsdato = payload.getFødselsdato();
+        if (fødselsdato.isPresent() && fødselsdato.get().isBefore(LocalDate.now().minusYears(2))) {
+            LOG.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet", payload.getHendelseId(),
+                fødselsdato.get());
             return true;
         }
         return hendelseTjenesteHjelper.vurderOmHendelseKanForkastes(payload, this::payloadFraJsonString);
@@ -77,62 +78,64 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
     @Override
     public KlarForSorteringResultat vurderOmKlarForSortering(PdlFødselHendelsePayload payload) {
         if (!payload.getFnrBarn().isEmpty()) {
-            Set<AktørId> foreldre = getForeldre(payload.getFnrBarn());
+            var foreldre = getForeldre(payload.getFnrBarn());
             if (!foreldre.isEmpty()) {
-                FødselKlarForSorteringResultat resultat = new FødselKlarForSorteringResultat(true);
+                var resultat = new FødselKlarForSorteringResultat(true);
                 resultat.setForeldre(foreldre.stream().map(AktørId::getId).collect(Collectors.toSet()));
                 return resultat;
             } else {
-                LOGGER.info("Fant ikke foreldre for hendelse {} med type {}", payload.getHendelseId(), payload.getHendelseType());
+                LOG.info("Fant ikke foreldre for hendelse {} med type {}", payload.getHendelseId(), payload.getHendelseType());
                 return new FødselKlarForSorteringResultat(false, true);
             }
         }
-        LOGGER.warn("Hendelse {} med type {} har ikke barns fødselsnummer", payload.getHendelseId(), payload.getHendelseType());
+        LOG.warn("Hendelse {} med type {} har ikke barns fødselsnummer", payload.getHendelseId(), payload.getHendelseType());
         return new FødselKlarForSorteringResultat(false, false);
     }
 
     @Override
     public void berikHendelseHvisNødvendig(InngåendeHendelse inngåendeHendelse, KlarForSorteringResultat klarForSorteringResultat) {
-        PdlFødsel pdlFødsel = JsonMapper.fromJson(inngåendeHendelse.getPayload(), PdlFødsel.class);
-        pdlFødsel.setAktørIdForeldre(((FødselKlarForSorteringResultat)klarForSorteringResultat).getForeldre());
-        inngåendeHendelse.setPayload(JsonMapper.toJson(pdlFødsel));
+        var pdlFødsel = DefaultJsonMapper.fromJson(inngåendeHendelse.getPayload(), PdlFødsel.class);
+        pdlFødsel.setAktørIdForeldre(((FødselKlarForSorteringResultat) klarForSorteringResultat).getForeldre());
+        inngåendeHendelse.setPayload(DefaultJsonMapper.toJson(pdlFødsel));
     }
 
     @Override
     public void loggFeiletHendelse(PdlFødselHendelsePayload payload) {
-        String basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
-        String årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
-        boolean info = false;
+        var basismelding = "Hendelse {} med type {} som ble opprettet {} kan fremdeles ikke sorteres og blir derfor ikke behandlet videre. ";
+        var årsak = "Årsaken er ukjent - bør undersøkes av utvikler.";
+        var info = false;
         if (payload.getFnrBarn().isEmpty()) {
             årsak = "Årsaken er at barnets fødselsnummer mangler på hendelsen.";
         } else if (getForeldre(payload.getFnrBarn()).isEmpty()) {
             årsak = "Årsaken er at barnet fortsatt ikke har registrerte foreldre i PDL.";
             info = true; // Innvandring blir varslet som fødsel OPPRETTET, men mangler ofte foreldreopplysninger (gjelder primært voksne)
         }
+        var melding = basismelding + årsak;
         if (info) {
-            LOGGER.info(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+            LOG.info(melding, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         } else {
-            LOGGER.warn(basismelding + årsak, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
+            LOG.warn(melding, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         }
     }
 
     private Set<AktørId> getForeldre(Set<PersonIdent> fnrBarn) {
         Set<AktørId> foreldre = new HashSet<>();
-        for (PersonIdent fnr : fnrBarn) {
+        for (var fnr : fnrBarn) {
             try {
                 foreldre.addAll(foreldreTjeneste.hentForeldre(fnr));
             } catch (TekniskException e) {
                 if (ENV.isProd()) {
                     throw e;
                 } else {
-                    LOGGER.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}", ENV.getCluster().clusterName(), e);
+                    LOG.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}",
+                        ENV.getCluster().clusterName(), e);
                 }
             }
         }
         return foreldre;
     }
 
-    private class FødselKlarForSorteringResultat extends KlarForSorteringResultat {
+    private static class FødselKlarForSorteringResultat extends KlarForSorteringResultat {
 
         private Set<String> foreldre;
 

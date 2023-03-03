@@ -35,32 +35,32 @@ public class UtflyttingsDatoTjeneste {
         this.pdlKlient = pdlKlient;
     }
 
-    public LocalDate finnUtflyttingsdato(String aktørId, String hendelseId) {
+    public LocalDate finnUtflyttingsdato(String aktørId) {
         var idag = LocalDate.now();
         var query = new HentPersonQueryRequest();
         query.setIdent(aktørId);
 
-        var projection = new PersonResponseProjection()
-                .folkeregisterpersonstatus(new PersonFolkeregisterpersonstatusParametrizedInput().historikk(true),
-                        new FolkeregisterpersonstatusResponseProjection().status()
-                                .folkeregistermetadata(new FolkeregistermetadataResponseProjection().ajourholdstidspunkt().gyldighetstidspunkt()))
-                .bostedsadresse(new PersonBostedsadresseParametrizedInput().historikk(true),
-                        new BostedsadresseResponseProjection().gyldigFraOgMed().gyldigTilOgMed());
+        var projection = new PersonResponseProjection().folkeregisterpersonstatus(
+                new PersonFolkeregisterpersonstatusParametrizedInput().historikk(true), new FolkeregisterpersonstatusResponseProjection().status()
+                    .folkeregistermetadata(new FolkeregistermetadataResponseProjection().ajourholdstidspunkt().gyldighetstidspunkt()))
+            .bostedsadresse(new PersonBostedsadresseParametrizedInput().historikk(true),
+                new BostedsadresseResponseProjection().gyldigFraOgMed().gyldigTilOgMed());
 
         var person = pdlKlient.hentPerson(query, projection);
 
-        var fraPersonStatus = person.getFolkeregisterpersonstatus().stream()
-                .filter(f -> "utflyttet".equals(f.getStatus()))
-                .map(UtflyttingsDatoTjeneste::personstatusGyldigFra)
-                .filter(d -> d != null && d.isAfter(idag.minusMonths(6)))
-                .max(Comparator.naturalOrder());
+        var fraPersonStatus = person.getFolkeregisterpersonstatus()
+            .stream()
+            .filter(f -> "utflyttet".equals(f.getStatus()))
+            .map(UtflyttingsDatoTjeneste::personstatusGyldigFra)
+            .filter(d -> d != null && d.isAfter(idag.minusMonths(6)))
+            .max(Comparator.naturalOrder());
 
-        var fraBostedsAdresse = person.getBostedsadresse().stream()
-                .max(Comparator.comparing(UtflyttingsDatoTjeneste::bostedsAdresseFraDato)
-                        .thenComparing(UtflyttingsDatoTjeneste::bostedsAdresseTilDato))
-                .map(Bostedsadresse::getGyldigTilOgMed)
-                .map(UtflyttingsDatoTjeneste::localDateFraDate)
-                .filter(d -> d.isAfter(idag.minusMonths(6)));
+        var fraBostedsAdresse = person.getBostedsadresse()
+            .stream()
+            .max(Comparator.comparing(UtflyttingsDatoTjeneste::bostedsAdresseFraDato).thenComparing(UtflyttingsDatoTjeneste::bostedsAdresseTilDato))
+            .map(Bostedsadresse::getGyldigTilOgMed)
+            .map(UtflyttingsDatoTjeneste::localDateFraDate)
+            .filter(d -> d.isAfter(idag.minusMonths(6)));
 
         if (fraPersonStatus.isEmpty() && fraBostedsAdresse.isEmpty()) {
             return idag;
@@ -72,7 +72,7 @@ public class UtflyttingsDatoTjeneste {
     }
 
     private static LocalDate personstatusGyldigFra(Folkeregisterpersonstatus status) {
-        var ajourFom = status.getFolkeregistermetadata().getAjourholdstidspunkt(); // TODO evaluer
+        var ajourFom = status.getFolkeregistermetadata().getAjourholdstidspunkt();
         var gyldigFom = status.getFolkeregistermetadata().getGyldighetstidspunkt();
         Date brukFom;
         if (ajourFom != null && gyldigFom != null) {
@@ -88,7 +88,7 @@ public class UtflyttingsDatoTjeneste {
     }
 
     private static LocalDate bostedsAdresseTilDato(Bostedsadresse bostedsadresse) {
-        return bostedsadresse.getGyldigTilOgMed() == null ? Tid.TIDENES_ENDE  : localDateFraDate(bostedsadresse.getGyldigTilOgMed());
+        return bostedsadresse.getGyldigTilOgMed() == null ? Tid.TIDENES_ENDE : localDateFraDate(bostedsadresse.getGyldigTilOgMed());
     }
 
     private static LocalDate localDateFraDate(Date fom) {

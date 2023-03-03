@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
@@ -36,7 +35,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
     @Override
     public HendelseWrapperDto mapPayloadTilDto() {
-        DødHendelseDto dto = new DødHendelseDto();
+        var dto = new DødHendelseDto();
         dto.setId(DødHendelseDto.HENDELSE_TYPE + "_" + getHendelseId());
         dto.setEndringstype(Endringstype.valueOf(endringstype));
         dto.setAktørId(finnAktørId(this));
@@ -45,10 +44,7 @@ public class PdlDødHendelsePayload extends HendelsePayload {
     }
 
     private List<AktørIdDto> finnAktørId(PdlDødHendelsePayload payload) {
-        if (payload.getAktørId().isPresent()) {
-            return payload.getAktørId().get().stream().map(AktørIdDto::new).collect(Collectors.toList());
-        }
-        return List.of();
+        return payload.getAktørId().map(strings -> strings.stream().map(AktørIdDto::new).toList()).orElseGet(List::of);
     }
 
     public Optional<Set<String>> getAktørId() {
@@ -80,17 +76,33 @@ public class PdlDødHendelsePayload extends HendelsePayload {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         PdlDødHendelsePayload payload = (PdlDødHendelsePayload) o;
 
-        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) return false;
-        if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) return false;
-        if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) return false;
-        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) return false;
-        if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) return false;
-        if (aktørId != null ? !aktørId.equals(payload.aktørId) : payload.aktørId != null) return false;
+        if (hendelseId != null ? !hendelseId.equals(payload.hendelseId) : payload.hendelseId != null) {
+            return false;
+        }
+        if (tidligereHendelseId != null ? !tidligereHendelseId.equals(payload.tidligereHendelseId) : payload.tidligereHendelseId != null) {
+            return false;
+        }
+        if (hendelseType != null ? !hendelseType.equals(payload.hendelseType) : payload.hendelseType != null) {
+            return false;
+        }
+        if (endringstype != null ? !endringstype.equals(payload.endringstype) : payload.endringstype != null) {
+            return false;
+        }
+        if (hendelseOpprettetTid != null ? !hendelseOpprettetTid.equals(payload.hendelseOpprettetTid) : payload.hendelseOpprettetTid != null) {
+            return false;
+        }
+        if (aktørId != null ? !aktørId.equals(payload.aktørId) : payload.aktørId != null) {
+            return false;
+        }
         return dødsdato != null ? dødsdato.equals(payload.dødsdato) : payload.dødsdato == null;
     }
 
