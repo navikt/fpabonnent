@@ -23,6 +23,7 @@
         <revision>1.0-SNAPSHOT</revision>
 
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+        <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
         <felles.version>4.2.30</felles.version>
