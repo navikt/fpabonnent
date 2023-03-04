@@ -17,7 +17,7 @@ import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
-@RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, application = FpApplication.FPSAK)
+@RestClientConfig(tokenConfig = TokenFlow.STS_CC, application = FpApplication.FPSAK)
 public class HendelserKlient {
 
     private static final String API_PATH = "/api/hendelser";
