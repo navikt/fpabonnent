@@ -60,16 +60,11 @@ public enum HendelseType implements Kodeverdi {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static HendelseType fraKode(@JsonProperty(value = "kode") Object node) {
-        return finnFraKode(node, "deserialiser");
-    }
-
-    public static HendelseType finnFraKode(Object node, String kallCtx) {
-        if (node == null) {
+    public static HendelseType fraKode(@JsonProperty(value = "kode") String kode) {
+        if (kode == null) {
             return null;
         }
-        var kode = TempAvledeKode.getVerdi(HendelseType.class, node, "kode", kallCtx);
-        return Optional.ofNullable(kode).map(KODER::get).orElseThrow(() -> new IllegalArgumentException("Ukjent Hendelsetype: " + kode));
+        return Optional.ofNullable(KODER.get(kode)).orElseThrow(() -> new IllegalArgumentException("Ukjent Hendelsetype: " + kode));
     }
 
     @Override
@@ -110,7 +105,7 @@ public enum HendelseType implements Kodeverdi {
 
         @Override
         public HendelseType convertToEntityAttribute(String dbData) {
-            return dbData == null ? null : finnFraKode(dbData, "db");
+            return dbData == null ? null : fraKode(dbData);
         }
     }
 }
