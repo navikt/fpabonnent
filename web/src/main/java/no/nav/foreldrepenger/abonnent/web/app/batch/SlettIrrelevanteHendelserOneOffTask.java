@@ -12,23 +12,21 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @Dependent
-@ProsessTask(value = "slett.hendelserAndre", cronExpression = "0 1 2 * * *", maxFailedRuns = 1)
-public class SlettIrrelevanteHendelserBatchTask implements ProsessTaskHandler {
+@ProsessTask(value = "slett.hendelserOneOff")
+public class SlettIrrelevanteHendelserOneOffTask implements ProsessTaskHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SlettIrrelevanteHendelserBatchTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SlettIrrelevanteHendelserOneOffTask.class);
 
     private final HendelseRepository hendelseRepository;
 
     @Inject
-    public SlettIrrelevanteHendelserBatchTask(HendelseRepository hendelseRepository) {
+    public SlettIrrelevanteHendelserOneOffTask(HendelseRepository hendelseRepository) {
         this.hendelseRepository = hendelseRepository;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        var slettet = hendelseRepository.slettIrrelevanteHendelser();
-        LOG.info("Slettet {} hendelser som ikke ble sendt til fpsak.", slettet);
-        slettet = hendelseRepository.slettGamleHendelser();
+        var slettet = hendelseRepository.slettGamleHendelser();
         LOG.info("Slettet {} hendelser som er foreldet.", slettet);
     }
 }
