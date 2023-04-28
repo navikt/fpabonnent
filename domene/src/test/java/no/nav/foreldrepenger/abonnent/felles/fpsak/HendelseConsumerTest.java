@@ -40,7 +40,7 @@ class HendelseConsumerTest {
         verify(restKlient).sendReturnOptional(captorPayload.capture(), any());
         var capturedDto = captorPayload.getValue();
         capturedDto.validateRequest(r -> {
-            assertThat(r.uri().toString()).contains("http://fpsak:8080/fpsak");
+            assertThat(r.uri().toString()).contains("http://localhost:8080/fpsak");
             assertThat(r.bodyPublisher().orElseThrow().contentLength()).isPositive();
 
         });
