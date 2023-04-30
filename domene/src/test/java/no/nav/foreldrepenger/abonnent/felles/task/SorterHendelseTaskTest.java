@@ -58,8 +58,6 @@ class SorterHendelseTaskTest {
     private SorterHendelseTask sorterHendelseTask;
     private ProsessTaskData prosessTaskData;
 
-    private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
-
     @Mock
     private HendelserKlient hendelser;
     @Mock
@@ -69,7 +67,7 @@ class SorterHendelseTaskTest {
     void setup(EntityManager em) {
         this.entityManager = em;
         this.hendelseRepository = new HendelseRepository(em);
-        this.inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository,
+        var inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository,
             new HendelseTjenesteProvider(new UnitTestLookupInstanceImpl<>(new PdlFødselHendelseTjeneste())));
         sorterHendelseTask = new SorterHendelseTask(prosessTaskTjeneste, inngåendeHendelseTjeneste, hendelser);
         prosessTaskData = ProsessTaskData.forProsessTask(SorterHendelseTask.class);
@@ -181,7 +179,7 @@ class SorterHendelseTaskTest {
 
     InngåendeHendelse finnHendelseMedHendelseId() {
         var query = entityManager.createQuery("from InngåendeHendelse where hendelseId = :hendelseId ",
-            InngåendeHendelse.class); //$NON-NLS-1$
+            InngåendeHendelse.class);
         query.setParameter("hendelseId", SorterHendelseTaskTest.HENDELSE_ID);
         return query.getSingleResult();
     }

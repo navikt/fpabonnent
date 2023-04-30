@@ -5,7 +5,7 @@ import static no.nav.foreldrepenger.abonnent.felles.tjeneste.AktørIdTjeneste.ge
 import java.util.Collections;
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -22,15 +22,15 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-@ApplicationScoped
+@Dependent
 @ProsessTask("hendelser.grovsorter")
 public class SorterHendelseTask implements ProsessTaskHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SorterHendelseTask.class);
 
-    private ProsessTaskTjeneste prosessTaskTjeneste;
-    private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
-    private HendelserKlient hendelser;
+    private final ProsessTaskTjeneste prosessTaskTjeneste;
+    private final InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
+    private final HendelserKlient hendelser;
 
     @Inject
     public SorterHendelseTask(ProsessTaskTjeneste prosessTaskTjeneste,
@@ -69,12 +69,9 @@ public class SorterHendelseTask implements ProsessTaskHandler {
     }
 
     private String getHendelseId(HendelserDataWrapper dataWrapper) {
-        var hendelseId = dataWrapper.getHendelseId();
-        if (hendelseId.isEmpty()) {
-            throw AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(dataWrapper.getProsessTaskData().getTaskType(),
-                HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId());
-        }
-        return hendelseId.get();
+        return dataWrapper.getHendelseId()
+            .orElseThrow(() -> AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(dataWrapper.getProsessTaskData().getTaskType(),
+                HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId()));
     }
 
     private void opprettSendHendelseTask(HendelserDataWrapper dataWrapper, HendelsePayload hendelsePayload) {
@@ -88,9 +85,4 @@ public class SorterHendelseTask implements ProsessTaskHandler {
         return !Collections.disjoint(hendelsePayload.getAktørIderForSortering(), aktørIdList);
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " [prosessTaskRepository=" + prosessTaskTjeneste + ", inngåendeHendelseTjeneste="
-            + inngåendeHendelseTjeneste + ", hendelser=" + hendelser + "]";
-    }
 }

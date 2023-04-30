@@ -69,10 +69,10 @@ public final class Databaseskjemainitialisering {
     private static synchronized DataSource settJdniOppslag() {
         var ds = createDs();
         try {
-            new EnvEntry("jdbc/defaultDS", ds); // NOSONAR
+            new EnvEntry("jdbc/defaultDS", ds);
             return ds;
         } catch (NamingException e) {
-            throw new IllegalStateException("Feil under registrering av JDNI-entry for defaultDS", e); // NOSONAR
+            throw new IllegalStateException("Feil under registrering av JDNI-entry for defaultDS", e);
         }
     }
 

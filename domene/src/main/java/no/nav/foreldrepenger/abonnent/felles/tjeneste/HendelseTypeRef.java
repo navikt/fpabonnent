@@ -6,11 +6,11 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Objects;
 
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 
 /**
@@ -23,54 +23,27 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 @Documented
 public @interface HendelseTypeRef {
 
-    String PDL_FØDSEL_HENDELSE = "PDL_FØDSEL_HENDELSE";
-    String PDL_DØD_HENDELSE = "PDL_DØD_HENDELSE";
-    String PDL_DØDFØDSEL_HENDELSE = "PDL_DØDFØDSEL_HENDELSE";
-    String PDL_UTFLYTTING_HENDELSE = "PDL_UTFLYTTING_HENDELSE";
-
-    String value();
+    HendelseOpplysningType value();
 
     /**
      * AnnotationLiteral som kan brukes ved CDI søk.
      */
     class HendelseTypeRefLiteral extends AnnotationLiteral<HendelseTypeRef> implements HendelseTypeRef {
 
-        private String navn;
+        private final HendelseOpplysningType opplysningType;
+
+        public HendelseTypeRefLiteral() {
+            opplysningType = HendelseOpplysningType.UDEFINERT;
+        }
 
         public HendelseTypeRefLiteral(HendelseType hendelseType) {
-            if (HendelseType.erPdlFødselHendelseType(hendelseType)) {
-                this.navn = PDL_FØDSEL_HENDELSE;
-            } else if (HendelseType.erPdlDødHendelseType(hendelseType)) {
-                this.navn = PDL_DØD_HENDELSE;
-            } else if (HendelseType.erPdlDødfødselHendelseType(hendelseType)) {
-                this.navn = PDL_DØDFØDSEL_HENDELSE;
-            } else if (HendelseType.erPdlUtflyttingHendelseType(hendelseType)) {
-                this.navn = PDL_UTFLYTTING_HENDELSE;
-            } else {
-                this.navn = hendelseType.getKode();
-            }
+            opplysningType = hendelseType != null ? hendelseType.getOpplysningType() : HendelseOpplysningType.UDEFINERT;
         }
 
         @Override
-        public String value() {
-            return navn;
+        public HendelseOpplysningType value() {
+            return opplysningType;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            if (!super.equals(o))
-                return false;
-            var that = (HendelseTypeRefLiteral) o;
-            return Objects.equals(navn, that.navn);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), navn);
-        }
     }
 }

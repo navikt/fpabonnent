@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
@@ -23,7 +24,7 @@ import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 
 @ApplicationScoped
-@HendelseTypeRef(HendelseTypeRef.PDL_UTFLYTTING_HENDELSE)
+@HendelseTypeRef(HendelseOpplysningType.PDL_UTFLYTTING_HENDELSE)
 public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyttingHendelsePayload> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdlUtflyttingHendelseTjeneste.class);
@@ -70,8 +71,8 @@ public class PdlUtflyttingHendelseTjeneste implements HendelseTjeneste<PdlUtflyt
         var resultat = new UtflyttingKlarForSorteringResultat(true);
         if (payload.getUtflyttingsdato().isPresent() || PdlEndringstype.OPPRETTET.name().equals(payload.getEndringstype())) {
             var registerdato = utflyttingTjeneste.finnUtflyttingsdato(aktuellAktør.get());
-            var brukdato = payload.getUtflyttingsdato().filter(d -> d.isBefore(registerdato)).isPresent() ? payload.getUtflyttingsdato()
-                .orElseThrow() : registerdato;
+            var brukdato = payload.getUtflyttingsdato().filter(d -> d.isBefore(registerdato)).isPresent() ?
+                payload.getUtflyttingsdato().orElseThrow() : registerdato;
             resultat.setUtflyttingsdato(brukdato);
         }
         return resultat;

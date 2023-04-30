@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTypeRef;
@@ -17,7 +18,7 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlDødfødselHendelseP
 import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ApplicationScoped
-@HendelseTypeRef(HendelseTypeRef.PDL_DØDFØDSEL_HENDELSE)
+@HendelseTypeRef(HendelseOpplysningType.PDL_DØDFØDSEL_HENDELSE)
 public class PdlDødfødselHendelseTjeneste implements HendelseTjeneste<PdlDødfødselHendelsePayload> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlDødfødselHendelseTjeneste.class);
