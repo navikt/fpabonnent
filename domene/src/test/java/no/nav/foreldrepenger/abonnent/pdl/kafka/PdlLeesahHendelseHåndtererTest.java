@@ -1,9 +1,12 @@
 package no.nav.foreldrepenger.abonnent.pdl.kafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -27,8 +30,10 @@ import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
+import no.nav.person.pdl.leesah.foedsel.Foedsel;
 import no.nav.person.pdl.leesah.utflytting.UtflyttingFraNorge;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
@@ -167,6 +172,29 @@ class PdlLeesahHendelseHåndtererTest {
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
             forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_ANNULLERT.getKode());
+    }
+
+    @Test
+    void skal_ikke_lagre_gammel_fødselshendelse() {
+        // Arrange
+        var payload = new Personhendelse();
+        payload.setHendelseId("ABC");
+        payload.setPersonidenter(List.of("1111111111111", "22222222222"));
+        payload.setMaster("Freg");
+        payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
+        payload.setOpplysningstype("FOEDSEL_V1");
+        payload.setEndringstype(Endringstype.ANNULLERT);
+        var fødselsdato = new Foedsel();
+        fødselsdato.setFoedselsdato(LocalDate.now().minusYears(20));
+        payload.setFoedsel(fødselsdato);
+
+        // Act
+        hendelseHåndterer.handleMessage("", payload);
+
+        // Assert
+        verify(hendelseRepository, times(0)).lagreInngåendeHendelse(any());
+        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
+        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskGruppe.class));
     }
 
 }

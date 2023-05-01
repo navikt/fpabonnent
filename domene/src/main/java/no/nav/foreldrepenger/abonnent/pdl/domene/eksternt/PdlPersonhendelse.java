@@ -1,12 +1,15 @@
 package no.nav.foreldrepenger.abonnent.pdl.domene.eksternt;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
-
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.HashSet;
 import java.util.Set;
 
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
+
 public abstract class PdlPersonhendelse {
+
+    static final Period STØNADSPERIODE = Period.of(3,3,1); // Stønadsperiode 3 år + søknadsfrist 3 mnd
 
     private String hendelseId;
     private Set<String> personidenter = new HashSet<>();

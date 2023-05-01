@@ -11,6 +11,10 @@ public class PdlFødsel extends PdlPersonhendelse {
     private Set<String> aktørIdForeldre;
 
     public boolean erRelevantForFpsak() {
+        // Ser ikke på eldre fødsler (som regel innflytting)
+        if (fødselsdato != null && fødselsdato.plus(STØNADSPERIODE).isBefore(LocalDate.now())) {
+            return false;
+        }
         return HendelseType.PDL_FØDSEL_OPPRETTET.equals(getHendelseType()) || HendelseType.PDL_FØDSEL_ANNULLERT.equals(getHendelseType())
             || HendelseType.PDL_FØDSEL_KORRIGERT.equals(getHendelseType());
     }

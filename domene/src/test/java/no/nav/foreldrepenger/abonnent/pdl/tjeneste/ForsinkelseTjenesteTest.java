@@ -37,6 +37,7 @@ class ForsinkelseTjenesteTest {
     void before() {
         mock = mockStatic(DateUtil.class);
         lenient().when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
+        lenient().when(forsinkelseKonfig.normalForsinkelseMinutter()).thenReturn(60);
         forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
     }
 
@@ -149,6 +150,7 @@ class ForsinkelseTjenesteTest {
     void skal_utlede_at_neste_forsøk_på_prosessesering_er_tirsdag_etter_06_30_gitt_sist_kjøring_på_mandag() {
         // Arrange
         var input = LocalDateTime.of(2020, 1, 6, 6, 34);
+        settTid(input);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
@@ -161,6 +163,7 @@ class ForsinkelseTjenesteTest {
     void skal_utlede_at_neste_forsøk_på_prosessesering_er_mandag_etter_06_30_gitt_sist_kjøring_på_fredag() {
         // Arrange
         var input = LocalDateTime.of(2020, 1, 10, 6, 46);
+        settTid(input);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
@@ -173,6 +176,7 @@ class ForsinkelseTjenesteTest {
     void skal_utlede_at_neste_forsøk_på_prosessesering_er_mandag_etter_06_30_gitt_sist_kjøring_på_lørdag() {
         // Arrange
         var input = LocalDateTime.of(2020, 1, 11, 6, 30);
+        settTid(input);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
@@ -185,6 +189,7 @@ class ForsinkelseTjenesteTest {
     void skal_utlede_at_neste_forsøk_på_prosessesering_er_mandag_etter_06_30_gitt_sist_kjøring_på_torsdag_og_fredag_er_første_januar() {
         // Arrange
         var input = LocalDateTime.of(2020, 12, 31, 6, 34);
+        settTid(input);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
@@ -197,6 +202,7 @@ class ForsinkelseTjenesteTest {
     void skal_utlede_at_neste_forsøk_på_prosessesering_er_tirsdag_etter_06_30_gitt_sist_kjøring_på_fredag_og_mandag_er_første_mai() {
         // Arrange
         var input = LocalDateTime.of(2023, 4, 28, 6, 43);
+        settTid(input);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(input, mock(InngåendeHendelse.class));
@@ -208,7 +214,8 @@ class ForsinkelseTjenesteTest {
     @Test
     void skal_utlede_at_en_hendelse_som_følger_en_tidligere_uhåndtert_hendelse_skal_behandles_2_minutter_etter() {
         // Arrange
-        var tidspunktA = LocalDateTime.now().plusDays(2);
+        var tidspunktA = LocalDateTime.of(2023, 4, 17, 13, 6);
+        settTid(tidspunktA);
 
         var hendelseA = InngåendeHendelse.builder()
             .hendelseId("A")
@@ -237,7 +244,8 @@ class ForsinkelseTjenesteTest {
     @Test
     void skal_utlede_at_en_hendelse_som_følger_en_tidligere_uhåndtert_hendelse_som_skulle_vært_håndtert_tilbake_i_tid_skal_behandles_etter_retry_all() {
         // Arrange
-        var tidspunktA = LocalDateTime.now().minusDays(2);
+        var tidspunktA = LocalDateTime.of(2023, 4, 25, 13, 6);
+        settTid(tidspunktA.plusDays(2));
 
         var hendelseA = InngåendeHendelse.builder()
             .hendelseId("A")
@@ -259,7 +267,7 @@ class ForsinkelseTjenesteTest {
         var resultat2 = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), hendelseB);
 
         // Assert
-        var nesteDagEtterRetryAll = LocalDateTime.now().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
+        var nesteDagEtterRetryAll = DateUtil.now().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
         assertThat(resultat1).isEqualTo(nesteDagEtterRetryAll);
         assertThat(resultat2).isEqualTo(nesteDagEtterRetryAll);
     }
@@ -299,6 +307,7 @@ class ForsinkelseTjenesteTest {
     void skal_ikke_forsinke_hendelser_når_konfig_er_deaktivert() {
         // Arrange
         when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(false);
+        settTid(LocalDateTime.now());
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));

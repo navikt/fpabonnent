@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
-import static java.util.Set.of;
 import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseType.PDL_UTFLYTTING_ANNULLERT;
 
 import java.util.Objects;
@@ -50,13 +49,8 @@ public class HendelseTjenesteHjelper {
      * @return true hvis hendelsen kan forkastes
      */
     public boolean vurderOmHendelseKanForkastes(HendelsePayload payload, Function<String, HendelsePayload> payloadFraJsonString) {
-        Optional<InngåendeHendelse> tidligereHendelse = getTidligereHendelse(payload.getTidligereHendelseId());
-        if (of(PdlEndringstype.ANNULLERT.name(), PdlEndringstype.KORRIGERT.name()).contains(payload.getEndringstype())
-            && tidligereHendelse.isEmpty()) {
-            LOGGER.info("Hendelse {} av type {} vil bli forkastet da endringstypen er {}, uten at vi har mottatt tidligere hendelse {}",
-                payload.getHendelseId(), payload.getHendelseType(), payload.getEndringstype(), payload.getTidligereHendelseId());
-            return true;
-        } else if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && tidligereHendelse.isPresent()) {
+        var tidligereHendelse = getTidligereHendelse(payload.getTidligereHendelseId());
+        if (PdlEndringstype.KORRIGERT.name().equals(payload.getEndringstype()) && tidligereHendelse.isPresent()) {
             return sjekkOmHendelseHarSammeVerdiOgErSendt(payload, tidligereHendelse, payloadFraJsonString);
         } else if (PDL_UTFLYTTING_ANNULLERT.getKode().equals(payload.getHendelseType()) && tidligereHendelse.isPresent()) {
             return tidligereHendelse.filter(h -> h.getOpprettetTidspunkt().plusWeeks(1).isBefore(payload.getHendelseOpprettetTid())).isPresent();
@@ -79,20 +73,19 @@ public class HendelseTjenesteHjelper {
             }
             return harSammeDato;
         } else if (tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() == null) {
-            LOGGER.info("Hendelse {} av type {} vil bli forkastet da endringstypen er {}, uten at vi har sendt tidligere hendelse {}",
+            LOGGER.info("Hendelse {} av type {} beholdes da endringstypen er {}, uten at vi vet om vi har sendt tidligere hendelse {}",
                 payload.getHendelseId(), payload.getHendelseType(), payload.getEndringstype(), tidligereHendelse.get().getHendelseId());
-            return true;
+            return false;
         } else if (tidligereHendelse.get().erFerdigbehandletMenIkkeSendtTilFpsak() && tidligereHendelse.get().getTidligereHendelseId() != null) {
             // Gjøre sammenlikningen mot neste tidligere hendelse i stedet, i tilfelle den er sendt til Fpsak
-            Optional<InngåendeHendelse> nesteTidligereHendelse = getTidligereHendelse(tidligereHendelse.get().getTidligereHendelseId());
+            var nesteTidligereHendelse = getTidligereHendelse(tidligereHendelse.get().getTidligereHendelseId());
             return nesteTidligereHendelse.isPresent() && sjekkOmHendelseHarSammeVerdiOgErSendt(payload, nesteTidligereHendelse, payloadFraJsonString);
         }
         return false;
     }
 
     private Optional<InngåendeHendelse> getTidligereHendelse(String tidligereHendelseId) {
-        return
-            tidligereHendelseId != null ? hendelseRepository.finnHendelseFraIdHvisFinnes(tidligereHendelseId, HendelseKilde.PDL) : Optional.empty();
+        return Optional.ofNullable(tidligereHendelseId).flatMap(th -> hendelseRepository.finnHendelseFraIdHvisFinnes(th, HendelseKilde.PDL));
     }
 
     /**

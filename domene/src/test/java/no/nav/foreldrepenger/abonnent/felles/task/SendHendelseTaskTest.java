@@ -2,29 +2,23 @@ package no.nav.foreldrepenger.abonnent.felles.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelserKlient;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
-import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.InngåendeHendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
@@ -44,21 +38,15 @@ class SendHendelseTaskTest {
 
     private HendelserKlient mockHendelseConsumer;
     private ProsessTaskData prosessTaskData;
-    private HendelseRepository hendelseRepository;
     private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
 
     private SendHendelseTask sendHendelseTask;
 
     @BeforeEach
     void setup() {
-        var hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
-        HendelseTjeneste fødselHendelseTjeneste = new PdlFødselHendelseTjeneste();
-        when(hendelseTjenesteProvider.finnTjeneste(eq(HENDELSE_TYPE), anyString())).thenReturn(fødselHendelseTjeneste);
-
+        inngåendeHendelseTjeneste = mock(InngåendeHendelseTjeneste.class);
         mockHendelseConsumer = mock(HendelserKlient.class);
-        hendelseRepository = mock(HendelseRepository.class);
-        inngåendeHendelseTjeneste = new InngåendeHendelseTjeneste(hendelseRepository, hendelseTjenesteProvider);
-        sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste, hendelseRepository);
+        sendHendelseTask = new SendHendelseTask(mockHendelseConsumer, inngåendeHendelseTjeneste);
 
         prosessTaskData = ProsessTaskData.forProsessTask(SendHendelseTask.class);
     }
@@ -83,8 +71,9 @@ class SendHendelseTaskTest {
             .håndtertStatus(HåndtertStatusType.GROVSORTERT)
             .payload(DefaultJsonMapper.toJson(fødsel))
             .build();
-        when(hendelseRepository.finnEksaktHendelse(1L)).thenReturn(inngåendeHendelse);
-        when(hendelseRepository.finnGrovsortertHendelse(HendelseKilde.PDL, HENDELSE_ID)).thenReturn(Optional.of(inngåendeHendelse));
+        when(inngåendeHendelseTjeneste.finnEksaktHendelse(1L)).thenReturn(inngåendeHendelse);
+        when(inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse))
+            .thenReturn(new PdlFødselHendelseTjeneste().payloadFraJsonString(inngåendeHendelse.getPayload()));
 
         var hendelse = new HendelserDataWrapper(prosessTaskData);
         hendelse.setInngåendeHendelseId(INNGÅENDE_HENDELSE_ID);
@@ -92,7 +81,7 @@ class SendHendelseTaskTest {
         hendelse.setHendelseType(HENDELSE_TYPE.getKode());
 
         var payloadCaptor = ArgumentCaptor.forClass(PdlFødselHendelsePayload.class);
-        var ihCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
+        var ihCaptor = ArgumentCaptor.forClass(HendelsePayload.class);
 
         // Act
         sendHendelseTask.doTask(hendelse.getProsessTaskData());
@@ -108,8 +97,7 @@ class SendHendelseTaskTest {
         assertThat(payload.getAktørIdForeldre().get()).containsExactlyInAnyOrder("3333333333333", "4444444444444", "5555555555555", "6666666666666");
         assertThat(payload.getFødselsdato()).isPresent().hasValue(FØDSELSDATO);
 
-        verify(hendelseRepository, times(1)).markerHendelseSomSendtNå(ihCaptor.capture());
-        verify(hendelseRepository, times(1)).oppdaterHåndtertStatus(ihCaptor.capture(), eq(HåndtertStatusType.HÅNDTERT));
+        verify(inngåendeHendelseTjeneste, times(1)).oppdaterHendelseSomSendtNå(ihCaptor.capture());
     }
 
     @Test
@@ -120,7 +108,7 @@ class SendHendelseTaskTest {
         dataWrapper.setInngåendeHendelseId(null);
 
         var task = dataWrapper.getProsessTaskData();
-        
+
         // Act
         assertThrows(TekniskException.class, () -> sendHendelseTask.doTask(task));
     }

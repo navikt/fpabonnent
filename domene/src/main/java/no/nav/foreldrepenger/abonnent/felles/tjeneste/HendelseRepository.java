@@ -32,7 +32,7 @@ import no.nav.vedtak.exception.TekniskException;
 public class HendelseRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(HendelseRepository.class);
 
-    private static final String SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT = "order by opprettetTidspunkt asc"; //$NON-NLS-1$
+    private static final String SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT = "order by opprettetTidspunkt asc";
 
     private static final String HÅNDTERT_STATUS = "håndtertStatus";
     private static final String HENDELSE_KILDE = "hendelseKilde";
@@ -46,7 +46,7 @@ public class HendelseRepository {
 
     @Inject
     public HendelseRepository(EntityManager entityManager) {
-        Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
+        Objects.requireNonNull(entityManager, "entityManager");
         this.entityManager = entityManager;
     }
 
@@ -55,8 +55,8 @@ public class HendelseRepository {
     }
 
     public Optional<InngåendeHendelse> finnHendelseSomErSendtTilSortering(String hendelseId) {
-        TypedQuery<InngåendeHendelse> query = entityManager.createQuery("from InngåendeHendelse where hendelseId = :hendelseId " + //$NON-NLS-1$
-            "and håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
+        TypedQuery<InngåendeHendelse> query = entityManager.createQuery("from InngåendeHendelse where hendelseId = :hendelseId " +
+            "and håndtertStatus = :håndtertStatus " +
             SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
         query.setParameter(HENDELSE_ID, hendelseId);
         query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.SENDT_TIL_SORTERING);
@@ -64,11 +64,19 @@ public class HendelseRepository {
     }
 
     public Optional<InngåendeHendelse> finnHendelseFraIdHvisFinnes(String hendelseId, HendelseKilde hendelseKilde) {
-        TypedQuery<InngåendeHendelse> query = entityManager.createQuery("from InngåendeHendelse where hendelseKilde = :hendelseKilde " + //$NON-NLS-1$
-            "and hendelseId = :hendelseId ", InngåendeHendelse.class); //$NON-NLS-1$
+        TypedQuery<InngåendeHendelse> query = entityManager.createQuery("from InngåendeHendelse where hendelseKilde = :hendelseKilde " +
+            "and hendelseId = :hendelseId ", InngåendeHendelse.class);
         query.setParameter(HENDELSE_KILDE, hendelseKilde);
         query.setParameter(HENDELSE_ID, hendelseId);
         return queryTilOptional(hendelseId, query);
+    }
+
+    public Optional<InngåendeHendelse> finnSenereKjedetHendelseHvisStatusMottatt(String hendelseId) {
+        TypedQuery<InngåendeHendelse> query = entityManager
+            .createQuery("from InngåendeHendelse where håndtertStatus = :håndtertStatus and tidligereHendelseId = :hendelseId", InngåendeHendelse.class);
+        query.setParameter(HÅNDTERT_STATUS, HåndtertStatusType.MOTTATT);
+        query.setParameter(HENDELSE_ID, hendelseId);
+        return query.getResultList().stream().findFirst();
     }
 
     private Optional<InngåendeHendelse> queryTilOptional(String hendelseId, TypedQuery<InngåendeHendelse> query) {
@@ -107,9 +115,9 @@ public class HendelseRepository {
     }
 
     public Optional<InngåendeHendelse> finnGrovsortertHendelse(HendelseKilde hendelseKilde, String hendelseId) {
-        TypedQuery<InngåendeHendelse> query = entityManager.createQuery("from InngåendeHendelse where hendelseKilde = :hendelseKilde " + //$NON-NLS-1$
-            "and hendelseId = :hendelseId " + //$NON-NLS-1$
-            "and håndtertStatus = :håndtertStatus " + //$NON-NLS-1$
+        TypedQuery<InngåendeHendelse> query = entityManager.createQuery("from InngåendeHendelse where hendelseKilde = :hendelseKilde " +
+            "and hendelseId = :hendelseId " +
+            "and håndtertStatus = :håndtertStatus " +
             SORTER_STIGENDE_PÅ_OPPRETTET_TIDSPUNKT, InngåendeHendelse.class);
         query.setParameter(HENDELSE_KILDE, hendelseKilde);
         query.setParameter(HENDELSE_ID, hendelseId);
@@ -131,8 +139,9 @@ public class HendelseRepository {
     }
 
     public int slettIrrelevanteHendelser() {
+        // Vurder å bruke (payload is null or sendt_tid is null) - har slått av sjekk på sendt_tid pga sporing av korrigert/annullert
         int deletedRows = entityManager.createNativeQuery(
-                "DELETE FROM INNGAAENDE_HENDELSE WHERE (payload is null or sendt_tid is null) and haandtert_status = :handtert")
+                "DELETE FROM INNGAAENDE_HENDELSE WHERE payload is null and haandtert_status = :handtert")
             .setParameter("handtert", HåndtertStatusType.HÅNDTERT.getKode())
             .executeUpdate();
         entityManager.flush();
@@ -147,7 +156,7 @@ public class HendelseRepository {
         int deletedRows = entityManager.createNativeQuery(
                 "DELETE FROM INNGAAENDE_HENDELSE WHERE sendt_tid < :foreldet and haandtert_status = :handtert")
             .setParameter("handtert", HåndtertStatusType.HÅNDTERT.getKode())
-            .setParameter("foreldet", LocalDateTime.now().minusWeeks(10))
+            .setParameter("foreldet", LocalDateTime.now().minusWeeks(13))
             .executeUpdate();
         entityManager.flush();
         return deletedRows;

@@ -52,77 +52,65 @@ public class ForsinkelseTjeneste {
 
     public LocalDateTime finnNesteTidspunktForVurderSortering(InngåendeHendelse inngåendeHendelse) {
         if (!forsinkelseKonfig.skalForsinkeHendelser()) {
-            return LocalDateTime.now();
+            return DateUtil.now();
         }
-        Optional<LocalDateTime> tidspunktBasertPåTidligereHendelse = sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse);
-        return tidspunktBasertPåTidligereHendelse.orElseGet(this::doFinnNesteTidspunktForVurderSortering);
+        return sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse)
+            .orElseGet(this::doFinnNesteTidspunktForVurderSortering);
     }
 
     public LocalDateTime finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime sistKjøringTid, InngåendeHendelse inngåendeHendelse) {
-        Optional<LocalDateTime> tidspunktBasertPåTidligereHendelse = sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse);
-        return tidspunktBasertPåTidligereHendelse.orElseGet(() -> finnNesteÅpningsdag(sistKjøringTid.toLocalDate().plusDays(1)));
+        return sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse)
+            .orElseGet(() -> finnNesteVurderingstid(sistKjøringTid.plusDays(1)));
     }
 
     private Optional<LocalDateTime> sjekkOmHendelsenMåKjøreEtterTidligereHendelse(InngåendeHendelse inngåendeHendelse) {
-        if (inngåendeHendelse.getTidligereHendelseId() != null) {
-            Optional<InngåendeHendelse> tidligereHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(inngåendeHendelse.getTidligereHendelseId(),
-                inngåendeHendelse.getHendelseKilde());
-            if (tidligereHendelse.isPresent() && !HåndtertStatusType.HÅNDTERT.equals(tidligereHendelse.get().getHåndtertStatus())) {
-                LocalDateTime tidspunktBasertPåTidligereHendelse = tidligereHendelse.get().getHåndteresEtterTidspunkt().plusMinutes(2);
-                if (LocalDateTime.now().isAfter(tidspunktBasertPåTidligereHendelse)) {
-                    LocalDateTime nesteDagEtterRetryAll = LocalDateTime.now().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
-                    LOGGER.info(
-                        "Hendelse {} har en tidligere hendelse {} som skulle vært håndtert {}, men ikke er det, og vil derfor bli forsøkt behandlet igjen i morgen etter retry all: {}",
-                        inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
-                        tidligereHendelse.get().getHåndteresEtterTidspunkt(), nesteDagEtterRetryAll);
-                    return Optional.of(nesteDagEtterRetryAll);
-                } else {
-                    LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert {} og vil derfor bli behandlet {}",
-                        inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
-                        tidligereHendelse.get().getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
-                    return Optional.of(tidspunktBasertPåTidligereHendelse);
-                }
-            }
+        return Optional.ofNullable(inngåendeHendelse.getTidligereHendelseId())
+            .flatMap(thid -> hendelseRepository.finnHendelseFraIdHvisFinnes(thid, inngåendeHendelse.getHendelseKilde()))
+            .filter(th -> !HåndtertStatusType.HÅNDTERT.equals(th.getHåndtertStatus()))
+            .map(th -> utledTidFraTidligereHendelse(inngåendeHendelse, th));
+    }
+
+    private LocalDateTime utledTidFraTidligereHendelse(InngåendeHendelse inngåendeHendelse, InngåendeHendelse tidligereHendelse) {
+        var tidspunktBasertPåTidligereHendelse = tidligereHendelse.getHåndteresEtterTidspunkt().plusMinutes(2);
+        if (DateUtil.now().isAfter(tidspunktBasertPåTidligereHendelse)) {
+            LocalDateTime nesteDagEtterRetryAll = DateUtil.now().plusDays(1).withHour(7).withMinute(30);
+            LOGGER.info(
+                "Hendelse {} har en tidligere hendelse {} som skulle vært håndtert {}, men ikke er det, og vil derfor bli forsøkt behandlet igjen i morgen etter retry all: {}",
+                inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
+                tidligereHendelse.getHåndteresEtterTidspunkt(), nesteDagEtterRetryAll);
+            return nesteDagEtterRetryAll;
+        } else {
+            LOGGER.info("Hendelse {} har en tidligere hendelse {} som ikke er håndtert {} og vil derfor bli behandlet {}",
+                inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
+                tidligereHendelse.getHåndteresEtterTidspunkt(), tidspunktBasertPåTidligereHendelse);
+            return tidspunktBasertPåTidligereHendelse;
         }
-        return Optional.empty();
     }
 
     private LocalDateTime doFinnNesteTidspunktForVurderSortering() {
-        LocalDate dagensDato = DateUtil.now().toLocalDate();
-        if (stengtTidEtterMidnattNå()) {
-            return finnNesteÅpningsdag(dagensDato);
-        } else if (stengtTidFørMidnattNå() || erStengtDag(dagensDato)) {
-            return finnNesteÅpningsdag(dagensDato.plusDays(1));
+        var tid = DateUtil.now().plusMinutes(forsinkelseKonfig.normalForsinkelseMinutter());
+        if (tid.isBefore(tid.with(OPPDRAG_VÅKNER))) {
+            return finnNesteVurderingstid(tid);
+        } else if (tid.isAfter(tid.withHour(22).withMinute(58)) || erStengtDag(tid)) {
+            return finnNesteVurderingstid(tid.plusDays(1));
         } else {
-            return DateUtil.now().plusHours(1);
+            return tid;
         }
     }
 
-    private LocalDateTime finnNesteÅpningsdag(LocalDate utgangspunkt) {
+    private LocalDateTime finnNesteVurderingstid(LocalDateTime utgangspunkt) {
         if (!erStengtDag(utgangspunkt)) {
-            return getTidspunktMellom0630og0659(utgangspunkt);
+            return getTidspunktMellom0630og0659(utgangspunkt.toLocalDate());
         } else {
-            return finnNesteÅpningsdag(utgangspunkt.plusDays(1));
+            return finnNesteVurderingstid(utgangspunkt.plusDays(1));
         }
     }
 
-    private boolean stengtTidFørMidnattNå() {
-        return DateUtil.now().isAfter(DateUtil.now().withHour(23).withMinute(30));
-    }
-
-    private boolean stengtTidEtterMidnattNå() {
-        return DateUtil.now().isBefore(DateUtil.now().withHour(6).withMinute(30));
-    }
-
-    private boolean erStengtDag(LocalDate dato) {
-        return HELGEDAGER.contains(dato.getDayOfWeek()) || erFastRødDag(dato);
+    private boolean erStengtDag(LocalDateTime tid) {
+        return HELGEDAGER.contains(tid.getDayOfWeek()) || FASTE_STENGT_DAGER.contains(MonthDay.from(tid));
     }
 
     private LocalDateTime getTidspunktMellom0630og0659(LocalDate utgangspunkt) {
-        return LocalDateTime.of(utgangspunkt, OPPDRAG_VÅKNER.plusSeconds(LocalDateTime.now().getNano() % 1739));
-    }
-
-    private boolean erFastRødDag(LocalDate dato) {
-        return FASTE_STENGT_DAGER.contains(MonthDay.from(dato));
+        return LocalDateTime.of(utgangspunkt, OPPDRAG_VÅKNER.plusSeconds(DateUtil.now().getNano() % 1739));
     }
 }

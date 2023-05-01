@@ -46,25 +46,26 @@ public class SorterHendelseTask implements ProsessTaskHandler {
         var dataWrapper = new HendelserDataWrapper(prosessTaskData);
         String hendelseId = getHendelseId(dataWrapper);
 
-        var inngåendeHendelse = inngåendeHendelseTjeneste.finnHendelseSomErSendtTilSortering(hendelseId);
-        if (inngåendeHendelse.isEmpty()) {
+        var inngåendeHendelse = inngåendeHendelseTjeneste.finnHendelseSomErSendtTilSortering(hendelseId).orElse(null);
+        if (inngåendeHendelse == null) {
             LOGGER.warn("Fant ikke InngåendeHendelse for HendelseId {} - kan ikke grovsortere", hendelseId);
             return;
         }
 
-        var hendelsePayload = inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse.get());
+        var hendelsePayload = inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
         var aktørIderForSortering = getAktørIderForSortering(hendelsePayload);
         var filtrertAktørIdList = hendelser.grovsorterAktørIder(aktørIderForSortering);
 
         if (!hendelseErRelevant(filtrertAktørIdList, hendelsePayload)) {
             LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK", hendelsePayload.getHendelseId(),
                 hendelsePayload.getHendelseType());
-            inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(inngåendeHendelse.get());
+            inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(inngåendeHendelse);
+            inngåendeHendelseTjeneste.fjernPayloadTidligereHendelser(inngåendeHendelse);
             return;
         }
 
         opprettSendHendelseTask(dataWrapper, hendelsePayload);
-        inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelse.get(), HåndtertStatusType.GROVSORTERT);
+        inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.GROVSORTERT);
         LOGGER.info("Opprettet SendHendelseTask for hendelse {}", hendelseId);
     }
 
