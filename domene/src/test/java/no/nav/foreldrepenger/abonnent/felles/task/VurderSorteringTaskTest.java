@@ -62,8 +62,6 @@ class VurderSorteringTaskTest {
 
     private ForsinkelseTjeneste forsinkelseTjeneste;
 
-    private HendelseTjenesteHjelper hendelseTjenesteHjelper;
-
     @Mock
     private ForeldreTjeneste foreldreTjeneste;
 
@@ -74,7 +72,7 @@ class VurderSorteringTaskTest {
     @BeforeEach
     void before(EntityManager em) {
         this.hendelseRepository = new HendelseRepository(em);
-        this.hendelseTjenesteHjelper = new HendelseTjenesteHjelper(hendelseRepository);
+        HendelseTjenesteHjelper hendelseTjenesteHjelper = new HendelseTjenesteHjelper(hendelseRepository);
         var forsinkelseKonfig = mock(ForsinkelseKonfig.class);
         lenient().when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
         forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
@@ -176,6 +174,128 @@ class VurderSorteringTaskTest {
         var hendelse = hendelseRepository.finnEksaktHendelse(inngåendeHendelse.getId());
         assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
     }
+
+    @Test
+    void skal_ikke_grovsortere_fødselshendelsesom_er_merket_håndtert() {
+        // Arrange
+        var hendelseOpprettet = InngåendeHendelse.builder()
+            .hendelseId("A")
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.HÅNDTERT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(LocalDateTime.now())
+            .payload(
+                DefaultJsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.OPPRETTET, "A", null).build()))
+            .build();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseOpprettet);
+
+        var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
+        hendelserDataWrapper.setHendelseId("A");
+
+        var taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        lenient().doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        var hendelse = hendelseRepository.finnEksaktHendelse(hendelseOpprettet.getId());
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
+        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
+    @Test
+    void skal_ikke_grovsortere_fødselshendelse_når_det_finnes_en_senere_lenket() {
+        // Arrange
+        var hendelseOpprettet = InngåendeHendelse.builder()
+            .hendelseId("A")
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(LocalDateTime.now())
+            .payload(
+                DefaultJsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.OPPRETTET, "A", null).build()))
+            .build();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseOpprettet);
+        var hendelseKorrigert1 = InngåendeHendelse.builder()
+            .hendelseId("B")
+            .hendelseType(HendelseType.PDL_FØDSEL_KORRIGERT)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(DefaultJsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(2), PdlEndringstype.KORRIGERT, "B", "A").build()))
+            .tidligereHendelseId("A")
+            .build();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert1);
+
+        var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
+        hendelserDataWrapper.setHendelseId("A");
+
+        var taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        lenient().doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        var hendelse = hendelseRepository.finnEksaktHendelse(hendelseOpprettet.getId());
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
+        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
+    @Test
+    void skal_sette_alle_håndtert_når_det_finnes_en_senere_lenket_annulert() {
+        // Arrange
+        var hendelseOpprettet = InngåendeHendelse.builder()
+            .hendelseId("A")
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(LocalDateTime.now())
+            .payload(
+                DefaultJsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.OPPRETTET, "A", null).build()))
+            .build();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseOpprettet);
+        var hendelseAnnullert = InngåendeHendelse.builder()
+            .hendelseId("B")
+            .hendelseType(HendelseType.PDL_FØDSEL_ANNULLERT)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseKilde(HendelseKilde.PDL)
+            .sendtTidspunkt(null)
+            .payload(DefaultJsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusDays(1), PdlEndringstype.ANNULLERT, "B", "A").build()))
+            .tidligereHendelseId("A")
+            .build();
+        hendelseRepository.lagreFlushInngåendeHendelse(hendelseAnnullert);
+
+        var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
+        hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
+        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
+        hendelserDataWrapper.setHendelseId("A");
+
+        var taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        lenient().doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
+
+        // Act
+        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
+
+        // Assert
+        var hendelseA = hendelseRepository.finnEksaktHendelse(hendelseOpprettet.getId());
+        assertThat(hendelseA.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+        var hendelseB = hendelseRepository.finnEksaktHendelse(hendelseAnnullert.getId());
+        assertThat(hendelseB.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+
+        verify(foreldreTjeneste, times(0)).hentForeldre(any());
+        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
+    }
+
 
     @Test
     void skal_ikke_grovsortere_fødselshendelse_med_fødselsdato_over_to_år_tilbake_i_tid() {
@@ -312,7 +432,7 @@ class VurderSorteringTaskTest {
     }
 
     @Test
-    void skal_ikke_grovsortere_korrigering_der_tidligere_fødselshendelser_ikke_ble_sendt_til_fpsak() {
+    void skal_grovsortere_korrigering_der_tidligere_fødselshendelser_ikke_ble_sendt_til_fpsak() {
         // Arrange
         var hendelseOpprettet = InngåendeHendelse.builder()
             .hendelseId("A")
@@ -358,14 +478,15 @@ class VurderSorteringTaskTest {
 
         // Assert
         var hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert2.getId());
-        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
 
-        verify(foreldreTjeneste, times(0)).hentForeldre(any());
-        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
+        verify(foreldreTjeneste, times(1)).hentForeldre(any());
+        verify(prosessTaskTjeneste, times(1)).lagre(any(ProsessTaskData.class));
     }
 
     @Test
-    void skal_ikke_grovsortere_korrigering_der_tidligere_fødselshendelse_ikke_finnes_i_vårt_system() {
+    void skal_grovsortere_korrigering_der_tidligere_fødselshendelse_ikke_finnes_i_vårt_system() {
+        when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
         // Arrange
         var hendelseKorrigert = InngåendeHendelse.builder()
             .hendelseId("B")
@@ -391,10 +512,14 @@ class VurderSorteringTaskTest {
 
         // Assert
         var hendelse = hendelseRepository.finnEksaktHendelse(hendelseKorrigert.getId());
-        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
+        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.SENDT_TIL_SORTERING);
 
-        verify(foreldreTjeneste, times(0)).hentForeldre(any());
-        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
+        verify(foreldreTjeneste, times(1)).hentForeldre(any());
+        var sorterHendelseTask = taskCaptor.getValue();
+        assertThat(sorterHendelseTask.taskType()).isEqualTo(TaskType.forProsessTask(SorterHendelseTask.class));
+        assertThat(sorterHendelseTask.getSekvens()).isEqualTo("2");
+        assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("B");
+        assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
     }
 
     @Test

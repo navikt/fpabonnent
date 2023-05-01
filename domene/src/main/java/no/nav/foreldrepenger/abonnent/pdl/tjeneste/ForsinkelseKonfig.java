@@ -13,6 +13,10 @@ public class ForsinkelseKonfig {
     private static final Environment ENV = Environment.current();
 
     public boolean skalForsinkeHendelser() {
-        return !(ENV.isLocal() || ENV.isVTP());
+        return !ENV.isLocal();
+    }
+
+    public int normalForsinkelseMinutter() {
+        return ENV.isProd() ? 24 * 60 : 5;
     }
 }

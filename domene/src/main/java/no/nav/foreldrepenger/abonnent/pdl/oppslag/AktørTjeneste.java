@@ -23,7 +23,7 @@ import no.nav.vedtak.util.LRUCache;
 public class AktørTjeneste {
 
     private static final int DEFAULT_CACHE_SIZE = 1000;
-    private static final long DEFAULT_CACHE_TIMEOUT = TimeUnit.MILLISECONDS.convert(8, TimeUnit.HOURS);
+    private static final long DEFAULT_CACHE_TIMEOUT = TimeUnit.MILLISECONDS.convert(4, TimeUnit.HOURS);
 
     private LRUCache<PersonIdent, AktørId> cacheIdentTilAktørId;
 
@@ -62,8 +62,7 @@ public class AktørTjeneste {
         }
 
         var aktørId = identliste.getIdenter().stream().findFirst().map(IdentInformasjon::getIdent).map(AktørId::new);
-        aktørId.ifPresent(
-            a -> cacheIdentTilAktørId.put(personIdent, a)); // Kan ikke legge til i cache aktørId -> ident ettersom ident kan være ikke-current
+        aktørId.ifPresent(a -> cacheIdentTilAktørId.put(personIdent, a));
         return aktørId;
     }
 }

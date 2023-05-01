@@ -57,11 +57,11 @@ public class PdlLeesahHendelseHåndterer {
         this.forsinkelseTjeneste = forsinkelseTjeneste;
     }
 
+    @SuppressWarnings("unused")
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
         setCallIdForHendelse(payload);
 
-        var inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(),
-            HendelseKilde.PDL);
+        var inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(payload.getHendelseId().toString(), HendelseKilde.PDL);
         if (inngåendeHendelse.isPresent()) {
             LOG.info(
                 "FPABONNENT mottok duplikat hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}. Tiltak: Sjekk om det skjedde en deploy/restart av Fpabonnent i det samme tidsrommet - i så fall kan dette ignoreres.",
@@ -154,20 +154,20 @@ public class PdlLeesahHendelseHåndterer {
     private void prosesserHendelseVidereHvisRelevant(PdlPersonhendelse personhendelse) {
         if (personhendelse.erRelevantForFpsak()) {
             LOG.info("Lagrer");
-            var inngåendeHendelse = lagreInngåendeHendelse(personhendelse, HåndtertStatusType.MOTTATT);
+            var inngåendeHendelse = lagreInngåendeHendelse(personhendelse);
             LOG.info("Finner neste");
             var håndteresEtterTidspunkt = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse);
             LOG.info("Opppdaterer");
             hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, håndteresEtterTidspunkt);
             LOG.info("Oppretter");
-            opprettVurderSorteringTask(personhendelse, inngåendeHendelse.getId(), håndteresEtterTidspunkt);
+            opprettVurderSorteringTask(inngåendeHendelse, håndteresEtterTidspunkt);
             LOG.info("Opprettet OK");
         } else {
-            LOG.info("Ikke-relevant hendelseId={} filtrert bort", personhendelse.getHendelseId());
+            LOG.info("Ikke-relevant hendelseId={} type={} filtrert bort", personhendelse.getHendelseId(), personhendelse.getHendelseType().getKode());
         }
     }
 
-    private InngåendeHendelse lagreInngåendeHendelse(PdlPersonhendelse personhendelse, HåndtertStatusType håndtertStatusType) {
+    private InngåendeHendelse lagreInngåendeHendelse(PdlPersonhendelse personhendelse) {
         var jsonPayload = DefaultJsonMapper.toJson(personhendelse);
         if (jsonPayload == null) {
             LOG.warn("Tom payload for objekt {}", personhendelse);
@@ -178,18 +178,18 @@ public class PdlLeesahHendelseHåndterer {
             .tidligereHendelseId(personhendelse.getTidligereHendelseId())
             .payload(jsonPayload)
             .hendelseKilde(HendelseKilde.PDL)
-            .håndtertStatus(håndtertStatusType)
+            .håndtertStatus(HåndtertStatusType.MOTTATT)
             .build();
         hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
         return inngåendeHendelse;
     }
 
-    private void opprettVurderSorteringTask(PdlPersonhendelse personhendelse, Long inngåendeHendelseId, LocalDateTime håndteresEtterTidspunkt) {
+    private void opprettVurderSorteringTask(InngåendeHendelse inngåendeHendelse, LocalDateTime håndteresEtterTidspunkt) {
         var vurderSorteringTask = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelseId);
-        vurderSorteringTask.setHendelseId(personhendelse.getHendelseId());
+        vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
+        vurderSorteringTask.setHendelseId(inngåendeHendelse.getHendelseId());
         vurderSorteringTask.setNesteKjøringEtter(håndteresEtterTidspunkt);
-        vurderSorteringTask.setHendelseType(personhendelse.getHendelseType().getKode());
+        vurderSorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
         prosessTaskTjeneste.lagre(vurderSorteringTask.getProsessTaskData());
     }
 }

@@ -33,7 +33,7 @@ public class GeneralRestExceptionMapper implements ExceptionMapper<Throwable> {
             loggTilApplikasjonslogg(feil);
             return serverError(getExceptionFullFeilmelding(feil));
         } finally {
-            MDC.remove("prosess"); //$NON-NLS-1$
+            MDC.remove("prosess");
         }
     }
 

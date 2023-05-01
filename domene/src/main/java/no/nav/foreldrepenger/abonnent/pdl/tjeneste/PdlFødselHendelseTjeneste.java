@@ -11,11 +11,10 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.vedtak.mapper.json.DefaultJsonMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.domene.KlarForSorteringResultat;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
@@ -27,9 +26,10 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePaylo
 import no.nav.foreldrepenger.abonnent.pdl.oppslag.ForeldreTjeneste;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ApplicationScoped
-@HendelseTypeRef(HendelseTypeRef.PDL_FØDSEL_HENDELSE)
+@HendelseTypeRef(HendelseOpplysningType.PDL_FØDSEL_HENDELSE)
 public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHendelsePayload> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlFødselHendelseTjeneste.class);

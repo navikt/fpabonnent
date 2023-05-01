@@ -5,7 +5,7 @@ import static no.nav.foreldrepenger.abonnent.felles.tjeneste.AktørIdTjeneste.ge
 import java.util.Collections;
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -22,15 +22,15 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-@ApplicationScoped
+@Dependent
 @ProsessTask("hendelser.grovsorter")
 public class SorterHendelseTask implements ProsessTaskHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SorterHendelseTask.class);
 
-    private ProsessTaskTjeneste prosessTaskTjeneste;
-    private InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
-    private HendelserKlient hendelser;
+    private final ProsessTaskTjeneste prosessTaskTjeneste;
+    private final InngåendeHendelseTjeneste inngåendeHendelseTjeneste;
+    private final HendelserKlient hendelser;
 
     @Inject
     public SorterHendelseTask(ProsessTaskTjeneste prosessTaskTjeneste,
@@ -46,35 +46,33 @@ public class SorterHendelseTask implements ProsessTaskHandler {
         var dataWrapper = new HendelserDataWrapper(prosessTaskData);
         String hendelseId = getHendelseId(dataWrapper);
 
-        var inngåendeHendelse = inngåendeHendelseTjeneste.finnHendelseSomErSendtTilSortering(hendelseId);
-        if (inngåendeHendelse.isEmpty()) {
+        var inngåendeHendelse = inngåendeHendelseTjeneste.finnHendelseSomErSendtTilSortering(hendelseId).orElse(null);
+        if (inngåendeHendelse == null) {
             LOGGER.warn("Fant ikke InngåendeHendelse for HendelseId {} - kan ikke grovsortere", hendelseId);
             return;
         }
 
-        var hendelsePayload = inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse.get());
+        var hendelsePayload = inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
         var aktørIderForSortering = getAktørIderForSortering(hendelsePayload);
         var filtrertAktørIdList = hendelser.grovsorterAktørIder(aktørIderForSortering);
 
         if (!hendelseErRelevant(filtrertAktørIdList, hendelsePayload)) {
             LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK", hendelsePayload.getHendelseId(),
                 hendelsePayload.getHendelseType());
-            inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(inngåendeHendelse.get());
+            inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(inngåendeHendelse);
+            inngåendeHendelseTjeneste.fjernPayloadTidligereHendelser(inngåendeHendelse);
             return;
         }
 
         opprettSendHendelseTask(dataWrapper, hendelsePayload);
-        inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelse.get(), HåndtertStatusType.GROVSORTERT);
+        inngåendeHendelseTjeneste.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.GROVSORTERT);
         LOGGER.info("Opprettet SendHendelseTask for hendelse {}", hendelseId);
     }
 
     private String getHendelseId(HendelserDataWrapper dataWrapper) {
-        var hendelseId = dataWrapper.getHendelseId();
-        if (hendelseId.isEmpty()) {
-            throw AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(dataWrapper.getProsessTaskData().getTaskType(),
-                HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId());
-        }
-        return hendelseId.get();
+        return dataWrapper.getHendelseId()
+            .orElseThrow(() -> AbonnentHendelserFeil.prosesstaskPreconditionManglerProperty(dataWrapper.getProsessTaskData().getTaskType(),
+                HendelserDataWrapper.HENDELSE_ID, dataWrapper.getId()));
     }
 
     private void opprettSendHendelseTask(HendelserDataWrapper dataWrapper, HendelsePayload hendelsePayload) {
@@ -88,9 +86,4 @@ public class SorterHendelseTask implements ProsessTaskHandler {
         return !Collections.disjoint(hendelsePayload.getAktørIderForSortering(), aktørIdList);
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " [prosessTaskRepository=" + prosessTaskTjeneste + ", inngåendeHendelseTjeneste="
-            + inngåendeHendelseTjeneste + ", hendelser=" + hendelser + "]";
-    }
 }

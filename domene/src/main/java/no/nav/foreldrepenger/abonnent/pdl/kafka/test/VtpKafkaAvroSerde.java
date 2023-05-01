@@ -14,7 +14,7 @@ public class VtpKafkaAvroSerde<T extends SpecificRecord> implements Serde<T> {
     private final Serde<T> inner;
 
     public VtpKafkaAvroSerde() {
-        this.inner = Serdes.serdeFrom(new SpecificAvroSerializer(), new VtpKafkaAvroDeserializer());
+        this.inner = Serdes.serdeFrom(new SpecificAvroSerializer(), new VtpKafkaAvroDeserializer()); // NOSONAR
     }
 
     public Serializer<T> serializer() {

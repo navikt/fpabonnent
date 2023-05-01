@@ -9,6 +9,10 @@ public class PdlDødfødsel extends PdlPersonhendelse {
     private LocalDate dødfødselsdato;
 
     public boolean erRelevantForFpsak() {
+        // Ser ikke på eldre tilfelle
+        if (dødfødselsdato != null && dødfødselsdato.plus(STØNADSPERIODE).isBefore(LocalDate.now())) {
+            return false;
+        }
         return (HendelseType.PDL_DØDFØDSEL_OPPRETTET.equals(getHendelseType()) || HendelseType.PDL_DØDFØDSEL_ANNULLERT.equals(getHendelseType())
             || HendelseType.PDL_DØDFØDSEL_KORRIGERT.equals(getHendelseType()));
     }

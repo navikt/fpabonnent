@@ -9,7 +9,7 @@ import javax.servlet.annotation.WebListener;
 public class ServiceStarterListener implements ServletContextListener {
 
     @Inject
-    private ApplicationServiceStarter applicationServiceStarter; // NOSONAR - vil ikke fungere med constructor innjection
+    private ApplicationServiceStarter applicationServiceStarter;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
