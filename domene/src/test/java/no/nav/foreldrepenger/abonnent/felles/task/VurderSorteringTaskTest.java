@@ -296,40 +296,6 @@ class VurderSorteringTaskTest {
         verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
     }
 
-
-    @Test
-    void skal_ikke_grovsortere_fødselshendelse_med_fødselsdato_over_to_år_tilbake_i_tid() {
-        // Arrange
-        var hendelseOpprettet = InngåendeHendelse.builder()
-            .hendelseId("A")
-            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
-            .håndtertStatus(HåndtertStatusType.MOTTATT)
-            .hendelseKilde(HendelseKilde.PDL)
-            .sendtTidspunkt(LocalDateTime.now())
-            .payload(
-                DefaultJsonMapper.toJson(opprettFødsel(LocalDateTime.now(), LocalDate.now().minusYears(10), PdlEndringstype.OPPRETTET, "A", null).build()))
-            .build();
-        hendelseRepository.lagreFlushInngåendeHendelse(hendelseOpprettet);
-
-        var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
-        hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
-        hendelserDataWrapper.setHendelseId("A");
-
-        var taskCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        lenient().doReturn("").when(prosessTaskTjeneste).lagre(taskCaptor.capture());
-
-        // Act
-        vurderSorteringTask.doTask(hendelserDataWrapper.getProsessTaskData());
-
-        // Assert
-        var hendelse = hendelseRepository.finnEksaktHendelse(hendelseOpprettet.getId());
-        assertThat(hendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.HÅNDTERT);
-
-        verify(foreldreTjeneste, times(0)).hentForeldre(any());
-        verify(prosessTaskTjeneste, times(0)).lagre(any(ProsessTaskData.class));
-    }
-
     @Test
     void skal_grovsortere_korrigering_da_en_tidligere_sendt_fødselshendelse_hadde_forskjellig_fødselsdato() {
         // Arrange

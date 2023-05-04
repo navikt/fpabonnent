@@ -66,12 +66,6 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
 
     @Override
     public boolean vurderOmHendelseKanForkastes(PdlFødselHendelsePayload payload) {
-        var fødselsdato = payload.getFødselsdato();
-        if (fødselsdato.isPresent() && fødselsdato.get().isBefore(LocalDate.now().minusYears(2))) {
-            LOG.info("Hendelse {} har fødselsdato {} som var for mer enn to år siden og blir derfor forkastet", payload.getHendelseId(),
-                fødselsdato.get());
-            return true;
-        }
         return hendelseTjenesteHjelper.vurderOmHendelseKanForkastes(payload, this::payloadFraJsonString);
     }
 

@@ -67,12 +67,6 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         var hendelseTjeneste = getHendelseTjeneste(dataWrapper, hendelseType);
         var hendelsePayload = hendelseTjeneste.payloadFraJsonString(inngåendeHendelse.getPayload());
 
-        if (hendelseTjeneste.vurderOmHendelseKanForkastes(hendelsePayload)) {
-            // Går på kjeding og sene korrigeringer (original kan ha blitt søppeltømt)
-            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse, false);
-            return;
-        }
-
         var tidligereHendelseBehandles = enTidligereHendelseSkalBehandles(inngåendeHendelse);
         if (tidligereHendelseBehandles.isPresent()) {
             opprettVurderSorteringTask(hendelsePayload, inngåendeHendelse);
@@ -80,6 +74,12 @@ public class VurderSorteringTask implements ProsessTaskHandler {
         }
 
         if (overlatVurderingTilSenereKjedetHendelse(inngåendeHendelse)) {
+            return;
+        }
+
+        if (hendelseTjeneste.vurderOmHendelseKanForkastes(hendelsePayload)) {
+            // Går på kjeding og sene korrigeringer (original kan ha blitt søppeltømt)
+            ferdigstillHendelseUtenVidereHåndtering(inngåendeHendelse, false);
             return;
         }
 
