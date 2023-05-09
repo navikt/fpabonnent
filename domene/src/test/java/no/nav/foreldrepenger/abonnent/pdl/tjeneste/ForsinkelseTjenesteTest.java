@@ -3,18 +3,15 @@ package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
@@ -31,23 +28,20 @@ class ForsinkelseTjenesteTest {
     private ForsinkelseKonfig forsinkelseKonfig;
     private ForsinkelseTjeneste forsinkelseTjeneste;
 
-    private MockedStatic<DateUtil> mock;
+    @Mock
+    private DateUtil mock;
 
     @BeforeEach
     void before() {
-        mock = mockStatic(DateUtil.class);
+        mock = mock(DateUtil.class);
+        when(mock.nå()).thenReturn(LocalDateTime.now());
         lenient().when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
         lenient().when(forsinkelseKonfig.normalForsinkelseMinutter()).thenReturn(60);
-        forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
-    }
-
-    @AfterEach
-    void after() {
-        mock.close();
+        forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository, mock);
     }
 
     private void settTid(LocalDateTime tid) {
-        mock.when(DateUtil::now).thenReturn(tid);
+        when(mock.nå()).thenReturn(tid);
     }
 
     @Test
@@ -267,7 +261,7 @@ class ForsinkelseTjenesteTest {
         var resultat2 = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), hendelseB);
 
         // Assert
-        var nesteDagEtterRetryAll = DateUtil.now().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
+        var nesteDagEtterRetryAll = mock.nå().plusDays(1).withHour(7).withMinute(30).withSecond(0).withNano(0);
         assertThat(resultat1).isEqualTo(nesteDagEtterRetryAll);
         assertThat(resultat2).isEqualTo(nesteDagEtterRetryAll);
     }

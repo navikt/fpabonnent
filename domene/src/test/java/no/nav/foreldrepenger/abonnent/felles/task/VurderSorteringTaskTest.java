@@ -37,6 +37,7 @@ import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.oppslag.ForeldreTjeneste;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.DateUtil;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseKonfig;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper;
@@ -75,7 +76,7 @@ class VurderSorteringTaskTest {
         HendelseTjenesteHjelper hendelseTjenesteHjelper = new HendelseTjenesteHjelper(hendelseRepository);
         var forsinkelseKonfig = mock(ForsinkelseKonfig.class);
         lenient().when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
-        forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
+        forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository, new DateUtil());
 
         HendelseTjeneste hendelseTjeneste = new PdlFødselHendelseTjeneste(hendelseTjenesteHjelper, foreldreTjeneste);
         var hendelseTjenesteProvider = mock(HendelseTjenesteProvider.class);
