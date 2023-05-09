@@ -1,12 +1,17 @@
 package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
+import no.nav.pdl.Foedsel;
+import no.nav.pdl.FoedselResponseProjection;
 import no.nav.pdl.ForelderBarnRelasjon;
 import no.nav.pdl.ForelderBarnRelasjonResponseProjection;
 import no.nav.pdl.ForelderBarnRelasjonRolle;
@@ -43,5 +48,20 @@ public class FødselTjeneste {
             .filter(Objects::nonNull)
             .map(PersonIdent::fra)
             .toList();
+    }
+
+    public Optional<LocalDate> hentFødselsdato(PersonIdent barn) {
+        var request = new HentPersonQueryRequest();
+        request.setIdent(barn.getIdent());
+        var projection = new PersonResponseProjection()
+            .foedsel(new FoedselResponseProjection().foedselsdato());
+
+        var person = pdlKlient.hentPerson(request, projection);
+
+        return person.getFoedsel().stream()
+            .map(Foedsel::getFoedselsdato)
+            .filter(Objects::nonNull)
+            .findFirst()
+            .map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE));
     }
 }

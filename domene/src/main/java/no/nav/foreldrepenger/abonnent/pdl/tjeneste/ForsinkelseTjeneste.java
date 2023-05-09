@@ -39,20 +39,26 @@ public class ForsinkelseTjeneste {
 
     private ForsinkelseKonfig forsinkelseKonfig;
     private HendelseRepository hendelseRepository;
+    private DateUtil dateUtil;
 
     public ForsinkelseTjeneste() {
         // CDI
     }
 
     @Inject
-    public ForsinkelseTjeneste(ForsinkelseKonfig forsinkelseKonfig, HendelseRepository hendelseRepository) {
+    public ForsinkelseTjeneste(ForsinkelseKonfig forsinkelseKonfig, HendelseRepository hendelseRepository, DateUtil dateUtil) {
         this.forsinkelseKonfig = forsinkelseKonfig;
         this.hendelseRepository = hendelseRepository;
+        this.dateUtil = dateUtil;
+    }
+
+    public LocalDateTime nå() {
+        return dateUtil.nå();
     }
 
     public LocalDateTime finnNesteTidspunktForVurderSortering(InngåendeHendelse inngåendeHendelse) {
         if (!forsinkelseKonfig.skalForsinkeHendelser()) {
-            return DateUtil.now();
+            return dateUtil.nå();
         }
         return sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse)
             .orElseGet(this::doFinnNesteTidspunktForVurderSortering);
@@ -72,8 +78,8 @@ public class ForsinkelseTjeneste {
 
     private LocalDateTime utledTidFraTidligereHendelse(InngåendeHendelse inngåendeHendelse, InngåendeHendelse tidligereHendelse) {
         var tidspunktBasertPåTidligereHendelse = tidligereHendelse.getHåndteresEtterTidspunkt().plusMinutes(2);
-        if (DateUtil.now().isAfter(tidspunktBasertPåTidligereHendelse)) {
-            LocalDateTime nesteDagEtterRetryAll = DateUtil.now().plusDays(1).withHour(7).withMinute(30);
+        if (dateUtil.nå().isAfter(tidspunktBasertPåTidligereHendelse)) {
+            LocalDateTime nesteDagEtterRetryAll = dateUtil.nå().plusDays(1).withHour(7).withMinute(30);
             LOGGER.info(
                 "Hendelse {} har en tidligere hendelse {} som skulle vært håndtert {}, men ikke er det, og vil derfor bli forsøkt behandlet igjen i morgen etter retry all: {}",
                 inngåendeHendelse.getHendelseId(), inngåendeHendelse.getTidligereHendelseId(),
@@ -88,7 +94,7 @@ public class ForsinkelseTjeneste {
     }
 
     private LocalDateTime doFinnNesteTidspunktForVurderSortering() {
-        var tid = DateUtil.now().plusMinutes(forsinkelseKonfig.normalForsinkelseMinutter());
+        var tid = dateUtil.nå().plusMinutes(forsinkelseKonfig.normalForsinkelseMinutter());
         if (tid.isBefore(tid.with(OPPDRAG_VÅKNER))) {
             return finnNesteVurderingstid(tid);
         } else if (tid.isAfter(tid.withHour(22).withMinute(58)) || erStengtDag(tid)) {
@@ -111,6 +117,6 @@ public class ForsinkelseTjeneste {
     }
 
     private LocalDateTime getTidspunktMellom0630og0659(LocalDate utgangspunkt) {
-        return LocalDateTime.of(utgangspunkt, OPPDRAG_VÅKNER.plusSeconds(DateUtil.now().getNano() % 1739));
+        return LocalDateTime.of(utgangspunkt, OPPDRAG_VÅKNER.plusSeconds(dateUtil.nå().getNano() % 1739));
     }
 }

@@ -1,13 +1,15 @@
 package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 
-import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
-import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
+import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 
 @ApplicationScoped
 public class ForeldreTjeneste {
@@ -30,5 +32,9 @@ public class ForeldreTjeneste {
             .stream()
             .flatMap(f -> aktørTjeneste.hentAktørIdForPersonIdent(f).stream())
             .collect(Collectors.toSet());
+    }
+
+    public Optional<LocalDate> hentFødselsdato(PersonIdent barn) {
+        return fødselTjeneste.hentFødselsdato(barn);
     }
 }

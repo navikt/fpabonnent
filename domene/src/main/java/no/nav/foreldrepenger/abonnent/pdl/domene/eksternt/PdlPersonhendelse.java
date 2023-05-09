@@ -9,7 +9,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 
 public abstract class PdlPersonhendelse {
 
-    static final Period STØNADSPERIODE = Period.of(3,3,1); // Stønadsperiode 3 år + søknadsfrist 3 mnd
+    public static final Period STØNADSPERIODE = Period.of(3,3,1); // Stønadsperiode 3 år + søknadsfrist 3 mnd
 
     private String hendelseId;
     private Set<String> personidenter = new HashSet<>();

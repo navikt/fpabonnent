@@ -78,11 +78,6 @@ public class PdlLeesahHendelseHåndterer {
             håndterDødfødtBarn(payload);
         } else if (UTFLYTTING.contentEquals(payload.getOpplysningstype())) {
             håndterUtflytting(payload);
-        } else {
-            LOG.info(
-                "FPABONNENT mottok en ukjent hendelse som ignoreres: hendelseId={} opplysningstype={} endringstype={} master={} opprettet={} tidligereHendelseId={}",
-                payload.getHendelseId(), payload.getOpplysningstype(), payload.getEndringstype(), payload.getMaster(), payload.getOpprettet(),
-                payload.getTidligereHendelseId());
         }
     }
 
@@ -162,8 +157,6 @@ public class PdlLeesahHendelseHåndterer {
             LOG.info("Oppretter");
             opprettVurderSorteringTask(inngåendeHendelse, håndteresEtterTidspunkt);
             LOG.info("Opprettet OK");
-        } else {
-            LOG.info("Ikke-relevant hendelseId={} type={} filtrert bort", personhendelse.getHendelseId(), personhendelse.getHendelseType().getKode());
         }
     }
 

@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.task.VurderSorteringTask;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
+import no.nav.foreldrepenger.abonnent.pdl.tjeneste.DateUtil;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseKonfig;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Endringstype;
@@ -55,7 +56,7 @@ class PdlLeesahHendelseHåndtererTest {
         prosessTaskTjeneste = mock(ProsessTaskTjeneste.class);
         var forsinkelseKonfig = mock(ForsinkelseKonfig.class);
         when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
-        forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository);
+        forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository, new DateUtil());
 
         hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskTjeneste, forsinkelseTjeneste);
     }

@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTypeRef;
 import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
+import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
 import no.nav.foreldrepenger.abonnent.pdl.domene.internt.PdlFødselHendelsePayload;
 import no.nav.foreldrepenger.abonnent.pdl.oppslag.ForeldreTjeneste;
 import no.nav.foreldrepenger.konfig.Environment;
@@ -77,6 +78,12 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
                 var resultat = new FødselKlarForSorteringResultat(true);
                 resultat.setForeldre(foreldre.stream().map(AktørId::getId).collect(Collectors.toSet()));
                 return resultat;
+            } else if (payload.getFnrBarn().stream().allMatch(PersonIdent::erDnr)) {
+                LOG.info("Fant ikke foreldre for hendelse {} med type {} og barn er DNR", payload.getHendelseId(), payload.getHendelseType());
+                return new FødselKlarForSorteringResultat(false, false);
+            } else if (!harRelevantFødselsdato(payload.getFnrBarn())) {
+                LOG.info("For tidlig fødselsdato for hendelse {} med type {}", payload.getHendelseId(), payload.getHendelseType());
+                return new FødselKlarForSorteringResultat(false, false);
             } else {
                 LOG.info("Fant ikke foreldre for hendelse {} med type {}", payload.getHendelseId(), payload.getHendelseType());
                 return new FødselKlarForSorteringResultat(false, true);
@@ -110,6 +117,25 @@ public class PdlFødselHendelseTjeneste implements HendelseTjeneste<PdlFødselHe
         } else {
             LOG.warn(melding, payload.getHendelseId(), payload.getHendelseType(), payload.getHendelseOpprettetTid());
         }
+    }
+
+    private boolean harRelevantFødselsdato(Set<PersonIdent> barn) {
+        for (var fnr : barn) {
+            try {
+                var fødselsdato = foreldreTjeneste.hentFødselsdato(fnr);
+                if (fødselsdato.filter(f -> f.plus(PdlPersonhendelse.STØNADSPERIODE).isBefore(LocalDate.now())).isPresent()) {
+                    return false;
+                }
+            } catch (TekniskException e) {
+                if (ENV.isProd()) {
+                    throw e;
+                } else {
+                    LOG.warn("Fikk feil ved kall til PDL, men lar mekanisme for å vurdere hendelsen på nytt håndtere feilen, siden miljøet er {}",
+                        ENV.getCluster().clusterName(), e);
+                }
+            }
+        }
+        return true;
     }
 
     private Set<AktørId> getForeldre(Set<PersonIdent> fnrBarn) {

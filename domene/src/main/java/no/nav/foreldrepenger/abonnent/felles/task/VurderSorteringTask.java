@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjeneste;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseTjenesteProvider;
-import no.nav.foreldrepenger.abonnent.pdl.tjeneste.DateUtil;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -141,7 +140,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     }
 
     private void opprettVurderSorteringTask(HendelsePayload hendelsePayload, InngåendeHendelse inngåendeHendelse) {
-        var nesteKjøringEtter = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(DateUtil.now(),
+        var nesteKjøringEtter = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(forsinkelseTjeneste.nå(),
             inngåendeHendelse);
         LOGGER.info("Hendelse {} med type {} som ble opprettet {} vil bli vurdert på nytt for sortering {}", hendelsePayload.getHendelseId(),
             inngåendeHendelse.getHendelseType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
@@ -155,7 +154,7 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     }
 
     private boolean hendelsenErUnderEnUkeGammel(LocalDateTime hendelseOpprettetTid) {
-        return hendelseOpprettetTid.plusDays(7).isAfter(DateUtil.now());
+        return hendelseOpprettetTid.plusDays(7).isAfter(forsinkelseTjeneste.nå());
     }
 
     private void ferdigstillHendelseUtenVidereHåndtering(InngåendeHendelse inngåendeHendelse, boolean fjernPayload) {
