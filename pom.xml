@@ -4,7 +4,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.5.0</version>
+        <version>0.5.2</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.abonnent</groupId>
@@ -26,9 +26,9 @@
         <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>4.2.43</felles.version>
-        <prosesstask.version>3.1.26</prosesstask.version>
-        <fp-kontrakter.version>6.2.19</fp-kontrakter.version>
+        <felles.version>4.2.45</felles.version>
+        <prosesstask.version>3.1.28</prosesstask.version>
+        <fp-kontrakter.version>6.2.20</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <avro.version>1.11.1</avro.version>
@@ -40,7 +40,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>0.5.0</version>
+                <version>0.5.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -204,7 +204,7 @@
             <url>https://maven.pkg.github.com/navikt/fpabonnent</url>
         </repository>
     </distributionManagement>
-    
+
     <repositories>
         <repository>
             <id>confluent</id>
