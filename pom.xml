@@ -32,7 +32,7 @@
 
         <!-- Eksterne -->
         <avro.version>1.11.1</avro.version>
-        <confluent.version>7.3.1</confluent.version>
+        <confluent.version>7.4.0</confluent.version>
     </properties>
 
     <dependencyManagement>
