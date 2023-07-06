@@ -65,7 +65,7 @@
 		</dependency>
 		<dependency>
 			<groupId>no.nav.foreldrepenger.kontrakter</groupId>
-			<artifactId>abonnent-v2</artifactId>
+			<artifactId>abonnent-v2-jakarta</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>

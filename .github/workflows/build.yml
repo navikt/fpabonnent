@@ -9,15 +9,21 @@ on:
       - '.gitignore'
       - '.editorconfig'
       - '.java-version'
-      - 'LICENCE'
+      - '.gitattributes'
+      - 'LICENSE'
       - 'CODEOWNERS'
+      - 'docs/**'
+      - '.oracle/**'
+      - '.github/*.yml'
 
 jobs:
   build-app:
     name: Build
+    permissions:
+      contents: read
+      packages: write
     uses: navikt/fp-gha-workflows/.github/workflows/build-app.yml@main
     with:
-      sonar-scan: true
       build-image: ${{ github.ref_name == 'master' }} # default: true
       push-image: ${{ github.ref_name == 'master' }} # default: false
     secrets: inherit
@@ -30,7 +36,6 @@ jobs:
     with:
       build-version: ${{ needs.build-app.outputs.build-version }}
       test-suite: verdikjede
-    secrets: inherit
 
   notify:
     name: Notify
