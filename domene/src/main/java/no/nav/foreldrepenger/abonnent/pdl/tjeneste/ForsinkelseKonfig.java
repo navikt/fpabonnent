@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import no.nav.foreldrepenger.konfig.Environment;
 

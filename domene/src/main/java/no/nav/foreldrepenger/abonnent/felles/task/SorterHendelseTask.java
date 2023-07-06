@@ -5,8 +5,8 @@ import static no.nav.foreldrepenger.abonnent.felles.tjeneste.AktørIdTjeneste.ge
 import java.util.Collections;
 import java.util.List;
 
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.abonnent.pdl.oppslag;
 
-import javax.enterprise.context.Dependent;
+import jakarta.enterprise.context.Dependent;
 
 import no.nav.vedtak.felles.integrasjon.person.AbstractPersonKlient;
 import no.nav.vedtak.felles.integrasjon.person.Tema;

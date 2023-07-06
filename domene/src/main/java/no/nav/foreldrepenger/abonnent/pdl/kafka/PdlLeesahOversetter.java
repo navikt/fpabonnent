@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.abonnent.pdl.kafka;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

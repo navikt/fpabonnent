@@ -6,8 +6,8 @@ import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import no.nav.pdl.Bostedsadresse;
 import no.nav.pdl.BostedsadresseResponseProjection;
