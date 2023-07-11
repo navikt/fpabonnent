@@ -4,7 +4,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.6.2</version>
+        <version>0.7.2-jakarta</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.abonnent</groupId>
@@ -26,11 +26,11 @@
         <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>4.4.0</felles.version>
+        <felles.version>4.4.2-jakarta</felles.version>
 
-        <prosesstask.version>3.2.3</prosesstask.version>
+        <prosesstask.version>3.2.5-jakarta</prosesstask.version>
 
-        <fp-kontrakter.version>6.2.22</fp-kontrakter.version>
+        <fp-kontrakter.version>6.3.0-jakarta</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <avro.version>1.11.2</avro.version>
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>0.6.2</version>
+                <version>0.7.2-jakarta</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -87,12 +87,6 @@
                 <groupId>no.nav.vedtak.prosesstask</groupId>
                 <artifactId>prosesstask-kontekst</artifactId>
                 <version>${prosesstask.version}</version>
-            </dependency>
-            <!-- Bør flyttes til fp-bom -->
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-micrometer</artifactId>
-                <version>${hibernate.version}</version>
             </dependency>
 
             <!-- Felles deps -->

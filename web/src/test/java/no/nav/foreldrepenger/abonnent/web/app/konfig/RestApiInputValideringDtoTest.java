@@ -11,18 +11,15 @@ import no.nav.foreldrepenger.abonnent.web.app.IndexClasses;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;

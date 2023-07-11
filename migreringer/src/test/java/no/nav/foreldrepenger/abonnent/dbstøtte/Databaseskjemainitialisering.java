@@ -48,6 +48,7 @@ public final class Databaseskjemainitialisering {
                 .locations(DB_SCRIPT_LOCATION + SCHEMA)
                 .table("schema_version")
                 .baselineOnMigrate(true)
+                .cleanDisabled(false)
                 .load();
             try {
                 if (!ENV.isLocal()) {

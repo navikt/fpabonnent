@@ -51,7 +51,11 @@
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>jakarta.transaction</groupId>
+            <artifactId>jakarta.transaction-api</artifactId>
+        </dependency>
+        <dependency>
 			<groupId>no.nav.foreldrepenger.felles</groupId>
 			<artifactId>felles-kontekst</artifactId>
 		</dependency>
@@ -159,7 +163,7 @@
 			</exclusions>
 		</dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <scope>test</scope>
         </dependency>
@@ -169,7 +173,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-micrometer</artifactId>
             <scope>test</scope>
         </dependency>
