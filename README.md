@@ -11,6 +11,8 @@ FP-Abonnent
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=navikt_fpabonnent)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=navikt_fpabonnent&metric=sqale_index)](https://sonarcloud.io/dashboard?id=navikt_fpabonnent)
 
+![GitHub](https://img.shields.io/github/license/navikt/fpabonnent)
+
 Applikasjonen tar inn hendelser fra potensielt flere kilder og videresender disse til FP-Sak, dersom aktuelle aktører har en fagsak der. Pr april 2021 er det kun lesing av fødsel, død og dødfødsel fra PDL/LEESAH Kafka topicen pdl-leesah-v1 som er implementert, men kjernen i applikasjonen er laget for at det skal være mulig å lese fra flere kilder i fremtiden, uten å endre noe særlig på den eksisterende koden.
 
 ### Virkemåte
