@@ -33,7 +33,7 @@
         <fp-kontrakter.version>7.0.1</fp-kontrakter.version>
 
         <!-- Eksterne -->
-        <avro.version>1.11.2</avro.version>
+        <avro.version>1.11.3</avro.version>
 
         <confluent.version>7.5.0</confluent.version>
     </properties>
