@@ -30,7 +30,9 @@ spec:
   replicas:
     min: {{minReplicas}}
     max: {{maxReplicas}}
-    cpuThresholdPercentage: 80
+    scalingStrategy:
+      cpu:
+        thresholdPercentage: 80
   prometheus:
     enabled: true
     path: /fpabonnent/internal/metrics/prometheus
@@ -52,8 +54,6 @@ spec:
       mountPath: /var/run/secrets/nais.io/defaultDSconfig
     - kvPath: {{serviceuserkv}}
       mountPath: /var/run/secrets/nais.io/serviceuser/
-    - kvPath: /apikey/appdynamics/{{environment}}
-      mountPath: /var/run/secrets/nais.io/appdynamics
   env:
 {{#each env}}
    - name: {{@key}}
