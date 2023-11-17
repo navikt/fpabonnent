@@ -4,12 +4,12 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>1.0.1</version>
+        <version>2.0.1</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.abonnent</groupId>
     <artifactId>fpabonnent</artifactId>
-    <version>${revision}</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>FP-Abonnent :: Root</name>
 
@@ -20,22 +20,21 @@
     </modules>
 
     <properties>
-        <revision>1.0-SNAPSHOT</revision>
 
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>5.1.0</felles.version>
+        <felles.version>6.0.0</felles.version>
 
-        <prosesstask.version>4.0.0</prosesstask.version>
+        <prosesstask.version>4.1.0</prosesstask.version>
 
-        <fp-kontrakter.version>7.0.1</fp-kontrakter.version>
+        <fp-kontrakter.version>8.1.0</fp-kontrakter.version>
 
         <!-- Eksterne -->
-        <avro.version>1.11.2</avro.version>
+        <avro.version>1.11.3</avro.version>
 
-        <confluent.version>7.5.0</confluent.version>
+        <confluent.version>7.5.2</confluent.version>
     </properties>
 
     <dependencyManagement>
@@ -43,7 +42,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>1.0.1</version>
+                <version>2.0.1</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -92,6 +91,11 @@
             <!-- Felles deps -->
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
+                <artifactId>felles-konfig</artifactId>
+                <version>${felles.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>felles-kontekst</artifactId>
                 <version>${felles.version}</version>
             </dependency>
@@ -115,13 +119,6 @@
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>abonnent-v2</artifactId>
                 <version>${fp-kontrakter.version}</version>
-            </dependency>
-
-            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).  Skal ikke benyttes direkte av vår egen kode. -->
-            <dependency>
-                <groupId>com.fasterxml</groupId>
-                <artifactId>classmate</artifactId>
-                <version>1.5.1</version>
             </dependency>
 
             <!-- Kafka -->
@@ -187,8 +184,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>no.nav.foreldrepenger</groupId>
-            <artifactId>konfig</artifactId>
+            <groupId>no.nav.foreldrepenger.felles</groupId>
+            <artifactId>felles-konfig</artifactId>
         </dependency>
         <dependency>
             <groupId>com.oracle.ojdbc</groupId>
