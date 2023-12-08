@@ -4,7 +4,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.abonnent</groupId>
@@ -29,7 +29,7 @@
 
         <prosesstask.version>5.0.0</prosesstask.version>
 
-        <fp-kontrakter.version>9.0.1</fp-kontrakter.version>
+        <fp-kontrakter.version>9.0.2</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <avro.version>1.11.3</avro.version>
@@ -42,7 +42,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
