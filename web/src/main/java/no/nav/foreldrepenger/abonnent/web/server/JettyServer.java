@@ -160,7 +160,8 @@ public class JettyServer {
             var resource = factory.newClassLoaderResource("/WEB-INF/web.xml", false);
             descriptor = resource.getURI().toURL().toExternalForm();
             baseResource = factory.newResource(".").getRealURI().toURL().toExternalForm();
-        }        ctx.setDescriptor(descriptor);
+        }
+        ctx.setDescriptor(descriptor);
         ctx.setContextPath(CONTEXT_PATH);
         ctx.setBaseResourceAsString(baseResource);
 
@@ -168,7 +169,6 @@ public class JettyServer {
 
         // Scanns the CLASSPATH for classes and jars.
         ctx.setAttribute(CONTAINER_JAR_PATTERN, String.format("%s%s", ENV.isLocal() ? JETTY_LOCAL_CLASSES : "", JETTY_SCAN_LOCATIONS));
-
 
         // Enable Weld + CDI
         ctx.setInitParameter(CdiServletContainerInitializer.CDI_INTEGRATION_ATTRIBUTE, CdiDecoratingListener.MODE);
