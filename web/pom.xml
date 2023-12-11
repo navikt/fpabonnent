@@ -36,9 +36,8 @@
             <artifactId>prosesstask</artifactId>
         </dependency>
 		<dependency>
-			<groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
-			<artifactId>felles-sikkerhet</artifactId>
-			<scope>compile</scope>
+            <groupId>no.nav.foreldrepenger.felles</groupId>
+            <artifactId>felles-auth-filter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>no.nav.foreldrepenger.felles</groupId>
@@ -128,24 +127,12 @@
 
 		<!-- Jetty -->
 		<dependency>
-			<groupId>org.eclipse.jetty.ee10</groupId>
-			<artifactId>jetty-ee10-annotations</artifactId>
-		</dependency>
-        <dependency>
             <groupId>org.eclipse.jetty.ee10</groupId>
             <artifactId>jetty-ee10-cdi</artifactId>
         </dependency>
 		<dependency>
-			<groupId>org.eclipse.jetty.ee10</groupId>
-			<artifactId>jetty-ee10-jaspi</artifactId>
-		</dependency>
-		<dependency>
             <groupId>org.eclipse.jetty.ee10</groupId>
             <artifactId>jetty-ee10-plus</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-security</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty.ee10</groupId>
