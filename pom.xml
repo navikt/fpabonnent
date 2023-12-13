@@ -25,7 +25,7 @@
         <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>7.0.2</felles.version>
+        <felles.version>7.0.3</felles.version>
 
         <prosesstask.version>5.0.2</prosesstask.version>
 
