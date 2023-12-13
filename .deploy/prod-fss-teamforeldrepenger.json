@@ -5,14 +5,18 @@
 	"serviceuserkv": "/serviceuser/data/prod/srvfpabonnent",
 	"minReplicas": "2",
 	"maxReplicas": "3",
+  "limits": {
+    "cpu": "2000m",
+    "mem": "2048Mi"
+  },
+  "requests": {
+    "cpu": "200m",
+    "mem": "512Mi"
+  },
 	"ingresses": [
-		"https://fpabonnent.intern.nav.no",
 		"https://fpabonnent.prod-fss-pub.nais.io"
 	],
 	"kafkaPool": "nav-prod",
-	"env": {
-		"APPD_ENABLED": "true"
-	},
 	"groups": [
 		"0d226374-4748-4367-a38a-062dcad70034"
 	],

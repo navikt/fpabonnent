@@ -38,11 +38,11 @@ spec:
     path: /fpabonnent/internal/metrics/prometheus
   resources:
     limits:
-      cpu: "2000m"
-      memory: "2048Mi"
+      cpu: "{{limits.cpu}}"
+      memory: "{{limits.mem}}"
     requests:
-      cpu: "200m"
-      memory: "1024Mi"
+      cpu: "{{requests.cpu}}"
+      memory: "{{requests.mem}}"
   kafka:
     pool: {{kafkaPool}}
   vault:
@@ -54,11 +54,6 @@ spec:
       mountPath: /var/run/secrets/nais.io/defaultDSconfig
     - kvPath: {{serviceuserkv}}
       mountPath: /var/run/secrets/nais.io/serviceuser/
-  env:
-{{#each env}}
-   - name: {{@key}}
-     value: "{{this}}"
-{{/each}}
   azure:
     application:
       enabled: true
