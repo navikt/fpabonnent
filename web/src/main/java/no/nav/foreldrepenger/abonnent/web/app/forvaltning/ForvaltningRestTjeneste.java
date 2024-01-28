@@ -11,6 +11,8 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -39,6 +41,8 @@ public class ForvaltningRestTjeneste {
     private ProsessTaskTjeneste taskTjeneste;
     private HendelseRepository hendelseRepository;
 
+    private Validator validator;
+
     public ForvaltningRestTjeneste() {
         // CDI
     }
@@ -47,6 +51,9 @@ public class ForvaltningRestTjeneste {
     public ForvaltningRestTjeneste(ProsessTaskTjeneste taskTjeneste, HendelseRepository hendelseRepository) {
         this.taskTjeneste = taskTjeneste;
         this.hendelseRepository = hendelseRepository;
+        @SuppressWarnings("resource") var factory = Validation.buildDefaultValidatorFactory();
+        // hibernate validator implementations er thread-safe, trenger ikke close
+        validator = factory.getValidator();
     }
 
     @GET
@@ -56,10 +63,16 @@ public class ForvaltningRestTjeneste {
     @Path("/lesHendelser")
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
     public Response lesHendelser() {
-        var respons = hendelseRepository.hentAlleInngåendeHendelser().stream()
+        var hendelser = hendelseRepository.hentAlleInngåendeHendelser().stream()
             .map(MigreringMapper::tilHendelseDto)
             .toList();
-        return Response.ok(new MigreringHendelseDto(respons)).build();
+        var respons = new MigreringHendelseDto(hendelser);
+        var violations = validator.validate(respons);
+        if (!violations.isEmpty()) {
+            var allErrors = violations.stream().map(it -> it.getPropertyPath().toString() + " :: " + it.getMessage()).toList();
+            throw new IllegalArgumentException("Valideringsfeil; " + allErrors);
+        }
+        return Response.ok(respons).build();
     }
 
     @POST
@@ -98,11 +111,17 @@ public class ForvaltningRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
     public Response lesTasks() {
         var vurderSortering = TaskType.forProsessTask(VurderSorteringTask.class);
-        var respons = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream()
+        var tasks = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream()
             .filter(t -> vurderSortering.equals(t.taskType()))
             .map(MigreringMapper::tilProsesstaskDto)
             .toList();
-        return Response.ok(new MigreringProsesstaskDto(respons)).build();
+        var respons = new MigreringProsesstaskDto(tasks);
+        var violations = validator.validate(respons);
+        if (!violations.isEmpty()) {
+            var allErrors = violations.stream().map(it -> it.getPropertyPath().toString() + " :: " + it.getMessage()).toList();
+            throw new IllegalArgumentException("Valideringsfeil; " + allErrors);
+        }
+        return Response.ok(respons).build();
     }
 
 
