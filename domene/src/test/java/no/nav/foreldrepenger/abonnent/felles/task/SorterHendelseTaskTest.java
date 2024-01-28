@@ -14,8 +14,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.abonnent.extensions.JpaExtension;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
@@ -101,7 +100,7 @@ class SorterHendelseTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
 
         var dataWrapper = lagDefaultDataWrapper();
-        dataWrapper.setInngåendeHendelseId(hendelse.getId());
+        dataWrapper.setHendelseId(hendelse.getHendelseId());
 
         // Act
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
@@ -121,7 +120,7 @@ class SorterHendelseTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
 
         var dataWrapper = lagDefaultDataWrapper();
-        dataWrapper.setInngåendeHendelseId(hendelse.getId());
+        dataWrapper.setHendelseId(hendelse.getHendelseId());
 
         when(hendelser.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
         var argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
@@ -137,7 +136,6 @@ class SorterHendelseTaskTest {
         assertThat(data.getHendelseId()).isPresent().hasValue(FMELDING.getHendelseId());
         var inngåendeHendelse = finnHendelseMedHendelseId();
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
-        assertThat(data.getInngåendeHendelseId()).isPresent().hasValue(inngåendeHendelse.getId());
     }
 
     @Test
@@ -150,7 +148,7 @@ class SorterHendelseTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
 
         var dataWrapper = lagDefaultDataWrapper();
-        dataWrapper.setInngåendeHendelseId(hendelse.getId());
+        dataWrapper.setHendelseId(hendelse.getHendelseId());
 
         // Act
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());

@@ -53,7 +53,6 @@ public class InngåendeHendelse extends BaseEntitet {
     }
 
     private InngåendeHendelse(Builder builder) {
-        this.id = builder.id;
         this.hendelseId = builder.hendelseId;
         this.tidligereHendelseId = builder.tidligereHendelseId;
         this.hendelseKilde = builder.hendelseKilde;
@@ -82,6 +81,10 @@ public class InngåendeHendelse extends BaseEntitet {
 
     public HendelseType getHendelseType() {
         return hendelseType;
+    }
+
+    public LocalDateTime getSendtTidspunkt() {
+        return sendtTidspunkt;
     }
 
     public String getPayload() {
@@ -125,7 +128,6 @@ public class InngåendeHendelse extends BaseEntitet {
     }
 
     public static class Builder {
-        private Long id;
         private String hendelseId;
         private String tidligereHendelseId;
         private HendelseKilde hendelseKilde;
@@ -134,11 +136,6 @@ public class InngåendeHendelse extends BaseEntitet {
         private LocalDateTime håndteresEtterTidspunkt;
         private HåndtertStatusType håndtertStatus;
         private LocalDateTime sendtTidspunkt;
-
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
 
         public Builder hendelseId(String hendelseId) {
             this.hendelseId = hendelseId;

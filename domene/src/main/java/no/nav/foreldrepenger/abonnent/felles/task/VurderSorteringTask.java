@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.enterprise.context.Dependent;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseEndringType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
@@ -52,9 +51,10 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         var dataWrapper = new HendelserDataWrapper(prosessTaskData);
-        var hendelseId = dataWrapper.getInngåendeHendelseId()
+        var hendelseId = dataWrapper.getHendelseId()
             .orElseThrow(() -> new IllegalStateException("Prosesstask " + prosessTaskData.getId() + " peker ikke på en gyldig inngående hendelse"));
-        var inngåendeHendelse = hendelseRepository.finnEksaktHendelse(hendelseId);
+        var inngåendeHendelse = hendelseRepository.finnHendelseFraIdHvisFinnes(hendelseId, dataWrapper.getHendelseKilde().orElseThrow())
+            .orElseThrow(() -> new IllegalStateException("Prosesstask " + prosessTaskData.getId() + " peker ikke på en gyldig inngående hendelse"));
 
         // Sjekk om blitt håndtert utenfor task
         if (HåndtertStatusType.HÅNDTERT.equals(inngåendeHendelse.getHåndtertStatus())) {
@@ -133,7 +133,6 @@ public class VurderSorteringTask implements ProsessTaskHandler {
     private void opprettSorteringTask(String hendelseId, InngåendeHendelse inngåendeHendelse, HendelserDataWrapper dataWrapper) {
         HendelserDataWrapper grovsorteringTask = dataWrapper.nesteSteg(TaskType.forProsessTask(SorterHendelseTask.class));
         grovsorteringTask.setHendelseId(hendelseId);
-        grovsorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
         grovsorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
         prosessTaskTjeneste.lagre(grovsorteringTask.getProsessTaskData());
         hendelseRepository.oppdaterHåndtertStatus(inngåendeHendelse, HåndtertStatusType.SENDT_TIL_SORTERING);
@@ -146,7 +145,6 @@ public class VurderSorteringTask implements ProsessTaskHandler {
             inngåendeHendelse.getHendelseType().getKode(), hendelsePayload.getHendelseOpprettetTid(), nesteKjøringEtter);
         hendelseRepository.oppdaterHåndteresEtterTidspunkt(inngåendeHendelse, nesteKjøringEtter);
         HendelserDataWrapper vurderSorteringTask = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
         vurderSorteringTask.setHendelseId(hendelsePayload.getHendelseId());
         vurderSorteringTask.setNesteKjøringEtter(nesteKjøringEtter);
         vurderSorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());

@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.abonnent.web.app.exceptions.ConstraintViolationMapp
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.GeneralRestExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.abonnent.web.app.exceptions.JsonParseExceptionMapper;
+import no.nav.foreldrepenger.abonnent.web.app.forvaltning.ForvaltningRestTjeneste;
 import no.nav.foreldrepenger.abonnent.web.app.jackson.JacksonJsonConfig;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.vedtak.exception.TekniskException;
@@ -54,7 +55,10 @@ public class ApiConfig extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<>();
         // Autentisering
-        classes.add(AuthFilter.class);
+        classes.add(AuthenticationFilter.class);
+
+        // midlertidig migrering
+        classes.add(ForvaltningRestTjeneste.class);
 
         // eksponert grensesnitt
         classes.add(ProsessTaskRestTjeneste.class);

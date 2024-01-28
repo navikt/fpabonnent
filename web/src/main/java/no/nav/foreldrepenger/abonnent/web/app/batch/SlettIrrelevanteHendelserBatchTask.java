@@ -1,11 +1,10 @@
 package no.nav.foreldrepenger.abonnent.web.app.batch;
 
-import jakarta.enterprise.context.Dependent;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -29,6 +28,7 @@ public class SlettIrrelevanteHendelserBatchTask implements ProsessTaskHandler {
         var slettet = hendelseRepository.slettIrrelevanteHendelser();
         LOG.info("Slettet {} hendelser som ikke ble sendt til fpsak.", slettet);
         slettet = hendelseRepository.slettGamleHendelser();
+        slettet += hendelseRepository.slettGamleHendelser2();
         LOG.info("Slettet {} hendelser som er foreldet.", slettet);
     }
 }

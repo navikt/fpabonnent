@@ -1,11 +1,10 @@
 package no.nav.foreldrepenger.abonnent.felles.task;
 
-import jakarta.enterprise.context.Dependent;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelserKlient;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.AbonnentHendelserFeil;
@@ -40,10 +39,10 @@ public class SendHendelseTask implements ProsessTaskHandler {
     }
 
     private HendelsePayload getHendelsePayload(HendelserDataWrapper dataWrapper) {
-        Long inngåendeHendelseId = dataWrapper.getInngåendeHendelseId()
+        var inngåendeHendelseId = dataWrapper.getHendelseId()
             .orElseThrow(() -> AbonnentHendelserFeil.manglerInngåendeHendelseIdPåProsesstask(dataWrapper.getProsessTaskData().getTaskType(),
                 dataWrapper.getProsessTaskData().getId()));
-        var inngåendeHendelse = inngåendeHendelseTjeneste.finnEksaktHendelse(inngåendeHendelseId);
+        var inngåendeHendelse = inngåendeHendelseTjeneste.finnHendelse(inngåendeHendelseId, dataWrapper.getHendelseKilde().orElseThrow());
         return inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
     }
 }
