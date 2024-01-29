@@ -12,11 +12,11 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 public record MigreringHendelseDto(@Valid @Size List<HendelseDto> hendelser) {
 
     public record HendelseDto(@Valid HendelseType type,
-                              @Size @Pattern(regexp = "^[\\p{Alnum}_.\\-]*$") String payload,
+                              @Size @Pattern(regexp = "^[\\p{P}\\p{L}\\p{N}\\p{Alnum}\\p{Punct}\\p{Space}\\\\_.\\-]*$") String payload,
                               LocalDateTime haandteresEtter,
                               @Valid HåndtertStatusType haandtertStatus,
                               LocalDateTime sendtTid,
-                              @Size @Pattern(regexp = "^[\\p{Alnum}_.\\-]*$") String hendelseId,
-                              @Size @Pattern(regexp = "^[\\p{Alnum}_.\\-]*$") String tidligereHendelseId) {}
+                              @Size @Pattern(regexp = "^[\\p{P}\\p{L}\\p{N}\\p{Alnum}\\p{Punct}\\p{Space}_.\\-]*$") String hendelseId,
+                              @Size @Pattern(regexp = "^[\\p{P}\\p{L}\\p{N}\\p{Alnum}\\p{Punct}\\p{Space}_.\\-]*$") String tidligereHendelseId) {}
 }
 
