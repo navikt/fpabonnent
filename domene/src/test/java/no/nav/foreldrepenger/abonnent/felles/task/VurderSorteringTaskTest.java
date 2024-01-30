@@ -14,8 +14,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.abonnent.extensions.JpaExtension;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
@@ -91,10 +90,9 @@ class VurderSorteringTaskTest {
         when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of(new AktørId(AKTØR_ID_MOR), new AktørId(AKTØR_ID_FAR)));
 
         var inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now());
-        hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
+        hendelseRepository.lagreFlushInngåendeHendelse(inngåendeHendelse);
         var vurderSorteringTask = ProsessTaskData.forProsessTask(VurderSorteringTask.class);
         var hendelserDataWrapper = new HendelserDataWrapper(vurderSorteringTask);
-        hendelserDataWrapper.setInngåendeHendelseId(inngåendeHendelse.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         hendelserDataWrapper.setHendelseId(HENDELSE_ID);
 
@@ -114,7 +112,6 @@ class VurderSorteringTaskTest {
         assertThat(sorterHendelseTask.taskType()).isEqualTo(TaskType.forProsessTask(SorterHendelseTask.class));
         assertThat(sorterHendelseTask.getSekvens()).isEqualTo("2");
         assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
-        assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
         assertThat(sorterHendelseTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
     }
 
@@ -125,9 +122,8 @@ class VurderSorteringTaskTest {
         when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of());
 
         var inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now());
-        hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
+        hendelseRepository.lagreFlushInngåendeHendelse(inngåendeHendelse);
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(inngåendeHendelse.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         hendelserDataWrapper.setHendelseId(HENDELSE_ID);
 
@@ -141,7 +137,6 @@ class VurderSorteringTaskTest {
         var vurderSorteringTask = taskCaptor.getValue();
         assertThat(vurderSorteringTask.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
-        assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isEqualTo(inngåendeHendelse.getId().toString());
         assertThat(vurderSorteringTask.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         assertThat(vurderSorteringTask.getNesteKjøringEtter().toLocalDate()).isEqualTo(
             forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime.now(), inngåendeHendelse).toLocalDate());
@@ -157,9 +152,8 @@ class VurderSorteringTaskTest {
         when(foreldreTjeneste.hentForeldre(any(PersonIdent.class))).thenReturn(Set.of());
 
         var inngåendeHendelse = opprettInngåendeHendelse(LocalDateTime.now().minusDays(8));
-        hendelseRepository.lagreInngåendeHendelse(inngåendeHendelse);
+        hendelseRepository.lagreFlushInngåendeHendelse(inngåendeHendelse);
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(inngåendeHendelse.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         hendelserDataWrapper.setHendelseId(HENDELSE_ID);
 
@@ -191,7 +185,6 @@ class VurderSorteringTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseOpprettet);
 
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         hendelserDataWrapper.setHendelseId("A");
 
@@ -234,7 +227,6 @@ class VurderSorteringTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert1);
 
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         hendelserDataWrapper.setHendelseId("A");
 
@@ -277,7 +269,6 @@ class VurderSorteringTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseAnnullert);
 
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseOpprettet.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_OPPRETTET.getKode());
         hendelserDataWrapper.setHendelseId("A");
 
@@ -333,7 +324,6 @@ class VurderSorteringTaskTest {
 
         var vurderSorteringTask = ProsessTaskData.forProsessTask(VurderSorteringTask.class);
         var hendelserDataWrapper = new HendelserDataWrapper(vurderSorteringTask);
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert2.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
         hendelserDataWrapper.setHendelseId("C");
 
@@ -380,7 +370,6 @@ class VurderSorteringTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
         hendelserDataWrapper.setHendelseId("B");
 
@@ -433,7 +422,6 @@ class VurderSorteringTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert2);
 
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert2.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
         hendelserDataWrapper.setHendelseId("C");
 
@@ -467,7 +455,6 @@ class VurderSorteringTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
         hendelserDataWrapper.setHendelseId("B");
 
@@ -504,7 +491,6 @@ class VurderSorteringTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_DØD_ANNULLERT.getKode());
         hendelserDataWrapper.setHendelseId("B");
 
@@ -547,7 +533,6 @@ class VurderSorteringTaskTest {
         hendelseRepository.lagreFlushInngåendeHendelse(hendelseKorrigert);
 
         var hendelserDataWrapper = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        hendelserDataWrapper.setInngåendeHendelseId(hendelseKorrigert.getId());
         hendelserDataWrapper.setHendelseType(HendelseType.PDL_FØDSEL_KORRIGERT.getKode());
         hendelserDataWrapper.setHendelseId("B");
 
@@ -576,6 +561,8 @@ class VurderSorteringTaskTest {
         return InngåendeHendelse.builder()
             .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
             .håndtertStatus(HåndtertStatusType.MOTTATT)
+            .hendelseId(HENDELSE_ID)
+            .hendelseKilde(HendelseKilde.PDL)
             .payload(DefaultJsonMapper.toJson(pdlFødsel.build()))
             .build();
     }

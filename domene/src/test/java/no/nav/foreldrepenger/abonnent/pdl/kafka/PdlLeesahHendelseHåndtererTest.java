@@ -94,7 +94,6 @@ class PdlLeesahHendelseHåndtererTest {
 
         var prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
             forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
@@ -131,7 +130,6 @@ class PdlLeesahHendelseHåndtererTest {
 
         var prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
             forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());
@@ -168,7 +166,6 @@ class PdlLeesahHendelseHåndtererTest {
 
         var prosessTaskData = taskCaptor.getValue();
         assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(VurderSorteringTask.class));
-        assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.INNGÅENDE_HENDELSE_ID)).isNotNull();
         assertThat(prosessTaskData.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo("ABC");
         assertThat(prosessTaskData.getNesteKjøringEtter().toLocalDate()).isEqualTo(
             forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(inngåendeHendelse).toLocalDate());

@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
@@ -29,8 +28,8 @@ public class InngåendeHendelseTjeneste {
         this.hendelseTjenesteProvider = hendelseTjenesteProvider;
     }
 
-    public InngåendeHendelse finnEksaktHendelse(Long inngåendeHendelseId) {
-        return repo.finnEksaktHendelse(inngåendeHendelseId);
+    public InngåendeHendelse finnHendelse(String hendelseId, HendelseKilde hendelseKilde) {
+        return repo.finnHendelseFraIdHvisFinnes(hendelseId, hendelseKilde).orElseThrow();
     }
 
     public Optional<InngåendeHendelse> finnHendelseSomErSendtTilSortering(String hendelseId) {

@@ -8,14 +8,13 @@ import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.UTFLY
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
@@ -179,7 +178,6 @@ public class PdlLeesahHendelseHåndterer {
 
     private void opprettVurderSorteringTask(InngåendeHendelse inngåendeHendelse, LocalDateTime håndteresEtterTidspunkt) {
         var vurderSorteringTask = new HendelserDataWrapper(ProsessTaskData.forProsessTask(VurderSorteringTask.class));
-        vurderSorteringTask.setInngåendeHendelseId(inngåendeHendelse.getId());
         vurderSorteringTask.setHendelseId(inngåendeHendelse.getHendelseId());
         vurderSorteringTask.setNesteKjøringEtter(håndteresEtterTidspunkt);
         vurderSorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());

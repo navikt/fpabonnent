@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
@@ -86,7 +85,7 @@ public class HendelseRepository {
         } else if (resultater.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(resultater.get(0));
+        return Optional.of(resultater.getFirst());
     }
 
     public void lagreInngåendeHendelse(InngåendeHendelse inngåendeHendelse) {
@@ -135,7 +134,7 @@ public class HendelseRepository {
                     hendelseId, HåndtertStatusType.GROVSORTERT)).getMessage());
             return Optional.empty();
         }
-        return Optional.of(resultater.get(0));
+        return Optional.of(resultater.getFirst());
     }
 
     public int slettIrrelevanteHendelser() {
@@ -156,9 +155,27 @@ public class HendelseRepository {
         int deletedRows = entityManager.createNativeQuery(
                 "DELETE FROM INNGAAENDE_HENDELSE WHERE sendt_tid < :foreldet and haandtert_status = :handtert")
             .setParameter("handtert", HåndtertStatusType.HÅNDTERT.getKode())
-            .setParameter("foreldet", LocalDateTime.now().minusWeeks(13))
+            .setParameter("foreldet", LocalDateTime.now().minusWeeks(10))
             .executeUpdate();
         entityManager.flush();
         return deletedRows;
+    }
+
+    public int slettGamleHendelser2() {
+        // Kan justeres ned til mellom 0 dager og 60 dager - avhengig av behov for feilsøking.
+        // 1/3 av endringer kommer samme dag, 2/3 innen 1 uke og 85-90% innen 30 dager
+        // Logikken ser kun på tilfelle der tidligere hendelse ikke er håndtert
+        // Dersom det ikke er behov for feilsøking: Kan slette alle som er håndtert (slå sammen med slettIrrelevanteHendelser)
+        int deletedRows = entityManager.createNativeQuery(
+                "DELETE FROM INNGAAENDE_HENDELSE WHERE sendt_tid is null and opprettet_tid < :foreldet and haandtert_status = :handtert")
+            .setParameter("handtert", HåndtertStatusType.HÅNDTERT.getKode())
+            .setParameter("foreldet", LocalDateTime.now().minusWeeks(10))
+            .executeUpdate();
+        entityManager.flush();
+        return deletedRows;
+    }
+
+    public List<InngåendeHendelse> hentAlleInngåendeHendelser() {
+        return entityManager.createQuery("from InngåendeHendelse", InngåendeHendelse.class).getResultList();
     }
 }
