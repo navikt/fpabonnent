@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.abonnent.web.app.forvaltning;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.util.function.Function;
 
@@ -25,6 +26,7 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
@@ -73,6 +75,28 @@ public class ForvaltningRestTjeneste {
             throw new IllegalArgumentException("Valideringsfeil; " + allErrors);
         }
         return Response.ok(respons).build();
+    }
+
+    @GET
+    @Consumes(TEXT_PLAIN)
+    @Produces(TEXT_PLAIN)
+    @Operation(description = "Leser ut hendelser som skal migreres i text", tags = "Forvaltning",
+        summary = ("Leser ut hendelser som skal migreres i text"),
+        responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
+    @Path("/lesHendelserPlain")
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    public Response lesHendelserPlain() {
+        var hendelser = hendelseRepository.hentAlleInngåendeHendelser().stream()
+            .map(MigreringMapper::tilHendelseDto)
+            .toList();
+        var respons = new MigreringHendelseDto(hendelser);
+        var violations = validator.validate(respons);
+        if (!violations.isEmpty()) {
+            var allErrors = violations.stream().map(it -> it.getPropertyPath().toString() + " :: " + it.getMessage()).toList();
+            throw new IllegalArgumentException("Valideringsfeil; " + allErrors);
+        }
+        var responsTxt = DefaultJsonMapper.toJson(respons);
+        return Response.ok(responsTxt).build();
     }
 
     @POST
