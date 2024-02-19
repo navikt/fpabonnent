@@ -34,7 +34,7 @@
         <!-- Eksterne -->
         <avro.version>1.11.3</avro.version>
 
-        <confluent.version>7.5.3</confluent.version>
+        <confluent.version>7.6.0</confluent.version>
     </properties>
 
     <dependencyManagement>
@@ -126,7 +126,7 @@
             <dependency>
                 <artifactId>commons-compress</artifactId>
                 <groupId>org.apache.commons</groupId>
-                <version>1.25.0</version>
+                <version>1.26.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.avro</groupId>
