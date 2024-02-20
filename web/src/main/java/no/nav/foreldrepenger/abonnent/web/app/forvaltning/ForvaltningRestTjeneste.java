@@ -3,7 +3,9 @@ package no.nav.foreldrepenger.abonnent.web.app.forvaltning;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 
+import java.util.HashSet;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -100,6 +102,24 @@ public class ForvaltningRestTjeneste {
     }
 
     @POST
+    @Operation(description = "Sammenlign hendelser som skal migreres", tags = "Forvaltning",
+        summary = ("Sammenlign hendelser som skal migreres"),
+        responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
+    @Path("/sammenlignHendelser")
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    public Response sammenlignHendelser(@TilpassetAbacAttributt(supplierClass = MigreringAbacSupplier.class)
+                                   @NotNull @Parameter(name = "hendelser") @Valid MigreringHendelseDto hendelser) {
+        var rmap = hendelser.hendelser().stream()
+            .map(MigreringMapper::fraHendelseDto)
+            .toList();
+        var lokale = hendelseRepository.hentAlleInngåendeHendelser().stream()
+            .map(MigreringMapper::tilHendelseDto)
+            .collect(Collectors.toSet());
+        var remote = new HashSet<>(hendelser.hendelser());
+        return lokale.size() == remote.size() && lokale.containsAll(remote) ? Response.ok().build() : Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @POST
     @Operation(description = "Lagrer hendelser som skal migreres", tags = "Forvaltning",
         summary = ("Lagre hendelser som skal migreres"),
         responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
@@ -125,6 +145,26 @@ public class ForvaltningRestTjeneste {
             .map(MigreringMapper::fraProsesstaskDto)
             .forEach(t -> taskTjeneste.lagre(t));
         return Response.ok().build();
+    }
+
+    @POST
+    @Operation(description = "Sammenlign tasks som skal migreres", tags = "Forvaltning",
+        summary = ("Sammenlign tasks som skal migreres"),
+        responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
+    @Path("/sammenlignTasks")
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    public Response sammenlignTasks(@TilpassetAbacAttributt(supplierClass = MigreringAbacSupplier.class)
+                                        @NotNull @Parameter(name = "tasks") @Valid MigreringProsesstaskDto tasks) {
+        var rmap = tasks.tasks().stream()
+            .map(MigreringMapper::fraProsesstaskDto)
+            .toList();
+        var vurderSortering = TaskType.forProsessTask(VurderSorteringTask.class);
+        var lokale = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream()
+            .filter(t -> vurderSortering.equals(t.taskType()))
+            .map(MigreringMapper::tilProsesstaskDto)
+            .collect(Collectors.toSet());
+        var remote = new HashSet<>(tasks.tasks());
+        return lokale.size() == remote.size() && lokale.containsAll(remote) ? Response.ok().build() : Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @GET
