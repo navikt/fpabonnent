@@ -4,11 +4,6 @@ import static org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler.St
 
 import java.time.Duration;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
-import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
-
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
@@ -16,13 +11,14 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.felles.integrasjon.kafka.KafkaProperties;
-import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
-public class PdlLeesahHendelseStream implements LiveAndReadinessAware, Controllable {
+public class PdlLeesahHendelseStream { //implements LiveAndReadinessAware, Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseStream.class);
 
@@ -52,24 +48,24 @@ public class PdlLeesahHendelseStream implements LiveAndReadinessAware, Controlla
         return new KafkaStreams(builder.build(), KafkaProperties.forStreamsGenericValue(APPLICATION_ID, topic.serdeValue()));
     }
 
-    @Override
+    //@Override
     public boolean isAlive() {
         return (stream != null) && stream.state().isRunningOrRebalancing();
     }
 
-    @Override
+    //@Override
     public boolean isReady() {
         return isAlive();
     }
 
-    @Override
+    //@Override
     public void start() {
         addShutdownHooks();
         stream.start();
         LOG.info("Starter konsumering av topic={}, tilstand={}", getTopicName(), stream.state());
     }
 
-    @Override
+    //@Override
     public void stop() {
         if (stream != null) {
             LOG.info("Starter shutdown av topic={}, tilstand={} med 10 sekunder timeout", getTopicName(), stream.state());

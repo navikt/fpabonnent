@@ -28,15 +28,24 @@ record Topic<K, V>(String topic, Serde<K> serdeKey, Serde<V> serdeValue) {
     @SuppressWarnings("resource")
     static Topic<String, Personhendelse> createConfiguredTopic(String topicName) {
         var configuredTopic = new Topic<>(topicName, Serdes.String(), getSerde());
-        var schemaRegistryUrl = KafkaProperties.getAvroSchemaRegistryURL();
-        if (schemaRegistryUrl != null && !schemaRegistryUrl.isEmpty()) {
-            var schemaMap = Map.of(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl,
-                AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO", AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG,
-                KafkaProperties.getAvroSchemaRegistryBasicAuth(), SPECIFIC_AVRO_READER_CONFIG, true);
+        var schemaMap = getSchemaMap();
+        if (!schemaMap.isEmpty()) {
             configuredTopic.serdeKey().configure(schemaMap, true);
             configuredTopic.serdeValue().configure(schemaMap, false);
         }
         return configuredTopic;
+    }
+
+    static Map<String, Object> getSchemaMap() {
+        var schemaRegistryUrl = KafkaProperties.getAvroSchemaRegistryURL();
+        if (schemaRegistryUrl != null && !schemaRegistryUrl.isEmpty()) {
+            return Map.of(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl,
+                AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO",
+                AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, KafkaProperties.getAvroSchemaRegistryBasicAuth(),
+                SPECIFIC_AVRO_READER_CONFIG, true);
+        } else {
+            return Map.of();
+        }
     }
 
     private static Serde<Personhendelse> getSerde() {
