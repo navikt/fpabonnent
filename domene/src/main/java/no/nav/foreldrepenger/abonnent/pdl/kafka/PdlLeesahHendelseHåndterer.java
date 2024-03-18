@@ -7,10 +7,14 @@ import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.UTFLY
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.function.Supplier;
 
+import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.confluent.kafka.streams.serdes.avro.SpecificAvroDeserializer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.inject.Inject;
@@ -22,7 +26,10 @@ import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.task.VurderSorteringTask;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
+import no.nav.foreldrepenger.abonnent.pdl.kafka.test.VtpKafkaAvroSerde;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
+import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -32,14 +39,16 @@ import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 @Transactional
 @ActivateRequestContext
 @ApplicationScoped
-public class PdlLeesahHendelseHåndterer {
+public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, Personhendelse> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseHåndterer.class);
+    private static final Environment ENV = Environment.current();
 
     private HendelseRepository hendelseRepository;
     private PdlLeesahOversetter oversetter;
     private ProsessTaskTjeneste prosessTaskTjeneste;
     private ForsinkelseTjeneste forsinkelseTjeneste;
+    private String topicName;
 
     PdlLeesahHendelseHåndterer() {
         // CDI
@@ -49,12 +58,20 @@ public class PdlLeesahHendelseHåndterer {
     public PdlLeesahHendelseHåndterer(HendelseRepository hendelseRepository,
                                       PdlLeesahOversetter pdlLeesahOversetter,
                                       ProsessTaskTjeneste prosessTaskTjeneste,
-                                      ForsinkelseTjeneste forsinkelseTjeneste) {
+                                      ForsinkelseTjeneste forsinkelseTjeneste,
+                                      @KonfigVerdi(value = "kafka.pdl.leesah.topic") String topicName) {
         this.hendelseRepository = hendelseRepository;
         this.oversetter = pdlLeesahOversetter;
         this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.forsinkelseTjeneste = forsinkelseTjeneste;
+        this.topicName = topicName;
     }
+
+    @Override
+    public void handleRecord(String key, Personhendelse value) {
+        handleMessage(key, value);
+    }
+
 
     @SuppressWarnings("unused")
     void handleMessage(String key, Personhendelse payload) { // key er spesialtegn + aktørId, som også finnes i payload
@@ -182,5 +199,45 @@ public class PdlLeesahHendelseHåndterer {
         vurderSorteringTask.setNesteKjøringEtter(håndteresEtterTidspunkt);
         vurderSorteringTask.setHendelseType(inngåendeHendelse.getHendelseType().getKode());
         prosessTaskTjeneste.lagre(vurderSorteringTask.getProsessTaskData());
+    }
+
+
+    // Configuration
+    @Override
+    public String topic() {
+        return topicName;
+    }
+
+    @Override
+    public String groupId() { // Keep stable (or it will read from autoOffsetReset()
+        return "fpabonnent";
+    }
+    @Override
+    public String autoOffsetReset() {
+        return "latest";
+    }
+
+    @Override
+    public Supplier<Deserializer<String>> keyDeserializer() {
+        return () -> {
+            var smap = Topic.getSchemaMap();
+            var s = new StringDeserializer();
+            s.configure(smap, true);
+            return s;
+        };
+    }
+
+    @Override
+    public Supplier<Deserializer<Personhendelse>> valueDeserializer() {
+        return () -> {
+            var smap = Topic.getSchemaMap();
+            var s = getDeserializer();
+            s.configure(smap, false);
+            return s;
+        };
+    }
+
+    private static Deserializer<Personhendelse> getDeserializer() {
+        return ENV.isProd() || ENV.isDev() ? new SpecificAvroDeserializer<>() : (new VtpKafkaAvroSerde<Personhendelse>()).deserializer();
     }
 }

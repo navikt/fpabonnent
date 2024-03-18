@@ -58,7 +58,7 @@ class PdlLeesahHendelseHåndtererTest {
         when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
         forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository, new DateUtil());
 
-        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskTjeneste, forsinkelseTjeneste);
+        hendelseHåndterer = new PdlLeesahHendelseHåndterer(hendelseRepository, new PdlLeesahOversetter(), prosessTaskTjeneste, forsinkelseTjeneste, "topic");
     }
 
     @Test
