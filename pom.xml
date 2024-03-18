@@ -43,12 +43,12 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
-                <version>3.7.0</version>
+                <version>7.6.0-ce</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-streams</artifactId>
-                <version>3.7.0</version>
+                <version>7.6.0-ce</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
@@ -137,7 +137,7 @@
             <dependency>
                 <artifactId>commons-compress</artifactId>
                 <groupId>org.apache.commons</groupId>
-                <version>1.26.0</version>
+                <version>1.26.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.avro</groupId>
