@@ -25,11 +25,11 @@
         <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>7.0.5</felles.version>
+        <felles.version>7.0.8</felles.version>
 
         <prosesstask.version>5.0.5</prosesstask.version>
 
-        <fp-kontrakter.version>9.1.4</fp-kontrakter.version>
+        <fp-kontrakter.version>9.1.8</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <avro.version>1.11.3</avro.version>
@@ -39,17 +39,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Kafka -->
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>3.7.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-streams</artifactId>
-                <version>3.7.0</version>
-            </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
@@ -133,12 +122,6 @@
             </dependency>
 
             <!-- Kafka -->
-            <!-- Fikser https://github.com/navikt/fpabonnent/security/dependabot/10 - kan fjernes om avro bumper selv. -->
-            <dependency>
-                <artifactId>commons-compress</artifactId>
-                <groupId>org.apache.commons</groupId>
-                <version>1.26.0</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
@@ -157,44 +140,8 @@
             </dependency>
             <dependency>
                 <groupId>io.confluent</groupId>
-                <artifactId>kafka-connect-avro-converter</artifactId>
-                <version>${confluent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.confluent</groupId>
                 <artifactId>kafka-avro-serializer</artifactId>
                 <version>${confluent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.confluent</groupId>
-                <artifactId>kafka-streams-avro-serde</artifactId>
-                <version>${confluent.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>io.swagger</groupId>
-                        <artifactId>swagger-annotations</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.hibernate.validator</groupId>
-                        <artifactId>hibernate-validator</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.sun.activation</groupId>
-                        <artifactId>jakarta.activation</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.checkerframework</groupId>
-                        <artifactId>checker-qual</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.glassfish.jersey.core</groupId>
-                        <artifactId>jersey-common</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_annotations</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.abonnent.pdl.kafka;
 
+import static io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØD;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØDFØDSEL;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FØDSEL;
@@ -7,6 +8,7 @@ import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.UTFLY
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.apache.kafka.common.serialization.Deserializer;
@@ -14,7 +16,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.confluent.kafka.streams.serdes.avro.SpecificAvroDeserializer;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.inject.Inject;
@@ -26,11 +28,13 @@ import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.task.VurderSorteringTask;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
-import no.nav.foreldrepenger.abonnent.pdl.kafka.test.VtpKafkaAvroSerde;
+import no.nav.foreldrepenger.abonnent.pdl.kafka.test.VtpKafkaAvroDeserializer;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.person.pdl.leesah.Personhendelse;
+import no.nav.vedtak.felles.integrasjon.kafka.KafkaMessageHandler;
+import no.nav.vedtak.felles.integrasjon.kafka.KafkaProperties;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.mdc.MDCOperations;
@@ -43,6 +47,7 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseHåndterer.class);
     private static final Environment ENV = Environment.current();
+    private static final Map<String, Object> SCHEMA_MAP = getSchemaMap();
 
     private HendelseRepository hendelseRepository;
     private PdlLeesahOversetter oversetter;
@@ -202,7 +207,6 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
     }
 
 
-    // Configuration
     @Override
     public String topic() {
         return topicName;
@@ -212,17 +216,12 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
     public String groupId() { // Keep stable (or it will read from autoOffsetReset()
         return "fpabonnent";
     }
-    @Override
-    public String autoOffsetReset() {
-        return "latest";
-    }
 
     @Override
     public Supplier<Deserializer<String>> keyDeserializer() {
         return () -> {
-            var smap = Topic.getSchemaMap();
             var s = new StringDeserializer();
-            s.configure(smap, true);
+            s.configure(SCHEMA_MAP, true);
             return s;
         };
     }
@@ -230,14 +229,25 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
     @Override
     public Supplier<Deserializer<Personhendelse>> valueDeserializer() {
         return () -> {
-            var smap = Topic.getSchemaMap();
             var s = getDeserializer();
-            s.configure(smap, false);
+            s.configure(SCHEMA_MAP, false);
             return s;
         };
     }
 
     private static Deserializer<Personhendelse> getDeserializer() {
-        return ENV.isProd() || ENV.isDev() ? new SpecificAvroDeserializer<>() : (new VtpKafkaAvroSerde<Personhendelse>()).deserializer();
+        return ENV.isProd() || ENV.isDev() ? new WrappedAvroDeserializer<>() : new WrappedAvroDeserializer<>(new VtpKafkaAvroDeserializer());
+    }
+
+    private static Map<String, Object> getSchemaMap() {
+        var schemaRegistryUrl = KafkaProperties.getAvroSchemaRegistryURL();
+        if (schemaRegistryUrl != null && !schemaRegistryUrl.isEmpty()) {
+            return Map.of(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl,
+                AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO",
+                AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, KafkaProperties.getAvroSchemaRegistryBasicAuth(),
+                SPECIFIC_AVRO_READER_CONFIG, true);
+        } else {
+            return Map.of();
+        }
     }
 }
