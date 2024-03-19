@@ -8,21 +8,22 @@ import org.slf4j.LoggerFactory;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.person.pdl.leesah.Personhendelse;
+import no.nav.vedtak.felles.integrasjon.kafka.KafkaConsumerManager;
 import no.nav.vedtak.log.metrics.Controllable;
 import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
 
 @ApplicationScoped
-public class PdlLeesahHendelseConsumers implements LiveAndReadinessAware, Controllable {
+public class PdlLeesahHendelseConsumer implements LiveAndReadinessAware, Controllable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseConsumers.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahHendelseConsumer.class);
 
     private KafkaConsumerManager<String, Personhendelse> kcm;
 
-    PdlLeesahHendelseConsumers() {
+    PdlLeesahHendelseConsumer() {
     }
 
     @Inject
-    public PdlLeesahHendelseConsumers(PdlLeesahHendelseHåndterer håndterer) {
+    public PdlLeesahHendelseConsumer(PdlLeesahHendelseHåndterer håndterer) {
         this.kcm = new KafkaConsumerManager<>(List.of(håndterer));
     }
 
