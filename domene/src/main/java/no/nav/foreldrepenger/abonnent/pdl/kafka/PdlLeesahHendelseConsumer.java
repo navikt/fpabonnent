@@ -23,8 +23,9 @@ public class PdlLeesahHendelseConsumer implements LiveAndReadinessAware, Control
     }
 
     @Inject
-    public PdlLeesahHendelseConsumer(PdlLeesahHendelseHåndterer håndterer) {
-        this.kcm = new KafkaConsumerManager<>(List.of(håndterer));
+    public PdlLeesahHendelseConsumer(
+        PdlLeesahHendelseHåndterer håndterer) {
+        this.kcm = new KafkaConsumerManager<>(håndterer);
     }
 
     @Override
