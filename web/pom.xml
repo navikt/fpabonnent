@@ -65,6 +65,10 @@
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
+        </dependency>
 
 		<!-- Database -->
 		<dependency>
@@ -87,28 +91,6 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-micrometer</artifactId>
         </dependency>
-
-		<!-- Metrics, helse- og selftest -->
-		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient_dropwizard</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient_servlet</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient_hotspot</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient_common</artifactId>
-		</dependency>
 
 		<!-- Swagger -->
 		<dependency>
