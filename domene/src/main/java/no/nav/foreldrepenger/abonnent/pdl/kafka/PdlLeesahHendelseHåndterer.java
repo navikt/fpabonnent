@@ -10,6 +10,7 @@ import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.UTFLY
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.apache.kafka.common.serialization.Deserializer;
@@ -23,6 +24,7 @@ import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
@@ -113,7 +115,10 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
             loggMottakUtenDato(payload, "fødsel");
         }
         var pdlFødsel = oversetter.oversettFødsel(payload);
-        prosesserHendelseVidereHvisRelevant(pdlFødsel);
+        // Må håndtere korrigerte og annullerte hendelser et par dager framover
+        if (!HendelseType.PDL_FØDSEL_OPPRETTET.equals(pdlFødsel.getHendelseType())) {
+            prosesserHendelseVidereHvisRelevant(pdlFødsel);
+        }
     }
 
     private void håndterFødselsdato(Personhendelse payload) {
@@ -123,8 +128,12 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
         } else {
             loggMottakUtenDato(payload, "fødsel dato");
         }
-        //var pdlFødsel = oversetter.oversettFødsel(payload);
-        //prosesserHendelseVidereHvisRelevant(pdlFødsel);
+        var pdlFødsel = oversetter.oversettFødselsdato(payload);
+        var tidligere = Optional.ofNullable(pdlFødsel.getTidligereHendelseId())
+            .flatMap(th -> hendelseRepository.finnHendelseFraIdHvisFinnes(th, HendelseKilde.PDL));
+        if (HendelseType.PDL_FØDSEL_OPPRETTET.equals(pdlFødsel.getHendelseType()) || tidligere.isPresent()) {
+            prosesserHendelseVidereHvisRelevant(pdlFødsel);
+        }
     }
 
     private void håndterDødsfall(Personhendelse payload) {
