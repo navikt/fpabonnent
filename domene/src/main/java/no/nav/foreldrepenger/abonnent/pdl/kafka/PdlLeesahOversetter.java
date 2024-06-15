@@ -23,6 +23,7 @@ public class PdlLeesahOversetter {
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahOversetter.class);
 
     public static final String FØDSEL = "FOEDSEL_V1";
+    public static final String FØDSELSDATO = "FOEDSELSDATO_V1";
     public static final String DØD = "DOEDSFALL_V1";
     public static final String DØDFØDSEL = "DOEDFOEDT_BARN_V1";
     public static final String UTFLYTTING = "UTFLYTTING_FRA_NORGE";
