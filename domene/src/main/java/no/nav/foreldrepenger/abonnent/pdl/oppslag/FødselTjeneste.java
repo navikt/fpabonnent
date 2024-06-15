@@ -8,10 +8,9 @@ import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
-import no.nav.pdl.Foedsel;
-import no.nav.pdl.FoedselResponseProjection;
+import no.nav.pdl.Foedselsdato;
+import no.nav.pdl.FoedselsdatoResponseProjection;
 import no.nav.pdl.ForelderBarnRelasjon;
 import no.nav.pdl.ForelderBarnRelasjonResponseProjection;
 import no.nav.pdl.ForelderBarnRelasjonRolle;
@@ -54,12 +53,12 @@ public class FødselTjeneste {
         var request = new HentPersonQueryRequest();
         request.setIdent(barn.getIdent());
         var projection = new PersonResponseProjection()
-            .foedsel(new FoedselResponseProjection().foedselsdato());
+            .foedselsdato(new FoedselsdatoResponseProjection().foedselsdato());
 
         var person = pdlKlient.hentPerson(request, projection);
 
-        return person.getFoedsel().stream()
-            .map(Foedsel::getFoedselsdato)
+        return person.getFoedselsdato().stream()
+            .map(Foedselsdato::getFoedselsdato)
             .filter(Objects::nonNull)
             .findFirst()
             .map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE));
