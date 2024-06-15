@@ -4,6 +4,7 @@ import static io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFI
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØD;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØDFØDSEL;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FØDSEL;
+import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FØDSELSDATO;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.UTFLYTTING;
 
 import java.time.LocalDate;
@@ -93,6 +94,8 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
 
         if (FØDSEL.contentEquals(payload.getOpplysningstype())) {
             håndterFødsel(payload);
+        } else if (FØDSELSDATO.contentEquals(payload.getOpplysningstype())) {
+            håndterFødselsdato(payload);
         } else if (DØD.contentEquals(payload.getOpplysningstype())) {
             håndterDødsfall(payload);
         } else if (DØDFØDSEL.contentEquals(payload.getOpplysningstype())) {
@@ -111,6 +114,17 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
         }
         var pdlFødsel = oversetter.oversettFødsel(payload);
         prosesserHendelseVidereHvisRelevant(pdlFødsel);
+    }
+
+    private void håndterFødselsdato(Personhendelse payload) {
+        var foedselsdato = payload.getFoedselsdato();
+        if (foedselsdato != null) {
+            loggMottakMedDato(payload, "fødsel dato", "fødselsdato", foedselsdato.getFoedselsdato());
+        } else {
+            loggMottakUtenDato(payload, "fødsel dato");
+        }
+        //var pdlFødsel = oversetter.oversettFødsel(payload);
+        //prosesserHendelseVidereHvisRelevant(pdlFødsel);
     }
 
     private void håndterDødsfall(Personhendelse payload) {
