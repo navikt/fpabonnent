@@ -3,12 +3,14 @@ package no.nav.foreldrepenger.abonnent.pdl.kafka;
 import static io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØD;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØDFØDSEL;
+import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FØDSEL;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FØDSELSDATO;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.UTFLYTTING;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.apache.kafka.common.serialization.Deserializer;
@@ -22,6 +24,7 @@ import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
@@ -91,7 +94,9 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
             return;
         }
 
-        if (FØDSELSDATO.contentEquals(payload.getOpplysningstype())) {
+        if (FØDSEL.contentEquals(payload.getOpplysningstype())) {
+            håndterFødsel(payload);
+        } else if (FØDSELSDATO.contentEquals(payload.getOpplysningstype())) {
             håndterFødselsdato(payload);
         } else if (DØD.contentEquals(payload.getOpplysningstype())) {
             håndterDødsfall(payload);
@@ -99,6 +104,20 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
             håndterDødfødtBarn(payload);
         } else if (UTFLYTTING.contentEquals(payload.getOpplysningstype())) {
             håndterUtflytting(payload);
+        }
+    }
+
+    private void håndterFødsel(Personhendelse payload) {
+        var foedsel = payload.getFoedsel();
+        if (foedsel != null) {
+            loggMottakMedDato(payload, "fødsel", "fødselsdato", foedsel.getFoedselsdato());
+        } else {
+            loggMottakUtenDato(payload, "fødsel");
+        }
+        var pdlFødsel = oversetter.oversettFødsel(payload);
+        // Må håndtere korrigerte og annullerte hendelser et par dager framover
+        if (!HendelseType.PDL_FØDSEL_OPPRETTET.equals(pdlFødsel.getHendelseType())) {
+            prosesserHendelseVidereHvisRelevant(pdlFødsel);
         }
     }
 
@@ -110,7 +129,11 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
             loggMottakUtenDato(payload, "fødsel dato");
         }
         var pdlFødsel = oversetter.oversettFødselsdato(payload);
-        prosesserHendelseVidereHvisRelevant(pdlFødsel);
+        var tidligere = Optional.ofNullable(pdlFødsel.getTidligereHendelseId())
+            .flatMap(th -> hendelseRepository.finnHendelseFraIdHvisFinnes(th, HendelseKilde.PDL));
+        if (HendelseType.PDL_FØDSEL_OPPRETTET.equals(pdlFødsel.getHendelseType()) || tidligere.isPresent()) {
+            prosesserHendelseVidereHvisRelevant(pdlFødsel);
+        }
     }
 
     private void håndterDødsfall(Personhendelse payload) {

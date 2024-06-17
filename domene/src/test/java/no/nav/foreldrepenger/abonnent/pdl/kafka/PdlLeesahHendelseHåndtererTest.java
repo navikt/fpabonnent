@@ -31,7 +31,7 @@ import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.person.pdl.leesah.Endringstype;
 import no.nav.person.pdl.leesah.Personhendelse;
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall;
-import no.nav.person.pdl.leesah.foedselsdato.Foedselsdato;
+import no.nav.person.pdl.leesah.foedsel.Foedsel;
 import no.nav.person.pdl.leesah.utflytting.UtflyttingFraNorge;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
@@ -144,7 +144,7 @@ class PdlLeesahHendelseHåndtererTest {
         payload.setPersonidenter(List.of("1111111111111", "22222222222"));
         payload.setMaster("Freg");
         payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
-        payload.setOpplysningstype("FOEDSELSDATO_V1");
+        payload.setOpplysningstype("FOEDSEL_V1");
         payload.setEndringstype(Endringstype.ANNULLERT);
         var hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
@@ -157,7 +157,7 @@ class PdlLeesahHendelseHåndtererTest {
         // Assert
         var inngåendeHendelse = hendelseCaptor.getValue();
         assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]",
-            "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSELSDATO_V1\"", "\"endringstype\":\"ANNULLERT\"",
+            "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"",
             "\"hendelseType\":\"PDL_FOEDSEL_ANNULLERT\"");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
@@ -180,11 +180,11 @@ class PdlLeesahHendelseHåndtererTest {
         payload.setPersonidenter(List.of("1111111111111", "22222222222"));
         payload.setMaster("Freg");
         payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
-        payload.setOpplysningstype("FOEDSELSDATO_V1");
+        payload.setOpplysningstype("FOEDSEL_V1");
         payload.setEndringstype(Endringstype.ANNULLERT);
-        var fødselsdato = new Foedselsdato();
+        var fødselsdato = new Foedsel();
         fødselsdato.setFoedselsdato(LocalDate.now().minusYears(20));
-        payload.setFoedselsdato(fødselsdato);
+        payload.setFoedsel(fødselsdato);
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
