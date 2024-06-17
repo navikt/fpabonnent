@@ -105,9 +105,9 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
     private void håndterFødselsdato(Personhendelse payload) {
         var foedselsdato = payload.getFoedselsdato();
         if (foedselsdato != null) {
-            loggMottakMedDato(payload, "fødsel dato", "fødselsdato", foedselsdato.getFoedselsdato());
+            loggMottakMedDato(payload, "fødselsdato", "fødselsdato", foedselsdato.getFoedselsdato());
         } else {
-            loggMottakUtenDato(payload, "fødsel dato");
+            loggMottakUtenDato(payload, "fødselsdato");
         }
         var pdlFødsel = oversetter.oversettFødselsdato(payload);
         prosesserHendelseVidereHvisRelevant(pdlFødsel);
