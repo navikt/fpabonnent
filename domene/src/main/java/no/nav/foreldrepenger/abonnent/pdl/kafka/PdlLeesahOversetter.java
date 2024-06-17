@@ -31,17 +31,6 @@ public class PdlLeesahOversetter {
         // CDI
     }
 
-    public PdlFødsel oversettFødsel(Personhendelse personhendelse) {
-        var builder = PdlFødsel.builder();
-        oversettPersonhendelse(personhendelse, builder);
-
-        if (personhendelse.getFoedsel() != null) {
-            builder.medFødselsdato(personhendelse.getFoedsel().getFoedselsdato());
-        }
-
-        return builder.build();
-    }
-
     public PdlFødsel oversettFødselsdato(Personhendelse personhendelse) {
         var builder = PdlFødsel.builder();
         oversettPersonhendelse(personhendelse, builder);
@@ -109,7 +98,7 @@ public class PdlLeesahOversetter {
             var endringstype = personhendelse.getEndringstype();
 
             switch (opplysningstype) {
-                case FØDSEL, FØDSELSDATO -> {
+                case FØDSELSDATO -> {
                     return switch (endringstype) {
                         case OPPRETTET -> HendelseType.PDL_FØDSEL_OPPRETTET;
                         case ANNULLERT -> HendelseType.PDL_FØDSEL_ANNULLERT;

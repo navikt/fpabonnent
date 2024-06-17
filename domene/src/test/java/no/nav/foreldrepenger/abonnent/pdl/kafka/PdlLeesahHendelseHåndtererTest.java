@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
+import no.nav.person.pdl.leesah.foedselsdato.Foedselsdato;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -144,7 +146,7 @@ class PdlLeesahHendelseHåndtererTest {
         payload.setPersonidenter(List.of("1111111111111", "22222222222"));
         payload.setMaster("Freg");
         payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
-        payload.setOpplysningstype("FOEDSEL_V1");
+        payload.setOpplysningstype("FOEDSELSDATO_V1");
         payload.setEndringstype(Endringstype.ANNULLERT);
         var hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
         doNothing().when(hendelseRepository).lagreInngåendeHendelse(hendelseCaptor.capture());
@@ -157,7 +159,7 @@ class PdlLeesahHendelseHåndtererTest {
         // Assert
         var inngåendeHendelse = hendelseCaptor.getValue();
         assertThat(inngåendeHendelse.getPayload()).contains("\"hendelseId\":\"ABC\"", "\"personidenter\":[\"1111111111111\",\"22222222222\"]",
-            "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSEL_V1\"", "\"endringstype\":\"ANNULLERT\"",
+            "\"master\":\"Freg\"", "\"opplysningstype\":\"FOEDSELSDATO_V1\"", "\"endringstype\":\"ANNULLERT\"",
             "\"hendelseType\":\"PDL_FOEDSEL_ANNULLERT\"");
         assertThat(inngåendeHendelse.getHendelseId()).isEqualTo("ABC");
         assertThat(inngåendeHendelse.getHåndtertStatus()).isEqualTo(HåndtertStatusType.MOTTATT);
@@ -180,11 +182,11 @@ class PdlLeesahHendelseHåndtererTest {
         payload.setPersonidenter(List.of("1111111111111", "22222222222"));
         payload.setMaster("Freg");
         payload.setOpprettet(OPPRETTET_TID.atZone(ZoneId.systemDefault()).toInstant());
-        payload.setOpplysningstype("FOEDSEL_V1");
+        payload.setOpplysningstype("FOEDSELSDATO_V1");
         payload.setEndringstype(Endringstype.ANNULLERT);
-        var fødselsdato = new Foedsel();
+        var fødselsdato = new Foedselsdato();
         fødselsdato.setFoedselsdato(LocalDate.now().minusYears(20));
-        payload.setFoedsel(fødselsdato);
+        payload.setFoedselsdato(fødselsdato);
 
         // Act
         hendelseHåndterer.handleMessage("", payload);
