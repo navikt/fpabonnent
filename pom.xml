@@ -25,7 +25,7 @@
         <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>7.2.5</felles.version>
+        <felles.version>7.2.6</felles.version>
 
         <prosesstask.version>5.0.15</prosesstask.version>
 
@@ -122,12 +122,6 @@
             </dependency>
 
             <!-- Kafka -->
-            <!-- Fikser https://github.com/navikt/fpabonnent/security/dependabot/10 - kan fjernes om avro bumper selv. -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-compress</artifactId>
-                <version>1.26.2</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
