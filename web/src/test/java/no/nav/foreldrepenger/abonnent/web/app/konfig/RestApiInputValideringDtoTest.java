@@ -1,10 +1,12 @@
 package no.nav.foreldrepenger.abonnent.web.app.konfig;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import jakarta.ws.rs.PathParam;
 import no.nav.foreldrepenger.abonnent.felles.domene.Kodeverdi;
 import no.nav.foreldrepenger.abonnent.web.app.IndexClasses;
 
@@ -42,8 +44,8 @@ class RestApiInputValideringDtoTest extends RestApiTester {
         validerRekursivt(validerteKlasser, dto, null);
     }
 
-    private static final Set<Class<? extends Object>> ALLOWED_ENUM_ANNOTATIONS = Set.of(JsonProperty.class, JsonValue.class, JsonIgnore.class,
-        Valid.class, Null.class, NotNull.class);
+    private static final Set<Class<? extends Object>> ALLOWED_ENUM_ANNOTATIONS = Set.of(JsonAlias.class, JsonProperty.class, JsonValue.class, JsonIgnore.class,
+        Valid.class, Null.class, NotNull.class, PathParam.class);
 
     @SuppressWarnings("rawtypes")
     private static final Map<Class, List<List<Class<? extends Annotation>>>> UNNTATT_FRA_VALIDERING = new HashMap<>() {

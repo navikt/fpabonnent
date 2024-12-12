@@ -1,11 +1,6 @@
 package no.nav.foreldrepenger.abonnent.web.app.tjenester;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
-import jakarta.enterprise.inject.Instance;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.vedtak.log.metrics.Controllable;
+import no.nav.vedtak.server.Controllable;
+
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationServiceStarterTest {
