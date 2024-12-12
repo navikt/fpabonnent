@@ -1,12 +1,13 @@
 package no.nav.foreldrepenger.abonnent.web.app.healthcheck;
 
-import io.swagger.v3.oas.annotations.Operation;
-import no.nav.foreldrepenger.abonnent.web.app.tjenester.ApplicationServiceStarter;
-import no.nav.vedtak.log.metrics.LivenessAware;
-import no.nav.vedtak.log.metrics.ReadinessAware;
+import static jakarta.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
@@ -15,9 +16,9 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Response;
-import java.util.List;
-
-import static jakarta.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
+import no.nav.foreldrepenger.abonnent.web.app.tjenester.ApplicationServiceStarter;
+import no.nav.vedtak.server.LivenessAware;
+import no.nav.vedtak.server.ReadinessAware;
 
 @Path("/health")
 @ApplicationScoped
