@@ -1,13 +1,14 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class AbonnentHendelserFeil {
 
     private AbonnentHendelserFeil() {
     }
 
-    public static TekniskException prosesstaskPreconditionManglerProperty(String taskname, String property, Long taskId) {
+    public static TekniskException prosesstaskPreconditionManglerProperty(TaskType taskname, String property, Long taskId) {
         return new TekniskException("FP-690327",
             String.format("Prosessering av preconditions for %s mangler %s. TaskId: %s", taskname, property, taskId));
     }
@@ -34,8 +35,8 @@ public class AbonnentHendelserFeil {
         return new TekniskException("FP-295374", String.format("Finner ikke unik aktørId. Fant %s aktørId på hendelseId=%s", antall, hendelseId));
     }
 
-    public static TekniskException manglerInngåendeHendelseIdPåProsesstask(String prosesstaskType, Long taskId) {
+    public static TekniskException manglerInngåendeHendelseIdPåProsesstask(TaskType prosesstaskType, Long taskId) {
         return new TekniskException("FP-144656",
-            String.format("InngåendeHendelse ID mangler på prosess task %s med TaskId=%s", prosesstaskType, taskId));
+            String.format("InngåendeHendelse ID mangler på %s med TaskId=%s", prosesstaskType, taskId));
     }
 }
