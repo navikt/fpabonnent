@@ -5,6 +5,7 @@ import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,6 +19,7 @@ class HendelserDataWrapperTest {
 
     @BeforeEach
     void setup() {
+        MDC.clear(); // av og til er callId satt i MDC og dette kan påvirke testene her om samme tråd gjenbrukes
         eksisterendeData = ProsessTaskData.forTaskType(PROSESSTASK_STEG1);
         wrapper = new HendelserDataWrapper(eksisterendeData);
     }
