@@ -65,7 +65,7 @@ public class ForvaltningRestTjeneste {
         summary = ("Leser ut hendelser som skal migreres"),
         responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
     @Path("/lesHendelser")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response lesHendelser() {
         var hendelser = hendelseRepository.hentAlleInngåendeHendelser().stream()
             .map(MigreringMapper::tilHendelseDto)
@@ -86,7 +86,7 @@ public class ForvaltningRestTjeneste {
         summary = ("Leser ut hendelser som skal migreres i text"),
         responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
     @Path("/lesHendelserPlain")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response lesHendelserPlain() {
         var hendelser = hendelseRepository.hentAlleInngåendeHendelser().stream()
             .map(MigreringMapper::tilHendelseDto)
@@ -106,7 +106,7 @@ public class ForvaltningRestTjeneste {
         summary = ("Sammenlign hendelser som skal migreres"),
         responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
     @Path("/sammenlignHendelser")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response sammenlignHendelser(@TilpassetAbacAttributt(supplierClass = MigreringAbacSupplier.class)
                                    @NotNull @Parameter(name = "hendelser") @Valid MigreringHendelseDto hendelser) {
         var rmap = hendelser.hendelser().stream()
@@ -124,7 +124,7 @@ public class ForvaltningRestTjeneste {
         summary = ("Lagre hendelser som skal migreres"),
         responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
     @Path("/lagreHendelser")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response lagreHendelser(@TilpassetAbacAttributt(supplierClass = MigreringAbacSupplier.class)
                                        @NotNull @Parameter(name = "hendelser") @Valid MigreringHendelseDto hendelser) {
         hendelser.hendelser().stream()
@@ -138,7 +138,7 @@ public class ForvaltningRestTjeneste {
         summary = ("Lagre tasks som skal migreres"),
         responses = {@ApiResponse(responseCode = "200", description = "Tasks")})
     @Path("/lagreTasks")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response lagreTasks(@TilpassetAbacAttributt(supplierClass = MigreringAbacSupplier.class)
                                    @NotNull @Parameter(name = "tasks") @Valid MigreringProsesstaskDto tasks) {
         tasks.tasks().stream()
@@ -152,7 +152,7 @@ public class ForvaltningRestTjeneste {
         summary = ("Sammenlign tasks som skal migreres"),
         responses = {@ApiResponse(responseCode = "200", description = "Hendelser")})
     @Path("/sammenlignTasks")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response sammenlignTasks(@TilpassetAbacAttributt(supplierClass = MigreringAbacSupplier.class)
                                         @NotNull @Parameter(name = "tasks") @Valid MigreringProsesstaskDto tasks) {
         var rmap = tasks.tasks().stream()
@@ -172,7 +172,7 @@ public class ForvaltningRestTjeneste {
         summary = ("Leser ut tasks som skal migreres"),
         responses = {@ApiResponse(responseCode = "200", description = "Tasks")})
     @Path("/lesTasks")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response lesTasks() {
         var vurderSortering = TaskType.forProsessTask(VurderSorteringTask.class);
         var tasks = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream()
