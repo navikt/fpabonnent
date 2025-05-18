@@ -1,10 +1,12 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
+import static java.time.temporal.TemporalAdjusters.next;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -22,6 +24,8 @@ import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 @ExtendWith(MockitoExtension.class)
 class ForsinkelseTjenesteTest {
 
+    private static final int NORMAL_FORSINKELSE_MINUTTER = 1;
+
     @Mock
     private HendelseRepository hendelseRepository;
     @Mock
@@ -36,108 +40,116 @@ class ForsinkelseTjenesteTest {
         mock = mock(DateUtil.class);
         when(mock.nå()).thenReturn(LocalDateTime.now());
         lenient().when(forsinkelseKonfig.skalForsinkeHendelser()).thenReturn(true);
-        lenient().when(forsinkelseKonfig.normalForsinkelseMinutter()).thenReturn(60);
+        lenient().when(forsinkelseKonfig.normalForsinkelseMinutter()).thenReturn(NORMAL_FORSINKELSE_MINUTTER);
         forsinkelseTjeneste = new ForsinkelseTjeneste(forsinkelseKonfig, hendelseRepository, mock);
     }
 
     private void settTid(LocalDateTime tid) {
-        when(mock.nå()).thenReturn(tid);
+        lenient().when(mock.nå()).thenReturn(tid);
     }
 
     @Test
     void skal_utlede_at_hendelsen_kan_prosesseres_10_30_gitt_at_klokka_er_09_30() {
         // Arrange
-        settTid(LocalDateTime.of(2020, 1, 6, 9, 30));
+        var tid = LocalDateTime.of(2020, 1, 6, 9, 30);
+        settTid(tid);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isEqualTo(LocalDateTime.of(2020, 1, 6, 10, 30));
+        assertThat(resultat).isEqualTo(tid.plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
     }
 
     @Test
     void skal_utlede_at_hendelsen_kan_prosesseres_etter_06_30_gitt_at_klokka_er_01_30() {
         // Arrange
-        settTid(LocalDateTime.of(2020, 1, 6, 1, 30));
+        var tid = LocalDateTime.of(2020, 1, 6, 1, 30);
+        settTid(tid);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 6, 6, 30), LocalDateTime.of(2020, 1, 6, 6, 59));
+        assertThat(resultat).isEqualTo(tid.plusHours(7).plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
     }
 
     @Test
     void skal_utlede_at_hendelsen_kan_prosesseres_torsdag_etter_06_30_gitt_at_klokka_er_23_45_på_onsdag() {
         // Arrange
-        settTid(LocalDateTime.of(2020, 1, 8, 23, 45));
+        var tid = LocalDateTime.of(2020, 1, 8, 23, 45);
+        settTid(tid);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 9, 6, 30), LocalDateTime.of(2020, 1, 9, 6, 59));
+        assertThat(resultat).isEqualTo(tid.plusDays(1).withHour(tid.getHour() - 14).plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
     }
 
     @Test
     void skal_utlede_at_hendelsen_kan_prosesseres_mandag_etter_06_30_gitt_at_det_er_lørdag() {
         // Arrange
-        settTid(LocalDateTime.of(2020, 1, 11, 2, 49));
+        var tid = LocalDateTime.of(2020, 1, 11, 2, 49);
+        settTid(tid);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30), LocalDateTime.of(2020, 1, 13, 6, 59));
+        assertThat(resultat).isEqualTo(tid.with(next(DayOfWeek.MONDAY)).plusHours(7).plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
     }
 
     @Test
     void skal_utlede_at_hendelsen_kan_prosesseres_mandag_etter_06_30_gitt_at_det_er_søndag() {
         // Arrange
-        settTid(LocalDateTime.of(2020, 1, 12, 1, 1));
+        var tid = LocalDateTime.of(2020, 1, 12, 1, 1);
+        settTid(tid);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2020, 1, 13, 6, 30), LocalDateTime.of(2020, 1, 13, 6, 59));
+        assertThat(resultat).isEqualTo(tid.with(next(DayOfWeek.MONDAY)).plusHours(7).plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
     }
 
     @Test
     void skal_utlede_at_hendelse_mottatt_torsdag_etter_stengetid_kan_prosesseres_mandag_etter_06_30_pga_17_mai_fredag() {
         // Arrange
-        settTid(LocalDateTime.of(2019, 5, 16, 23, 55));
+        var tid = LocalDateTime.of(2019, 5, 16, 23, 55);
+        settTid(tid);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2019, 5, 20, 6, 30), LocalDateTime.of(2019, 5, 20, 6, 59));
+        assertThat(resultat).isEqualTo(tid.with(next(DayOfWeek.MONDAY)).withHour(tid.getHour() - 14).plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
     }
 
     @Test
     void skal_utlede_at_hendelse_mottatt_mandag_17_mai_kan_prosesseres_tirsdag_etter_06_30() {
         // Arrange
-        settTid(LocalDateTime.of(2027, 5, 17, 13, 6));
+        var tid = LocalDateTime.of(2027, 5, 17, 13, 6);
+        settTid(tid);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2027, 5, 18, 6, 30), LocalDateTime.of(2027, 5, 18, 6, 59));
+        assertThat(resultat).isEqualTo(tid.plusDays(1).plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
     }
 
     @Test
     void skal_utlede_at_hendelse_mottatt_fredag_etter_stengetid_kan_prosesseres_onsdag_etter_06_30_pga_juledager_mandag_og_tirsdag() {
         // Arrange
-        settTid(LocalDateTime.of(2017, 12, 22, 23, 34));
+        var tid = LocalDateTime.of(2017, 12, 22, 23, 34);
+        settTid(tid);
 
         // Act
         var resultat = forsinkelseTjeneste.finnNesteTidspunktForVurderSortering(mock(InngåendeHendelse.class));
 
         // Assert
-        assertThat(resultat).isBetween(LocalDateTime.of(2017, 12, 27, 6, 30), LocalDateTime.of(2017, 12, 27, 6, 59));
+        assertThat(resultat).isEqualTo(tid.with(next(DayOfWeek.WEDNESDAY)).withHour(tid.getHour() - 14).plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
     }
 
     @Test
@@ -293,7 +305,7 @@ class ForsinkelseTjenesteTest {
         var resultat2 = forsinkelseTjeneste.finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(innsendingstidspunkt, hendelseB);
 
         // Assert
-        assertThat(resultat1).isEqualTo(innsendingstidspunkt.plusHours(1));
+        assertThat(resultat1).isEqualTo(innsendingstidspunkt.plusMinutes(NORMAL_FORSINKELSE_MINUTTER));
         assertThat(resultat2).isBetween(LocalDateTime.of(2023, 5, 2, 6, 30), LocalDateTime.of(2023, 5, 2, 6, 59));
     }
 

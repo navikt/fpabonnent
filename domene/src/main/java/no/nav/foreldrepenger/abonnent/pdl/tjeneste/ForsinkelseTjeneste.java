@@ -1,19 +1,18 @@
 package no.nav.foreldrepenger.abonnent.pdl.tjeneste;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.MonthDay;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
@@ -30,12 +29,15 @@ public class ForsinkelseTjeneste {
     private static final Logger LOGGER = LoggerFactory.getLogger(ForsinkelseTjeneste.class);
 
     // Velger et tidspunkt litt etter at Oppdrag har åpnet for business kl 06:00.
-    private static final LocalTime OPPDRAG_VÅKNER = LocalTime.of(6, 30);
+    private static final int DAGSTART = 7;
+    private static final int DAGSLUTT = 23;
+    private static final LocalTime OPPDRAG_VÅKNER = LocalTime.of(DAGSTART - 1, 30);
 
     private static final Set<DayOfWeek> HELGEDAGER = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 
-    private static final Set<MonthDay> FASTE_STENGT_DAGER = Set.of(MonthDay.of(1, 1), MonthDay.of(5, 1), MonthDay.of(5, 17), MonthDay.of(12, 25),
-        MonthDay.of(12, 26), MonthDay.of(12, 31));
+    private static final Set<MonthDay> FASTE_STENGT_DAGER = Set.of(MonthDay.of(Month.JANUARY, 1),
+        MonthDay.of(Month.MAY, 1), MonthDay.of(Month.MAY, 17),
+        MonthDay.of(Month.DECEMBER, 25), MonthDay.of(Month.DECEMBER, 26), MonthDay.of(Month.DECEMBER, 31));
 
     private ForsinkelseKonfig forsinkelseKonfig;
     private HendelseRepository hendelseRepository;
@@ -61,7 +63,7 @@ public class ForsinkelseTjeneste {
             return dateUtil.nå();
         }
         return sjekkOmHendelsenMåKjøreEtterTidligereHendelse(inngåendeHendelse)
-            .orElseGet(this::doFinnNesteTidspunktForVurderSortering);
+            .orElseGet(() -> finnNesteVurderingstid(dateUtil.nå().plusMinutes(forsinkelseKonfig.normalForsinkelseMinutter())));
     }
 
     public LocalDateTime finnNesteTidspunktForVurderSorteringEtterFørsteKjøring(LocalDateTime sistKjøringTid, InngåendeHendelse inngåendeHendelse) {
@@ -93,30 +95,19 @@ public class ForsinkelseTjeneste {
         }
     }
 
-    private LocalDateTime doFinnNesteTidspunktForVurderSortering() {
-        var tid = dateUtil.nå().plusMinutes(forsinkelseKonfig.normalForsinkelseMinutter());
-        if (tid.isBefore(tid.with(OPPDRAG_VÅKNER))) {
-            return finnNesteVurderingstid(tid);
-        } else if (tid.isAfter(tid.withHour(22).withMinute(58)) || erStengtDag(tid)) {
-            return finnNesteVurderingstid(tid.plusDays(1));
-        } else {
-            return tid;
-        }
-    }
-
     private LocalDateTime finnNesteVurderingstid(LocalDateTime utgangspunkt) {
-        if (!erStengtDag(utgangspunkt)) {
-            return getTidspunktMellom0630og0659(utgangspunkt.toLocalDate());
-        } else {
+        if (erStengtDag(utgangspunkt)) {
             return finnNesteVurderingstid(utgangspunkt.plusDays(1));
+        } else if (utgangspunkt.isBefore(utgangspunkt.with(OPPDRAG_VÅKNER))) {
+            return utgangspunkt.plusHours(DAGSTART);
+        } else if (utgangspunkt.isAfter(utgangspunkt.withHour(DAGSLUTT - 1).withMinute(45))) {
+            return finnNesteVurderingstid(utgangspunkt.plusDays(1).minusHours(2L * DAGSTART));
+        } else {
+            return utgangspunkt;
         }
     }
 
     private boolean erStengtDag(LocalDateTime tid) {
         return HELGEDAGER.contains(tid.getDayOfWeek()) || FASTE_STENGT_DAGER.contains(MonthDay.from(tid));
-    }
-
-    private LocalDateTime getTidspunktMellom0630og0659(LocalDate utgangspunkt) {
-        return LocalDateTime.of(utgangspunkt, OPPDRAG_VÅKNER.plusSeconds(dateUtil.nå().getNano() % 1739));
     }
 }
