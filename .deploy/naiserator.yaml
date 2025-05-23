@@ -52,6 +52,10 @@ spec:
       destinations:
         - id: "grafana-lgtm"
         - id: "elastic-apm"
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
   vault:
     enabled: true
     paths:
@@ -59,8 +63,6 @@ spec:
       mountPath: /var/run/secrets/nais.io/defaultDS
     - kvPath: {{oracleconfigkv}}
       mountPath: /var/run/secrets/nais.io/defaultDSconfig
-    - kvPath: {{serviceuserkv}}
-      mountPath: /var/run/secrets/nais.io/serviceuser/
   azure:
     application:
       enabled: true
