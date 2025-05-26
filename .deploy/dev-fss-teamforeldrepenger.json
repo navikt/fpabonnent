@@ -1,10 +1,7 @@
 {
-	"environment": "dev",
+	"kafkaPool": "nav-dev",
 	"oraclecredskv": "/oracle/data/dev/creds/fpabonnent_q1-fpabonnent_q1",
 	"oracleconfigkv": "/oracle/data/dev/config/fpabonnent_q1",
-	"ingresses": [
-		"https://fpabonnent.dev-fss-pub.nais.io"
-	],
 	"minReplicas": "1",
 	"maxReplicas": "2",
   "limits": {
@@ -12,10 +9,12 @@
     "mem": "2048Mi"
   },
   "requests": {
-    "cpu": "200m",
-    "mem": "512Mi"
+    "cpu": "100m",
+    "mem": "256Mi"
   },
-	"kafkaPool": "nav-dev",
+  "ingresses": [
+    "https://fpabonnent.dev-fss-pub.nais.io"
+  ],
 	"groups": [
 		"f1b82579-c5b5-4617-9673-8ace5ff67f63"
 	],
