@@ -4,6 +4,7 @@
     <appender name="stdoutConsoleLogger" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <charset>UTF-8</charset>
                 <maxLength>15000</maxLength>
                 <maxDepthPerThrowable>200</maxDepthPerThrowable>
                 <shortenedClassNameLength>70</shortenedClassNameLength>
