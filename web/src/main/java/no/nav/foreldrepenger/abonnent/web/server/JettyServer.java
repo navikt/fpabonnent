@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.abonnent.web.server;
 
 import static org.eclipse.jetty.ee11.webapp.MetaInfConfiguration.CONTAINER_JAR_PATTERN;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,34 +62,10 @@ public class JettyServer {
     }
 
     protected void bootStrap() throws Exception {
-        konfigurerSikkerhet();
         var dataSource = DatasourceUtil.createDatasource(30, 2);
         konfigurerDatasource(dataSource);
         migrerDatabase(dataSource);
         start();
-    }
-
-    private static void konfigurerSikkerhet() {
-        if (ENV.isLocal()) {
-            initTrustStore();
-        }
-    }
-
-    private static void initTrustStore() {
-        final String trustStorePathProp = "javax.net.ssl.trustStore";
-        final String trustStorePasswordProp = "javax.net.ssl.trustStorePassword";
-
-        var defaultLocation = ENV.getProperty("user.home", ".") + "/.modig/truststore.jks";
-        var storePath = ENV.getProperty(trustStorePathProp, defaultLocation);
-        var storeFile = new File(storePath);
-        if (!storeFile.exists()) {
-            throw new IllegalStateException(
-                "Finner ikke truststore i " + storePath + "\n\tKonfrigurer enten som System property '" + trustStorePathProp
-                    + "' eller environment variabel '" + trustStorePathProp.toUpperCase().replace('.', '_') + "'");
-        }
-        var password = ENV.getProperty(trustStorePasswordProp, "changeit");
-        System.setProperty(trustStorePathProp, storeFile.getAbsolutePath());
-        System.setProperty(trustStorePasswordProp, password);
     }
 
     private static void konfigurerDatasource(DataSource dataSource) throws NamingException {
