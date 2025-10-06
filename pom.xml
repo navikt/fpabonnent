@@ -4,7 +4,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.abonnent</groupId>
@@ -25,17 +25,17 @@
         <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>7.6.5</felles.version>
+        <felles.version>7.6.6</felles.version>
 
 
-        <prosesstask.version>5.2.0</prosesstask.version>
+        <prosesstask.version>5.2.1</prosesstask.version>
 
-        <fp-kontrakter.version>9.4.1</fp-kontrakter.version>
+        <fp-kontrakter.version>9.4.3</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <avro.version>1.12.0</avro.version>
 
-        <confluent.version>7.9.1</confluent.version>
+        <confluent.version>8.0.1</confluent.version>
     </properties>
 
     <dependencyManagement>
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>4.0.0</version>
+                <version>4.0.1</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
