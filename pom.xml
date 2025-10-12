@@ -25,7 +25,7 @@
         <sonar.projectName>fp-abonnent</sonar.projectName>
         <sonar.projectKey>navikt_fpabonnent</sonar.projectKey>
 
-        <felles.version>7.6.6</felles.version>
+        <felles.version>7.6.7</felles.version>
 
 
         <prosesstask.version>5.2.1</prosesstask.version>
@@ -35,7 +35,7 @@
         <!-- Eksterne -->
         <avro.version>1.12.0</avro.version>
 
-        <confluent.version>8.0.1</confluent.version>
+        <confluent.version>8.0.2</confluent.version>
     </properties>
 
     <dependencyManagement>
