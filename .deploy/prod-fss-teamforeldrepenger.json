@@ -1,7 +1,12 @@
 {
 	"kafkaPool": "nav-prod",
-	"oraclecredskv": "/oracle/data/prod/creds/fpabonnent_p-fpabonnent_p",
-	"oracleconfigkv": "/oracle/data/prod/config/fpabonnent_p",
+  "vault": {
+    "mountPath": "/var/run/secrets/nais.io",
+    "db": {
+      "secretsPath": "oracle/data/prod/creds/fpabonnent_p-fpabonnent_p",
+      "configPath": "oracle/data/prod/config/fpabonnent_p"
+    }
+  },
 	"minReplicas": "2",
 	"maxReplicas": "3",
   "limits": {
@@ -16,7 +21,10 @@
 		"https://fpabonnent.prod-fss-pub.nais.io"
 	],
 	"groups": [
-		"0d226374-4748-4367-a38a-062dcad70034"
+    {
+      "uuid": "0d226374-4748-4367-a38a-062dcad70034",
+      "kommentar": "drift"
+    }
 	],
 	"AZURE_IAC_RULES": [
 		{
