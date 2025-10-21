@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.abonnent.web.server;
 
+import static no.nav.foreldrepenger.abonnent.web.server.VaultUtil.lesFilVerdi;
+
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -20,9 +22,9 @@ class DatasourceUtil {
 
     static DataSource createDatasource(int maxPoolSize, int minIdle) {
         var config = new HikariConfig();
-        config.setJdbcUrl(ENV.getRequiredProperty("defaultDS.url"));
-        config.setUsername(ENV.getRequiredProperty("defaultDS.username"));
-        config.setPassword(ENV.getRequiredProperty("defaultDS.password"));
+        config.setJdbcUrl(ENV.getProperty("defaultDS.url", lesFilVerdi("defaultDSconfig", "jdbc_url")));
+        config.setUsername(ENV.getProperty("defaultDS.username", lesFilVerdi("defaultDS", "username")));
+        config.setPassword(ENV.getProperty("defaultDS.password", lesFilVerdi("defaultDS", "password")));
         config.setConnectionTimeout(TimeUnit.SECONDS.toMillis(2));
         config.setMinimumIdle(minIdle);
         config.setMaximumPoolSize(maxPoolSize);
