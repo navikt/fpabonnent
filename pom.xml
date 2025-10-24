@@ -30,7 +30,7 @@
 
         <prosesstask.version>5.2.1</prosesstask.version>
 
-        <fp-kontrakter.version>9.4.3</fp-kontrakter.version>
+        <fp-kontrakter.version>9.4.4</fp-kontrakter.version>
 
         <!-- Eksterne -->
         <avro.version>1.12.1</avro.version>
