@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class HendelseConsumerTest {
     private HendelserKlient consumer;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         consumer = new HendelserKlient(restKlient);
     }
 
@@ -48,7 +48,7 @@ class HendelseConsumerTest {
 
     @Test
     void skal_returnere_tom_liste() {
-        var resultat = consumer.grovsorterAktørIder(List.of());
+        var resultat = consumer.grovsorterAktørIder(Set.of());
         assertThat(resultat).isEmpty();
     }
 
@@ -56,7 +56,7 @@ class HendelseConsumerTest {
     void skal_videresende_aktørId_som_dto() {
         var captor = ArgumentCaptor.forClass(RestRequest.class);
 
-        var idList = List.of("1", "2", "3");
+        var idList = Set.of("1", "2", "3");
         var resp = new String[]{"1", "2", "3"};
 
         when(restKlient.send(captor.capture(), any())).thenReturn(resp);

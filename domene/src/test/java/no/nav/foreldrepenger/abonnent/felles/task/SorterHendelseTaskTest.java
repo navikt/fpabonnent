@@ -5,14 +5,14 @@ import static no.nav.foreldrepenger.abonnent.testutilities.HendelseTestDataUtil.
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,7 +82,7 @@ class SorterHendelseTaskTest {
     void skal_ikke_opprette_task_når_ingen_hendelser_kommer_inn() {
         // Arrange
         var dataWrapper = lagDefaultDataWrapper();
-        lenient().when(hendelser.grovsorterAktørIder(anyList())).thenReturn(List.of());
+        lenient().when(hendelser.grovsorterAktørIder(anySet())).thenReturn(Set.of());
 
         // Act
         sorterHendelseTask.doTask(dataWrapper.getProsessTaskData());
@@ -94,7 +94,7 @@ class SorterHendelseTaskTest {
     @Test
     void skal_ikke_opprette_SendHendelseTask_når_grovsortering_returnerer_tom_liste() {
         // Arrange
-        when(hendelser.grovsorterAktørIder(anyList())).thenReturn(List.of());
+        when(hendelser.grovsorterAktørIder(anySet())).thenReturn(Set.of());
 
         var hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
@@ -114,7 +114,7 @@ class SorterHendelseTaskTest {
     @Test
     void skal_opprette_SendHendelseTask() {
         // Arrange
-        List<String> eksisterendeAktørIder = List.of(FORELDER1, FORELDER2);
+        Set<String> eksisterendeAktørIder = Set.of(FORELDER1, FORELDER2);
 
         var hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
@@ -122,7 +122,7 @@ class SorterHendelseTaskTest {
         var dataWrapper = lagDefaultDataWrapper();
         dataWrapper.setHendelseId(hendelse.getHendelseId());
 
-        when(hendelser.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
+        when(hendelser.grovsorterAktørIder(anySet())).thenReturn(eksisterendeAktørIder);
         var argumentCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
 
         // Act
@@ -141,8 +141,8 @@ class SorterHendelseTaskTest {
     @Test
     void skal_ikke_opprette_SendHendelseTask_for_ikke_relevant_aktørid() {
         // Arrange
-        var eksisterendeAktørIder = List.of("12", "13");
-        when(hendelser.grovsorterAktørIder(anyList())).thenReturn(eksisterendeAktørIder);
+        var eksisterendeAktørIder = Set.of("12", "13");
+        when(hendelser.grovsorterAktørIder(anySet())).thenReturn(eksisterendeAktørIder);
 
         var hendelse = lagInngåendeHendelse();
         hendelseRepository.lagreFlushInngåendeHendelse(hendelse);

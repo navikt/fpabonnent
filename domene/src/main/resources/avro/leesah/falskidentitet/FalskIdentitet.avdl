@@ -1,0 +1,7 @@
+@namespace("no.nav.person.pdl.leesah.falskidentitet")
+protocol FalskIdentitetV1 {
+
+  record FalskIdentitet {
+    boolean erFalsk;
+  }
+}

@@ -3,14 +3,14 @@ package no.nav.foreldrepenger.abonnent.felles.task;
 import static no.nav.foreldrepenger.abonnent.felles.tjeneste.AktørIdTjeneste.getAktørIderForSortering;
 
 import java.util.Collections;
-import java.util.List;
-
-import jakarta.enterprise.context.Dependent;
-import jakarta.inject.Inject;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.fpsak.HendelserKlient;
@@ -54,9 +54,26 @@ public class SorterHendelseTask implements ProsessTaskHandler {
 
         var hendelsePayload = inngåendeHendelseTjeneste.hentUtPayloadFraInngåendeHendelse(inngåendeHendelse);
         var aktørIderForSortering = getAktørIderForSortering(hendelsePayload);
-        var filtrertAktørIdList = hendelser.grovsorterAktørIder(aktørIderForSortering);
 
-        if (!hendelseErRelevant(filtrertAktørIdList, hendelsePayload)) {
+
+        if (HendelseOpplysningType.PDL_FALSKIDENT_HENDELSE.equals(inngåendeHendelse.getHendelseType().getOpplysningType())) {
+            var filtrertAktørIdList = hendelser.grovsorterHistorisk(aktørIderForSortering);
+            var relevant = hendelseErRelevant(aktørIderForSortering, filtrertAktørIdList);
+            if (relevant) {
+                LOGGER.warn("Falsk-Identitet hendelse med hendelseId {} og type {} er relevant for FPSAK", hendelsePayload.getHendelseId(),
+                    hendelsePayload.getHendelseType());
+            } else {
+                LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK", hendelsePayload.getHendelseId(),
+                    hendelsePayload.getHendelseType());
+            }
+            // Logikk i FP-sak ikke klart for å sende inn ennå
+            inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(inngåendeHendelse);
+            inngåendeHendelseTjeneste.fjernPayloadTidligereHendelser(inngåendeHendelse);
+            return;
+        }
+
+        var filtrertAktørIdList = hendelser.grovsorterAktørIder(aktørIderForSortering);
+        if (!hendelseErRelevant(aktørIderForSortering, filtrertAktørIdList)) {
             LOGGER.info("Ikke-relevant hendelse med hendelseId {} og type {} blir ikke videresendt til FPSAK", hendelsePayload.getHendelseId(),
                 hendelsePayload.getHendelseType());
             inngåendeHendelseTjeneste.markerHendelseSomHåndtertOgFjernPayload(inngåendeHendelse);
@@ -82,8 +99,8 @@ public class SorterHendelseTask implements ProsessTaskHandler {
         prosessTaskTjeneste.lagre(nesteSteg.getProsessTaskData());
     }
 
-    private boolean hendelseErRelevant(List<String> aktørIdList, HendelsePayload hendelsePayload) {
-        return !Collections.disjoint(hendelsePayload.getAktørIderForSortering(), aktørIdList);
+    private boolean hendelseErRelevant(Set<String> aktørIdForSortering, Set<String> grovsortert) {
+        return !Collections.disjoint(aktørIdForSortering, grovsortert);
     }
 
 }

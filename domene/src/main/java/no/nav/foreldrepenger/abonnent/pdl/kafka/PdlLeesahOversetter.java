@@ -11,6 +11,7 @@ import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDød;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlDødfødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
+import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFalskIdentitet;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlPersonhendelse;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlUtflytting;
@@ -21,7 +22,7 @@ public class PdlLeesahOversetter {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdlLeesahOversetter.class);
 
-    public static final String FØDSEL = "FOEDSEL_V1";
+    public static final String FALSKID = "FALSK_ID_V1";
     public static final String FØDSELSDATO = "FOEDSELSDATO_V1";
     public static final String DØD = "DOEDSFALL_V1";
     public static final String DØDFØDSEL = "DOEDFOEDT_BARN_V1";
@@ -56,6 +57,15 @@ public class PdlLeesahOversetter {
         oversettPersonhendelse(personhendelse, builder);
         if (personhendelse.getUtflyttingFraNorge() != null) {
             builder.medUtflyttingsdato(personhendelse.getUtflyttingFraNorge().getUtflyttingsdato());
+        }
+        return builder.build();
+    }
+
+    public PdlFalskIdentitet oversettFalskIdentitet(Personhendelse personhendelse) {
+        var builder = PdlFalskIdentitet.builder();
+        oversettPersonhendelse(personhendelse, builder);
+        if (personhendelse.getFalskIdentitet() != null) {
+            builder.medErFalsk(personhendelse.getFalskIdentitet().getErFalsk());
         }
         return builder.build();
     }
@@ -128,6 +138,14 @@ public class PdlLeesahOversetter {
                         case ANNULLERT -> HendelseType.PDL_UTFLYTTING_ANNULLERT;
                         case KORRIGERT -> HendelseType.PDL_UTFLYTTING_KORRIGERT;
                         case OPPHOERT -> HendelseType.PDL_UTFLYTTING_OPPHØRT;
+                    };
+                }
+                case FALSKID -> {
+                    return switch (endringstype) {
+                        case OPPRETTET -> HendelseType.PDL_FALSKIDENT_OPPRETTET;
+                        case ANNULLERT -> HendelseType.PDL_FALSKIDENT_ANNULLERT;
+                        case KORRIGERT -> HendelseType.PDL_FALSKIDENT_KORRIGERT;
+                        case OPPHOERT -> HendelseType.PDL_FALSKIDENT_OPPHØRT;
                     };
                 }
                 default -> {
