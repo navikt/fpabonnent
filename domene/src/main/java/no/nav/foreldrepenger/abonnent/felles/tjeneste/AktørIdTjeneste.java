@@ -1,18 +1,16 @@
 package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelsePayload;
 import no.nav.foreldrepenger.kontrakter.abonnent.v2.AktørIdDto;
 
@@ -20,19 +18,19 @@ public class AktørIdTjeneste {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AktørIdTjeneste.class);
 
-    private static ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+    private static final ValidatorFactory VALIDATOR_FACTORY = Validation.buildDefaultValidatorFactory();
 
     private AktørIdTjeneste() {
     }
 
-    public static List<String> getAktørIderForSortering(HendelsePayload payload) {
-        List<String> aktørIderFraPayload = new ArrayList<>(payload.getAktørIderForSortering());
+    public static Set<String> getAktørIderForSortering(HendelsePayload payload) {
+        var aktørIderFraPayload = payload.getAktørIderForSortering();
         return filtrerBortUgyldigeAktørIder(aktørIderFraPayload);
     }
 
-    private static List<String> filtrerBortUgyldigeAktørIder(List<String> aktørIder) {
-        var validator = validatorFactory.getValidator();
-        return aktørIder.stream().filter(a -> erGyldig(a, validator)).toList();
+    private static Set<String> filtrerBortUgyldigeAktørIder(Set<String> aktørIder) {
+        var validator = VALIDATOR_FACTORY.getValidator();
+        return aktørIder.stream().filter(a -> erGyldig(a, validator)).collect(Collectors.toSet());
     }
 
     private static boolean erGyldig(String aktørId, Validator validator) {

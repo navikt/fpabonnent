@@ -6,6 +6,7 @@ import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseEndringType.O
 import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseEndringType.OPPRETTET;
 import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType.PDL_DØDFØDSEL_HENDELSE;
 import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType.PDL_DØD_HENDELSE;
+import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType.PDL_FALSKIDENT_HENDELSE;
 import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType.PDL_FØDSEL_HENDELSE;
 import static no.nav.foreldrepenger.abonnent.felles.domene.HendelseOpplysningType.PDL_UTFLYTTING_HENDELSE;
 
@@ -14,12 +15,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 public enum HendelseType implements Kodeverdi {
 
@@ -42,6 +43,11 @@ public enum HendelseType implements Kodeverdi {
     PDL_UTFLYTTING_KORRIGERT("PDL_UTFLYTTING_KORRIGERT", PDL_UTFLYTTING_HENDELSE, KORRIGERT),
     PDL_UTFLYTTING_ANNULLERT("PDL_UTFLYTTING_ANNULLERT", PDL_UTFLYTTING_HENDELSE, ANNULLERT),
     PDL_UTFLYTTING_OPPHØRT("PDL_UTFLYTTING_OPPHOERT", PDL_UTFLYTTING_HENDELSE, OPPHOERT),
+
+    PDL_FALSKIDENT_OPPRETTET("PDL_FALSKIDENT_OPPRETTET", PDL_FALSKIDENT_HENDELSE, OPPRETTET),
+    PDL_FALSKIDENT_KORRIGERT("PDL_FALSKIDENT_KORRIGERT", PDL_FALSKIDENT_HENDELSE, KORRIGERT),
+    PDL_FALSKIDENT_ANNULLERT("PDL_FALSKIDENT_ANNULLERT", PDL_FALSKIDENT_HENDELSE, ANNULLERT),
+    PDL_FALSKIDENT_OPPHØRT("PDL_FALSKIDENT_OPPHOERT", PDL_FALSKIDENT_HENDELSE, OPPHOERT),
     /**
      * Alle kodeverk må ha en verdi, det kan ikke være null i databasen. Denne koden gjør samme nytten.
      */

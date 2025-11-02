@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.abonnent.pdl.kafka;
 import static io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØD;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.DØDFØDSEL;
+import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FALSKID;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.FØDSELSDATO;
 import static no.nav.foreldrepenger.abonnent.pdl.kafka.PdlLeesahOversetter.UTFLYTTING;
 
@@ -99,6 +100,8 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
             håndterDødfødtBarn(payload);
         } else if (UTFLYTTING.contentEquals(payload.getOpplysningstype())) {
             håndterUtflytting(payload);
+        } else if (FALSKID.contentEquals(payload.getOpplysningstype())) {
+            håndterFalskIdentitet(payload);
         }
     }
 
@@ -144,6 +147,12 @@ public class PdlLeesahHendelseHåndterer implements KafkaMessageHandler<String, 
         }
         var pdlUtflytting = oversetter.oversettUtflytting(payload);
         prosesserHendelseVidereHvisRelevant(pdlUtflytting);
+    }
+
+    private void håndterFalskIdentitet(Personhendelse payload) {
+        loggMottakUtenDato(payload, "falskIdentitet");
+        var pdlFalskIdentitet = oversetter.oversettFalskIdentitet(payload);
+        prosesserHendelseVidereHvisRelevant(pdlFalskIdentitet);
     }
 
     private void loggMottakMedDato(Personhendelse payload, String hendelse, String datofelt, LocalDate dato) {
