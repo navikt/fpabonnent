@@ -5,19 +5,23 @@ registries:
     url: https://maven.pkg.github.com/navikt/fp-felles
     username: x-access-token
     password: ${{ secrets.READER_TOKEN }}
-    
+
 updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
   - package-ecosystem: maven
     directory: "/"
     registries:
       - maven-github
     schedule:
-      interval: daily
+      interval: weekly
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 20
     allow:
       - dependency-type: "all"
@@ -33,4 +37,4 @@ updates:
       interne-deps:
         patterns:
           - "no.nav.*"
-          
+
