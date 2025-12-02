@@ -35,6 +35,8 @@ import no.nav.foreldrepenger.abonnent.web.app.konfig.ApiConfig;
 import no.nav.foreldrepenger.abonnent.web.app.konfig.InternalApiConfig;
 import no.nav.foreldrepenger.konfig.Environment;
 
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
 public class JettyServer {
 
     private static final Environment ENV = Environment.current();
@@ -61,6 +63,7 @@ public class JettyServer {
     protected void bootStrap() throws Exception {
         var dataSource = DatasourceUtil.createDatasource(30, 2);
         konfigurerDatasource(dataSource);
+        konfigurerLogging();
         migrerDatabase(dataSource);
         start();
     }
@@ -82,6 +85,15 @@ public class JettyServer {
             LOG.error("Feil under migrering av databasen.");
             throw e;
         }
+    }
+
+    /**
+     * Vi bruker SLF4J + logback, Jersey brukes JUL for logging.
+     * Setter opp en bridge til å få Jersey til å logge gjennom Logback også.
+     */
+    private void konfigurerLogging() {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
     }
 
     private void start() throws Exception {
