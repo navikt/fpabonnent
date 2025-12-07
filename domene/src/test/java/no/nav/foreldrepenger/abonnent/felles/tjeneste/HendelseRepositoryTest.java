@@ -3,14 +3,15 @@ package no.nav.foreldrepenger.abonnent.felles.tjeneste;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Optional;
-
-import jakarta.persistence.EntityManager;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.abonnent.extensions.JpaExtension;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
@@ -100,5 +101,34 @@ class HendelseRepositoryTest {
         assertThat(hendelse.get().getHendelseKilde()).isEqualTo(HendelseKilde.PDL);
         assertThat(hendelse.get().getHåndtertStatus()).isEqualTo(HåndtertStatusType.GROVSORTERT);
         assertThat(hendelse.get().getPayload()).isEqualTo("payload1");
+
+        var hendelser = hendelseRepository.finnNesteHundreHendelser(0L);
+        assertThat(hendelser).hasSize(3);
+    }
+
+    @Test
+    void hend_serie_hendelser_fra_lager() {
+        // Arrange
+        for (int i = 1; i < 110; i++) {
+            var hendelse = HendelseTestDataUtil.lagInngåendeFødselsHendelse(UUID.randomUUID().toString(), HåndtertStatusType.MOTTATT);
+            hendelseRepository.lagreFlushInngåendeHendelse(hendelse);
+        }
+        var sisteHendelse = InngåendeHendelse.builder()
+            .hendelseId(UUID.randomUUID().toString())
+            .hendelseType(HendelseType.PDL_FØDSEL_OPPRETTET)
+            .payload("payload1")
+            .hendelseKilde(HendelseKilde.PDL)
+            .håndtertStatus(HåndtertStatusType.GROVSORTERT)
+            .håndteresEtterTidspunkt(LocalDateTime.now())
+            .build();
+        hendelseRepository.lagreFlushInngåendeHendelse(sisteHendelse);
+
+        var hendelser = hendelseRepository.finnNesteHundreHendelser(0L);
+        assertThat(hendelser).hasSize(100);
+        var maxHendelse = hendelser.stream().max(Comparator.comparing(h -> h)).orElseThrow();
+
+        var hendelser2 = hendelseRepository.finnNesteHundreHendelser(maxHendelse);
+        assertThat(hendelser2).hasSize(10);
+
     }
 }
