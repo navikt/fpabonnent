@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.hibernate.jpa.HibernateHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,5 +178,18 @@ public class HendelseRepository {
 
     public List<InngåendeHendelse> hentAlleInngåendeHendelser() {
         return entityManager.createQuery("from InngåendeHendelse", InngåendeHendelse.class).getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Long> finnNesteHundreHendelser(Long fraHendelseId) {
+        var query = entityManager.createNativeQuery("""
+               select * from (
+                   SELECT h.id FROM inngaaende_hendelse h WHERE h.id > :fraHendelseId ORDER BY h.id ASC
+               ) where ROWNUM <= 100
+            """, Long.class)
+            .setParameter("fraHendelseId", fraHendelseId)
+            .setMaxResults(100)
+            .setHint(HibernateHints.HINT_READ_ONLY, "true");
+        return query.getResultList();
     }
 }

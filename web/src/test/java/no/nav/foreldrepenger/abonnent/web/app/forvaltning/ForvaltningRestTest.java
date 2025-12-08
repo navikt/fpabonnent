@@ -1,14 +1,16 @@
 package no.nav.foreldrepenger.abonnent.web.app.forvaltning;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,31 +18,25 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import jakarta.ws.rs.core.Response;
+import no.nav.foreldrepenger.abonnent.felles.domene.HendelseKilde;
 import no.nav.foreldrepenger.abonnent.felles.domene.HendelseType;
 import no.nav.foreldrepenger.abonnent.felles.domene.HåndtertStatusType;
 import no.nav.foreldrepenger.abonnent.felles.domene.InngåendeHendelse;
-import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
-import no.nav.foreldrepenger.abonnent.felles.task.VurderSorteringTask;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlEndringstype;
 import no.nav.foreldrepenger.abonnent.pdl.domene.eksternt.PdlFødsel;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ExtendWith(MockitoExtension.class)
-public class ForvaltningRestTest {
+class ForvaltningRestTest {
 
-    private static final HendelseType HENDELSE_TYPE = HendelseType.PDL_FØDSEL_OPPRETTET;
     private static final LocalDate FØDSELSDATO = LocalDate.of(2023,7,4);
-    private static final String HENDELSE_ID = "1";
+    private static final String HENDELSE_ID = UUID.randomUUID().toString();
 
 
     @Mock
     private HendelseRepository hendelseRepository;
-    @Mock
-    private ProsessTaskTjeneste prosessTaskTjeneste;
 
 
     @Test
@@ -63,11 +59,16 @@ public class ForvaltningRestTest {
             .payload(DefaultJsonMapper.toJson(fødsel))
             .build();
         when(hendelseRepository.hentAlleInngåendeHendelser()).thenReturn(List.of(inngåendeHendelse));
+        when(hendelseRepository.finnHendelseFraIdHvisFinnes(eq(HENDELSE_ID), eq(HendelseKilde.PDL))).thenReturn(Optional.of(inngåendeHendelse));
 
-        var forvaltning = new ForvaltningRestTjeneste(prosessTaskTjeneste, hendelseRepository);
+        var forvaltning = new ForvaltningRestTjeneste(hendelseRepository);
         var dtos = (MigreringHendelseDto) (forvaltning.lesHendelser().getEntity());
         var serializedDtos = DefaultJsonMapper.toJson(dtos);
         var deserDtos = DefaultJsonMapper.fromJson(serializedDtos, MigreringHendelseDto.class);
+
+        var resp = forvaltning.sammenlignHendelser(deserDtos);
+        assertThat(resp.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+
         var deserInngående = forvaltning.lagreHendelser(deserDtos);
 
         var hendelseCaptor = ArgumentCaptor.forClass(InngåendeHendelse.class);
@@ -81,32 +82,5 @@ public class ForvaltningRestTest {
     }
 
 
-    @Test
-    void roundtrip_prosesstaskDto() {
-        // Arrange
-        var nesteKjøring = LocalDateTime.now().plusHours(1);
-        var data1 = ProsessTaskData.forProsessTask(VurderSorteringTask.class);
-        data1.setStatus(ProsessTaskStatus.KLAR);
-        data1.setProperty(HendelserDataWrapper.HENDELSE_ID, HENDELSE_ID);
-        data1.setProperty(HendelserDataWrapper.HENDELSE_TYPE, HENDELSE_TYPE.getKode());
-        data1.setNesteKjøringEtter(nesteKjøring);
-        data1.setSekvens("1");
-        when(prosessTaskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).thenReturn(List.of(data1));
-
-        var forvaltning = new ForvaltningRestTjeneste(prosessTaskTjeneste, hendelseRepository);
-        var dtos = (MigreringProsesstaskDto) (forvaltning.lesTasks().getEntity());
-        var serializedDtos = DefaultJsonMapper.toJson(dtos);
-        var deserDtos = DefaultJsonMapper.fromJson(serializedDtos, MigreringProsesstaskDto.class);
-        var deserInngående = forvaltning.lagreTasks(deserDtos);
-
-        var hendelseCaptor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(prosessTaskTjeneste, times(1)).lagre(hendelseCaptor.capture());
-
-        var lagretInn = hendelseCaptor.getValue();
-        assertThat(lagretInn.getNesteKjøringEtter()).isEqualTo(nesteKjøring);
-        assertThat(lagretInn.getPropertyValue(HendelserDataWrapper.HENDELSE_ID)).isEqualTo(HENDELSE_ID);
-        assertThat(lagretInn.getPropertyValue(HendelserDataWrapper.HENDELSE_TYPE)).isEqualTo(HENDELSE_TYPE.getKode());
-
-    }
 
 }
