@@ -148,6 +148,15 @@ public class HendelseRepository {
         return deletedRows;
     }
 
+    public int slettEnkeltHendelse(String hendelseId) {
+        int deletedRows = entityManager.createNativeQuery(
+                "DELETE FROM INNGAAENDE_HENDELSE WHERE hendelse_id = :hendelseId")
+            .setParameter("hendelseId", hendelseId)
+            .executeUpdate();
+        entityManager.flush();
+        return deletedRows;
+    }
+
     public int slettGamleHendelser() {
         // Kan justeres ned til mellom 0 dager og 60 dager - avhengig av behov for feilsøking.
         // 1/3 av endringer kommer samme dag, 2/3 innen 1 uke og 85-90% innen 30 dager
@@ -188,6 +197,21 @@ public class HendelseRepository {
                ) where ROWNUM <= 100
             """, Long.class)
             .setParameter("fraHendelseId", fraHendelseId)
+            .setMaxResults(100)
+            .setHint(HibernateHints.HINT_READ_ONLY, "true");
+        return query.getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Long> finnNesteHundreNyligeHendelser(Long fraHendelseId) {
+        var tidsfilter = LocalDateTime.now().minusWeeks(1);
+        var query = entityManager.createNativeQuery("""
+               select * from (
+                   SELECT h.id FROM inngaaende_hendelse h WHERE h.id > :fraHendelseId and coalesce(endret_tid,opprettet_tid) > :tid ORDER BY h.id ASC
+               ) where ROWNUM <= 100
+            """, Long.class)
+            .setParameter("fraHendelseId", fraHendelseId)
+            .setParameter("tid", tidsfilter)
             .setMaxResults(100)
             .setHint(HibernateHints.HINT_READ_ONLY, "true");
         return query.getResultList();
