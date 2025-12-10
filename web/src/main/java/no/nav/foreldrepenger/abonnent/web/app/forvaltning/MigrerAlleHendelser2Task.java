@@ -14,16 +14,16 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @Dependent
-@ProsessTask(value = "migrer.hendelse.alle", maxFailedRuns = 1)
-class MigrerAlleHendelserTask implements ProsessTaskHandler {
+@ProsessTask(value = "migrer.hendelse2.alle", maxFailedRuns = 1)
+class MigrerAlleHendelser2Task implements ProsessTaskHandler {
 
     private static final String FRA_HENDELSE_ID = "fraHendelseId";
     private final HendelseRepository hendelseRepository;
     private final ProsessTaskTjeneste prosessTaskTjeneste;
 
     @Inject
-    public MigrerAlleHendelserTask(HendelseRepository hendelseRepository,
-                                   ProsessTaskTjeneste prosessTaskTjeneste) {
+    public MigrerAlleHendelser2Task(HendelseRepository hendelseRepository,
+                                    ProsessTaskTjeneste prosessTaskTjeneste) {
         this.hendelseRepository = hendelseRepository;
         this.prosessTaskTjeneste = prosessTaskTjeneste;
     }
@@ -32,33 +32,31 @@ class MigrerAlleHendelserTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         var fraHendelseId = Optional.ofNullable(prosessTaskData.getPropertyValue(FRA_HENDELSE_ID))
             .map(Long::valueOf).orElse(0L);
-
-        var hendelser = hendelseRepository.finnNesteHundreHendelser(fraHendelseId);
-
+        var hendelser = hendelseRepository.finnNesteHundreNyligeHendelser(fraHendelseId);
         if (hendelser.isEmpty()) {
             return;
         }
         var gruppe = new ProsessTaskGruppe();
-        var tasks = hendelser.stream().map(MigrerAlleHendelserTask::opprettTaskForEnkeltSak).toList();
+        var tasks = hendelser.stream().map(MigrerAlleHendelser2Task::opprettTaskForEnkeltSak).toList();
         gruppe.addNesteParallell(tasks);
         prosessTaskTjeneste.lagre(gruppe);
 
         hendelser.stream().max(Comparator.naturalOrder())
-            .map(MigrerAlleHendelserTask::opprettTaskForNesteUtvalg)
+            .map(MigrerAlleHendelser2Task::opprettTaskForNesteUtvalg)
             .ifPresent(prosessTaskTjeneste::lagre);
 
     }
 
     public static ProsessTaskData opprettTaskForEnkeltSak(Long hendelseId) {
-        var prosessTaskData = ProsessTaskData.forProsessTask(MigrerEnkeltHendelseTask.class);
+        var prosessTaskData = ProsessTaskData.forProsessTask(MigrerEnkeltHendelse2Task.class);
         prosessTaskData.setProperty(MigrerEnkeltHendelseTask.HENDELSE_ID, String.valueOf(hendelseId));
         return prosessTaskData;
     }
 
 
     public static ProsessTaskData opprettTaskForNesteUtvalg(Long fraHendelseId) {
-        var prosessTaskData = ProsessTaskData.forProsessTask(MigrerAlleHendelserTask.class);
-        prosessTaskData.setProperty(MigrerAlleHendelserTask.FRA_HENDELSE_ID, String.valueOf(fraHendelseId));
+        var prosessTaskData = ProsessTaskData.forProsessTask(MigrerAlleHendelser2Task.class);
+        prosessTaskData.setProperty(MigrerAlleHendelser2Task.FRA_HENDELSE_ID, String.valueOf(fraHendelseId));
         prosessTaskData.setNesteKjøringEtter(LocalDateTime.now().plusSeconds(5));
         return prosessTaskData;
     }
