@@ -7,10 +7,12 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
+import no.nav.foreldrepenger.abonnent.felles.task.HendelserDataWrapper;
 import no.nav.foreldrepenger.abonnent.felles.tjeneste.HendelseRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @Dependent
 @ProsessTask(value = "migrer.hendelse.single", maxFailedRuns = 1)
@@ -20,12 +22,14 @@ class MigrerEnkeltHendelseTask implements ProsessTaskHandler {
 
     static final String HENDELSE_ID = "hendelseId";
     private final HendelseRepository hendelseRepository;
+    private final ProsessTaskTjeneste prosessTaskTjeneste;
     private final MigreringKlient klient;
 
 
     @Inject
-    public MigrerEnkeltHendelseTask(HendelseRepository hendelseRepository, MigreringKlient klient) {
+    public MigrerEnkeltHendelseTask(HendelseRepository hendelseRepository, ProsessTaskTjeneste prosessTaskTjeneste, MigreringKlient klient) {
         this.hendelseRepository = hendelseRepository;
+        this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.klient = klient;
     }
 
@@ -35,9 +39,14 @@ class MigrerEnkeltHendelseTask implements ProsessTaskHandler {
             .map(Long::valueOf)
             .map(hendelseRepository::finnEksaktHendelse)
             .orElseThrow();
-        var dto = MigreringMapper.tilHåndtertHendelseDto(hendelse);
+        var dto = MigreringMapper.tilHendelseDto(hendelse);
         LOG.info("Migrerer hendelse id {} av type {}", hendelse.getHendelseId(), hendelse.getHendelseType().name());
-        klient.sendHendelse(dto);
+        var lagret = klient.sendHendelse(dto);
+        if (!lagret) {
+            var sletteTask = ProsessTaskData.forProsessTask(SlettEnkeltHendelseTask.class);
+            sletteTask.setProperty(HendelserDataWrapper.HENDELSE_ID, hendelse.getHendelseId());
+            prosessTaskTjeneste.lagre(sletteTask);
+        }
     }
 
 }

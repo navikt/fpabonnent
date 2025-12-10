@@ -19,6 +19,7 @@ public class MigreringKlient {
     private final RestClient restKlient;
     private final RestConfig restConfig;
     private final URI migrer;
+    private final URI migrerFase2;
 
 
     public MigreringKlient() {
@@ -29,11 +30,19 @@ public class MigreringKlient {
         this.restKlient = restKlient;
         this.restConfig = RestConfig.forClient(this.getClass());
         this.migrer = UriBuilder.fromUri(restConfig.fpContextPath()).path(API_PATH).build();
+        this.migrerFase2 = UriBuilder.fromUri(restConfig.fpContextPath()).path(API_PATH + "-fase2").build();
     }
 
-    public void sendHendelse(MigreringHendelseDto.HendelseDto h) {
+    public boolean sendHendelse(MigreringHendelseDto.HendelseDto h) {
         var request = RestRequest.newPOSTJson(h, migrer, restConfig);
-        restKlient.sendReturnOptional(request, String.class);
+        var respons = restKlient.sendReturnOptional(request, String.class);
+        return !"false".equals(respons.orElse("true"));
+    }
+
+    public boolean sendHendelseFase2(MigreringHendelseDto.HendelseDto h) {
+        var request = RestRequest.newPOSTJson(h, migrerFase2, restConfig);
+        var respons = restKlient.sendReturnOptional(request, String.class);
+        return !"false".equals(respons.orElse("true"));
     }
 
 }
