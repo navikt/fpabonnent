@@ -13,14 +13,13 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
-import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
 
 class FødselTjenesteTest {
 
-    private static final PersonIdent BARN_FNR = new PersonIdent(new FiktiveFnr().nesteBarnFnr());
-    private static final PersonIdent MOR_FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
+    private static final PersonIdent BARN_FNR = PersonIdent.randomBarn();
+    private static final PersonIdent MOR_FNR = PersonIdent.randomMor();
     private static final AktørId MOR_AKTØR_ID = new AktørId("1111111111111");
-    private static final PersonIdent FAR_FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
+    private static final PersonIdent FAR_FNR = PersonIdent.randomFar();
     private static final AktørId FAR_AKTØR_ID = new AktørId("2222222222222");
 
     private FødselTjeneste fødselTjeneste = mock(FødselTjeneste.class);
