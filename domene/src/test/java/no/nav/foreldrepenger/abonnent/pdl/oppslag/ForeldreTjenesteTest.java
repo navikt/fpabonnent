@@ -13,16 +13,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
-import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
 import no.nav.pdl.ForelderBarnRelasjon;
 import no.nav.pdl.ForelderBarnRelasjonRolle;
 import no.nav.pdl.Person;
 import no.nav.vedtak.felles.integrasjon.person.Persondata;
 
 class ForeldreTjenesteTest {
-    private static final PersonIdent BARN_FNR = new PersonIdent(new FiktiveFnr().nesteBarnFnr());
-    private static final PersonIdent MOR_FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
-    private static final PersonIdent FAR_FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
+    private static final PersonIdent BARN_FNR = PersonIdent.randomBarn();
+    private static final PersonIdent MOR_FNR = PersonIdent.randomMor();
+    private static final PersonIdent FAR_FNR = PersonIdent.randomFar();
 
     private FødselTjeneste fødselTjeneste;
 

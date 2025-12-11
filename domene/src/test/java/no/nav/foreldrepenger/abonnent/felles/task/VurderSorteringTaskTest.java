@@ -41,7 +41,6 @@ import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseKonfig;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.ForsinkelseTjeneste;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.HendelseTjenesteHjelper;
 import no.nav.foreldrepenger.abonnent.pdl.tjeneste.PdlFødselHendelseTjeneste;
-import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
@@ -51,7 +50,7 @@ import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 @ExtendWith(JpaExtension.class)
 class VurderSorteringTaskTest {
 
-    private static final String FNR_BARN = new FiktiveFnr().nesteBarnFnr();
+    private static final String FNR_BARN = PersonIdent.randomBarn().getIdent();
     private static final String AKTØR_ID_BARN = "1111111111111";
     private static final String AKTØR_ID_MOR = "2222222222222";
     private static final String AKTØR_ID_FAR = "3333333333333";

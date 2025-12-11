@@ -13,14 +13,13 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.abonnent.pdl.domene.AktørId;
 import no.nav.foreldrepenger.abonnent.pdl.domene.PersonIdent;
-import no.nav.foreldrepenger.abonnent.testutilities.FiktiveFnr;
 import no.nav.pdl.IdentGruppe;
 import no.nav.pdl.IdentInformasjon;
 import no.nav.pdl.Identliste;
 import no.nav.vedtak.felles.integrasjon.person.Persondata;
 
 class AktørTjenesteTest {
-    private static final PersonIdent FNR = new PersonIdent(new FiktiveFnr().nesteKvinneFnr());
+    private static final PersonIdent FNR = PersonIdent.randomMor();
     private static final AktørId AKTØR_ID = AktørId.dummy();
 
     private AktørTjeneste aktørTjeneste;
